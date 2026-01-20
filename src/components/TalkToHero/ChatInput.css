@@ -1,0 +1,281 @@
+.chat-input-container {
+  background: white;
+  border-top: 1px solid rgba(229, 231, 235, 0.5);
+  padding: 1.25rem;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* 음성 입력 모드 (기본) */
+.voice-input-mode {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.main-mic-button {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 2rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-mic-button:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 28px rgba(59, 130, 246, 0.5);
+}
+
+.main-mic-button.listening {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+  animation: pulse-main-mic 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-main-mic {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow: 0 6px 30px rgba(239, 68, 68, 0.6);
+  }
+}
+
+.main-mic-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.mic-icon,
+.mic-icon-listening {
+  filter: brightness(0) invert(1);
+}
+
+.keyboard-toggle-btn,
+.mic-toggle-btn {
+  width: 44px;
+  height: 44px;
+  background: rgba(156, 163, 175, 0.1);
+  border: 1px solid rgba(156, 163, 175, 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.keyboard-toggle-btn:hover,
+.mic-toggle-btn:hover {
+  background: rgba(156, 163, 175, 0.2);
+  border-color: rgba(156, 163, 175, 0.5);
+}
+
+.voice-send-btn {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-send-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.voice-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 텍스트 입력 모드 */
+.chat-input-form {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.chat-input-textarea {
+  flex: 1;
+  min-height: 48px;
+  max-height: 120px;
+  padding: 0.875rem 1rem;
+  border: 2px solid rgba(229, 231, 235, 0.5);
+  border-radius: 16px;
+  font-size: 0.9375rem;
+  font-family: inherit;
+  resize: none;
+  transition: all 0.2s ease;
+  line-height: 1.5;
+}
+
+.chat-input-textarea:focus {
+  outline: none;
+  border-color: #9ca3af;
+  box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.1);
+}
+
+.chat-input-textarea:disabled {
+  background: #f9fafb;
+  cursor: not-allowed;
+}
+
+.chat-input-textarea::placeholder {
+  color: #9ca3af;
+}
+
+.send-button {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.send-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.send-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.send-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* STT 상태 표시 */
+.stt-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 12px;
+}
+
+.stt-pulse {
+  width: 10px;
+  height: 10px;
+  background: #ef4444;
+  border-radius: 50%;
+  animation: stt-blink 1s ease-in-out infinite;
+}
+
+@keyframes stt-blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.stt-text {
+  font-size: 0.9375rem;
+  color: #dc2626;
+  font-weight: 500;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* TTS 상태 표시 */
+.tts-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem 1rem;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  border-radius: 8px;
+}
+
+.tts-icon {
+  font-size: 1rem;
+  animation: tts-pulse 1s ease-in-out infinite;
+}
+
+@keyframes tts-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.tts-text {
+  font-size: 0.8125rem;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .chat-input-container {
+    padding: 1rem;
+  }
+
+  .main-mic-button {
+    width: 64px;
+    height: 64px;
+    font-size: 1.75rem;
+  }
+
+  .keyboard-toggle-btn,
+  .mic-toggle-btn,
+  .voice-send-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.125rem;
+  }
+
+  .chat-input-textarea {
+    font-size: 0.875rem;
+    padding: 0.75rem 0.875rem;
+  }
+
+  .send-button {
+    width: 44px;
+    height: 44px;
+    font-size: 1.125rem;
+  }
+
+  .stt-status {
+    margin-top: 0.75rem;
+  }
+
+  .stt-text {
+    font-size: 0.875rem;
+    max-width: 200px;
+  }
+}

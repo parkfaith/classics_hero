@@ -1,0 +1,66 @@
+{
+  "heroes": [
+    {
+      "id": "benjamin_franklin",
+      "name": "Benjamin Franklin",
+      "book_ids": [148, 20203],
+      "books": [
+        {
+          "id": 148,
+          "title": "The Autobiography of Benjamin Franklin",
+          "genre": "Biography",
+          "difficulty": "easy"
+        },
+        {
+          "id": 20203,
+          "title": "Poor Richard's Almanack",
+          "genre": "Biography",
+          "difficulty": "easy"
+        }
+      ]
+    },
+    {
+      "id": "abraham_lincoln",
+      "name": "Abraham Lincoln",
+      "book_ids": [3253, 14721],
+      "books": [
+        {
+          "id": 3253,
+          "title": "The Papers and Writings of Abraham Lincoln",
+          "genre": "Political",
+          "difficulty": "medium"
+        },
+        {
+          "id": 14721,
+          "title": "Speeches & Letters of Abraham Lincoln",
+          "genre": "Political",
+          "difficulty": "medium"
+        }
+      ]
+    },
+    {
+      "id": "marie_curie",
+      "name": "Marie Curie",
+      "book_ids": [60564, 61622],
+      "books": [
+        {
+          "id": 60564,
+          "title": "Radio-Active Substances",
+          "genre": "Science",
+          "difficulty": "hard"
+        },
+        {
+          "id": 61622,
+          "title": "The Discovery of Radium",
+          "genre": "Science",
+          "difficulty": "medium"
+        }
+      ]
+    }
+  ],
+  "cover_colors": {
+    "Biography": ["#87CEEB", "#FFB6C1", "#98FB98"],
+    "Political": ["#FFD700", "#FFA07A", "#DDA0DD"],
+    "Science": ["#4682B4", "#20B2AA", "#2F4F4F"]
+  }
+}
