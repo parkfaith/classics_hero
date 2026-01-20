@@ -132,11 +132,31 @@
   background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.1) 100%);
 }
 
-.book-card-icon {
-  width: 64px;
-  height: 64px;
+/* 기본 책 표지 스타일 */
+.default-book-cover {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   position: relative;
   z-index: 1;
+}
+
+.book-initial {
+  font-size: 3rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  font-family: 'Georgia', serif;
+}
+
+.book-card-icon {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  z-index: 1;
+  opacity: 0.7;
 }
 
 .book-card-image {

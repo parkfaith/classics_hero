@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import './BookCard.css';
 
-// 기본 책 아이콘 컴포넌트
-const DefaultBookIcon = () => (
-  <svg viewBox="0 0 24 24" fill="white" className="book-card-icon">
-    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-  </svg>
+// 기본 책 표지 컴포넌트 (제목 첫 글자 + 아이콘)
+const DefaultBookCover = ({ title }) => (
+  <div className="default-book-cover">
+    <span className="book-initial">{title?.charAt(0) || 'B'}</span>
+    <svg viewBox="0 0 24 24" fill="none" className="book-card-icon">
+      <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  </div>
 );
 
 const BookCard = ({ book, onSelect, learningStats }) => {
@@ -29,7 +32,7 @@ const BookCard = ({ book, onSelect, learningStats }) => {
             onError={handleImageError}
           />
         ) : (
-          <DefaultBookIcon />
+          <DefaultBookCover title={book.title} />
         )}
         {isFullyCompleted && (
           <div className="completed-badge">
