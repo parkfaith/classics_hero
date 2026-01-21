@@ -149,12 +149,15 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking }) => {
         </form>
       )}
 
-      {/* STT 상태 표시 */}
+      {/* STT 상태 표시 - 말한 내용 전체 표시 */}
       {isListening && (
         <div className="stt-status">
-          <span className="stt-pulse"></span>
-          <span className="stt-text">
-            {message ? message : '영어로 말해보세요...'}
+          <div className="stt-indicator">
+            <span className="stt-pulse"></span>
+            <span className="stt-label">듣는 중</span>
+          </div>
+          <span className={`stt-text ${!message ? 'stt-placeholder' : ''}`}>
+            {message || '영어로 말해보세요...'}
           </span>
         </div>
       )}

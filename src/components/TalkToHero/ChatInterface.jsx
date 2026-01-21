@@ -95,35 +95,40 @@ const ChatInterface = ({ hero, onBack }) => {
           )}
 
           <div className="hero-intro-card">
-            {hero.portraitImage ? (
-              <img
-                src={hero.portraitImage}
-                alt={hero.name}
-                className="intro-portrait"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'block';
-                }}
-              />
-            ) : null}
-            <div className="intro-avatar" style={hero.portraitImage ? { display: 'none' } : {}}>{hero.avatar}</div>
-            <h3 className="intro-name">{hero.nameKo}</h3>
-            <p className="intro-period">{hero.period}</p>
-            <p className="intro-summary">{hero.profile.summaryKo}</p>
-
-            <div className="intro-topics">
-              <p className="intro-topics-label">💬 추천 대화 주제:</p>
-              <div className="intro-topics-list">
-                {hero.recommendedTopics.map((topic, index) => (
-                  <button
-                    key={index}
-                    className="intro-topic-btn"
-                    onClick={() => sendMessage(topic.questions[0])}
-                    disabled={isLoading}
-                  >
-                    {topic.titleKo}
-                  </button>
-                ))}
+            <div className="intro-left">
+              {hero.portraitImage ? (
+                <img
+                  src={hero.portraitImage}
+                  alt={hero.name}
+                  className="intro-portrait"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'flex';
+                  }}
+                />
+              ) : null}
+              <div className="intro-avatar" style={hero.portraitImage ? { display: 'none' } : {}}>{hero.avatar}</div>
+            </div>
+            <div className="intro-right">
+              <div className="intro-header">
+                <h3 className="intro-name">{hero.nameKo}</h3>
+                <span className="intro-period">{hero.period}</span>
+              </div>
+              <p className="intro-summary">{hero.profile.summaryKo}</p>
+              <div className="intro-topics">
+                <p className="intro-topics-label">💬 추천 대화 주제:</p>
+                <div className="intro-topics-list">
+                  {hero.recommendedTopics.map((topic, index) => (
+                    <button
+                      key={index}
+                      className="intro-topic-btn"
+                      onClick={() => sendMessage(topic.questions[0])}
+                      disabled={isLoading}
+                    >
+                      {topic.titleKo}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

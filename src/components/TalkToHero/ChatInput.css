@@ -178,20 +178,26 @@
 /* STT 상태 표시 */
 .stt-status {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
   gap: 0.75rem;
   margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 1rem;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0.04) 100%);
+  border: 1px solid rgba(59, 130, 246, 0.2);
   border-radius: 12px;
 }
 
+.stt-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 .stt-pulse {
-  width: 10px;
-  height: 10px;
-  background: #ef4444;
+  width: 8px;
+  height: 8px;
+  background: #3b82f6;
   border-radius: 50%;
   animation: stt-blink 1s ease-in-out infinite;
 }
@@ -201,14 +207,24 @@
   50% { opacity: 0.5; transform: scale(0.8); }
 }
 
+.stt-label {
+  font-size: 0.75rem;
+  color: #3b82f6;
+  font-weight: 600;
+}
+
 .stt-text {
-  font-size: 0.9375rem;
-  color: #dc2626;
+  flex: 1;
+  font-size: 1rem;
+  color: #1f2937;
   font-weight: 500;
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.stt-placeholder {
+  color: #9ca3af;
+  font-style: italic;
 }
 
 /* TTS 상태 표시 */
@@ -272,10 +288,14 @@
 
   .stt-status {
     margin-top: 0.75rem;
+    padding: 0.875rem;
+  }
+
+  .stt-label {
+    font-size: 0.6875rem;
   }
 
   .stt-text {
-    font-size: 0.875rem;
-    max-width: 200px;
+    font-size: 0.9375rem;
   }
 }

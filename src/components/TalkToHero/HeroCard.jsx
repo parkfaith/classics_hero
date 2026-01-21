@@ -3,9 +3,9 @@ import './HeroCard.css';
 const HeroCard = ({ hero, onSelect }) => {
   const getDifficultyBadge = (difficulty) => {
     const badges = {
-      easy: { label: 'Easy', emoji: '⭐', color: '#10b981' },
-      medium: { label: 'Medium', emoji: '⭐⭐', color: '#f59e0b' },
-      hard: { label: 'Hard', emoji: '⭐⭐⭐', color: '#ef4444' }
+      easy: { label: 'Easy', color: '#10b981' },
+      medium: { label: 'Medium', color: '#f59e0b' },
+      hard: { label: 'Hard', color: '#ef4444' }
     };
     return badges[difficulty] || badges.easy;
   };
@@ -14,7 +14,7 @@ const HeroCard = ({ hero, onSelect }) => {
 
   return (
     <div className="hero-card" onClick={() => onSelect(hero)}>
-      <div className="hero-card-avatar">
+      <div className="hero-card-left">
         {hero.portraitImage ? (
           <img
             src={hero.portraitImage}
@@ -22,7 +22,7 @@ const HeroCard = ({ hero, onSelect }) => {
             className="hero-avatar-image"
             onError={(e) => {
               e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'inline-block';
+              e.target.nextSibling.style.display = 'flex';
             }}
           />
         ) : null}
@@ -32,38 +32,30 @@ const HeroCard = ({ hero, onSelect }) => {
         >
           {hero.avatar}
         </span>
+        <span
+          className="difficulty-badge"
+          style={{ backgroundColor: difficulty.color }}
+        >
+          {difficulty.label}
+        </span>
       </div>
 
-      <div className="hero-card-content">
-        <h3 className="hero-name">{hero.name}</h3>
-        <p className="hero-name-ko">{hero.nameKo}</p>
-
-        <div className="hero-meta">
+      <div className="hero-card-right">
+        <div className="hero-card-header">
+          <h3 className="hero-name">{hero.nameKo}</h3>
           <span className="hero-period">{hero.period}</span>
-          <span className="hero-separator">·</span>
-          <span className="hero-nationality">{hero.nationalityKo}</span>
         </div>
+
+        <p className="hero-summary">{hero.profile?.summaryKo || ''}</p>
 
         <div className="hero-topics">
-          <p className="topics-label">💬 대화 주제:</p>
-          <ul className="topics-list">
-            {hero.recommendedTopics.slice(0, 2).map((topic, index) => (
-              <li key={index}>{topic.titleKo}</li>
-            ))}
-          </ul>
+          {hero.recommendedTopics.slice(0, 2).map((topic, index) => (
+            <span key={index} className="topic-tag">{topic.titleKo}</span>
+          ))}
         </div>
 
-        <div className="hero-difficulty">
-          <span className="difficulty-emoji">{difficulty.emoji}</span>
-          <span className="difficulty-label" style={{ color: difficulty.color }}>
-            {difficulty.label}
-          </span>
-        </div>
-      </div>
-
-      <div className="hero-card-footer">
-        <button className="start-conversation-btn">
-          대화 시작하기 →
+        <button className="start-btn">
+          대화하기 →
         </button>
       </div>
     </div>

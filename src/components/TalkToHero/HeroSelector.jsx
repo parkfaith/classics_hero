@@ -44,23 +44,14 @@ const HeroSelector = ({ onHeroSelect }) => {
   return (
     <div className="hero-selector">
       <header className="hero-selector-header">
-        <div className="hero-selector-title">
-          <h1>Talk to the Hero</h1>
-          <p className="hero-selector-subtitle">
-            역사 속 위대한 영웅들과 영어로 대화하며 배워보세요
-          </p>
-        </div>
+        <h1>Talk to Hero</h1>
+        <p>역사 속 위인과 영어로 대화해보세요</p>
       </header>
 
-      <div className="hero-grid">
+      <div className="hero-list">
         {heroes.map((hero) => (
           <HeroCard key={hero.id} hero={hero} onSelect={onHeroSelect} />
         ))}
-      </div>
-
-      <div className="hero-selector-tip">
-        <span className="tip-icon">💡</span>
-        <p>난이도별로 영웅을 선택해보세요. Easy는 기본적인 대화, Medium은 중급 수준의 대화, Advanced는 고급 주제를 다룹니다.</p>
       </div>
     </div>
   );

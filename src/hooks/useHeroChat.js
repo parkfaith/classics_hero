@@ -5,6 +5,17 @@ export const useHeroChat = (hero) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // 시스템 프롬프트 보강 - 짧은 답변, 스몰토크 허용
+  const enhancedSystemPrompt = `${hero.conversationStyle.systemPrompt}
+
+IMPORTANT GUIDELINES:
+- Keep responses SHORT and CONCISE (2-3 sentences max, under 50 words)
+- Be conversational and friendly, allowing small talk
+- If the user greets you casually or makes small talk, respond naturally and warmly
+- Ask follow-up questions to encourage dialogue
+- Use simple, clear English appropriate for language learners
+- Stay in character but be approachable`;
+
   // 초기 인사 메시지 생성
   const initializeChat = useCallback(async () => {
     const apiKey = localStorage.getItem('openai_api_key');
@@ -29,15 +40,15 @@ export const useHeroChat = (hero) => {
           messages: [
             {
               role: 'system',
-              content: hero.conversationStyle.systemPrompt
+              content: enhancedSystemPrompt
             },
             {
               role: 'user',
-              content: 'Please greet me and introduce yourself briefly.'
+              content: 'Please greet me warmly in 1-2 short sentences.'
             }
           ],
           temperature: 0.8,
-          max_tokens: 200
+          max_tokens: 80
         })
       });
 
@@ -96,13 +107,14 @@ export const useHeroChat = (hero) => {
     setError(null);
 
     try {
-      // 대화 히스토리 준비
+      // 대화 히스토리 준비 (최근 6개 메시지만 유지)
+      const recentMessages = messages.slice(-6);
       const conversationMessages = [
         {
           role: 'system',
-          content: hero.conversationStyle.systemPrompt
+          content: enhancedSystemPrompt
         },
-        ...messages.map(msg => ({
+        ...recentMessages.map(msg => ({
           role: msg.role === 'hero' ? 'assistant' : 'user',
           content: msg.content
         })),
@@ -121,8 +133,8 @@ export const useHeroChat = (hero) => {
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
           messages: conversationMessages,
-          temperature: 0.8,
-          max_tokens: 300
+          temperature: 0.85,
+          max_tokens: 100
         })
       });
 
