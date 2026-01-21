@@ -677,6 +677,78 @@
   font-size: 1rem;
 }
 
+/* 챕터 목록 섹션 */
+.chapters-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.chapters-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e3a8a;
+}
+
+.chapter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chapter-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 500;
+  color: #4b5563;
+  transition: all 0.2s ease;
+}
+
+.chapter-item:hover {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #1e3a8a;
+  transform: translateX(4px);
+}
+
+.chapter-item.current {
+  border-color: #3b82f6;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  color: #1e3a8a;
+  font-weight: 600;
+}
+
+.chapter-item.completed {
+  border-color: #10b981;
+}
+
+.chapter-item.completed .chapter-status {
+  color: #10b981;
+}
+
+.chapter-status {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+  color: #d1d5db;
+}
+
+.chapter-name {
+  flex: 1;
+}
+
+/* 북마크 섹션 */
 .bookmarks-section {
   background: white;
   padding: 2rem;
@@ -698,6 +770,9 @@
 }
 
 .bookmark-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   padding: 0.875rem 1.25rem;
   background: white;
   border: 2px solid #e5e7eb;
@@ -714,6 +789,15 @@
   background: #fffbeb;
   color: #1e3a8a;
   transform: translateX(4px);
+}
+
+.bookmark-item.completed {
+  border-color: #10b981;
+}
+
+.bookmark-check {
+  color: #10b981;
+  font-weight: 700;
 }
 
 /* 반응형 */

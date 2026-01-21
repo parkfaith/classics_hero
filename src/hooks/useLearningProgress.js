@@ -23,6 +23,7 @@ export const useLearningProgress = () => {
     return allProgress[bookId] || {
       chapters: {},
       lastAccessedAt: null,
+      lastChapterIndex: 0,
       readingCompleted: false,
       speakingCompleted: false,
     };

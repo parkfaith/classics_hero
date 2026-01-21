@@ -94,6 +94,14 @@
   line-height: 1;
 }
 
+.report-hero-portrait {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #e5e7eb;
+}
+
 .report-hero-info {
   flex: 1;
 }
@@ -109,6 +117,31 @@
   margin: 0;
   font-size: 0.9375rem;
   color: #6b7280;
+}
+
+.report-score-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.report-score-circle .score-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: white;
+  -webkit-text-fill-color: white;
+  background: none;
+}
+
+.report-score-circle .score-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 /* 통계 섹션 */
@@ -160,29 +193,102 @@
   font-weight: 500;
 }
 
-/* 인사이트 섹션 */
-.report-insights {
+/* 사용한 표현 섹션 */
+.report-expressions {
   margin-bottom: 2rem;
 }
 
-.insight-placeholder {
-  padding: 2rem;
-  background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%);
-  border: 1px dashed #d97706;
-  border-radius: 12px;
-  text-align: center;
+.expressions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.insight-placeholder p {
-  margin: 0;
-  color: #92400e;
+.expression-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border-radius: 8px;
+  border: 1px solid #bfdbfe;
+}
+
+.expression-label {
   font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1e40af;
 }
 
-.insight-coming-soon {
-  margin-top: 0.5rem !important;
+.expression-count {
+  font-size: 0.8125rem;
   font-weight: 700;
-  color: #d97706 !important;
+  color: #3b82f6;
+  background: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* 어휘 섹션 */
+.report-vocabulary {
+  margin-bottom: 2rem;
+}
+
+.vocabulary-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+.vocabulary-item {
+  display: flex;
+  flex-direction: column;
+  padding: 0.875rem;
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-radius: 10px;
+  border: 1px solid #bbf7d0;
+}
+
+.vocab-word {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #166534;
+  margin-bottom: 0.25rem;
+}
+
+.vocab-meaning {
+  font-size: 0.8125rem;
+  color: #15803d;
+}
+
+/* 피드백 섹션 */
+.report-feedback {
+  margin-bottom: 2rem;
+}
+
+.feedback-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feedback-item {
+  position: relative;
+  padding: 0.75rem 0.75rem 0.75rem 2rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  color: #92400e;
+  font-weight: 500;
+}
+
+.feedback-item::before {
+  content: '→';
+  position: absolute;
+  left: 0.75rem;
+  color: #d97706;
+  font-weight: 700;
 }
 
 /* 푸터 */

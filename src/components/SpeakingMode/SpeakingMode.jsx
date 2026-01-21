@@ -34,25 +34,38 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
   // 발음 연습 기록 관리
   const currentChapter = book.chapters[currentChapterIndex];
   const pronunciationHistory = usePronunciationHistory(book.id, currentChapter.id);
-  const { markChapterCompleted, isChapterCompleted } = useLearningProgress();
+  const { markChapterCompleted } = useLearningProgress();
 
-  // 초기 완료 상태 로드 (localStorage에서 직접 읽기)
-  useEffect(() => {
+  // 완료 상태 로드 함수
+  const loadCompletedChapters = useCallback(() => {
     const saved = localStorage.getItem('learning-progress');
     if (saved) {
       const allProgress = JSON.parse(saved);
       const bookProgress = allProgress[book.id];
       if (bookProgress && bookProgress.chapters) {
-        const initialCompleted = {};
+        const loadedCompleted = {};
         book.chapters.forEach(chapter => {
           const chapterProgress = bookProgress.chapters[chapter.id];
-          initialCompleted[chapter.id] = chapterProgress?.speakingCompleted || false;
+          loadedCompleted[chapter.id] = chapterProgress?.speakingCompleted || false;
         });
-        setCompletedChapters(initialCompleted);
+        return loadedCompleted;
       }
     }
+    // 저장된 데이터가 없으면 모두 false로 초기화
+    const emptyCompleted = {};
+    book.chapters.forEach(chapter => {
+      emptyCompleted[chapter.id] = false;
+    });
+    return emptyCompleted;
   }, [book.id, book.chapters]);
 
+  // 초기 완료 상태 로드
+  useEffect(() => {
+    const loaded = loadCompletedChapters();
+    setCompletedChapters(loaded);
+  }, [loadCompletedChapters]);
+
+  // 로컬 상태에서 현재 챕터 완료 여부 확인 (동기적으로 업데이트됨)
   const chapterCompleted = completedChapters[currentChapter.id] || false;
 
   const handleMarkCompleted = () => {
@@ -620,25 +633,9 @@ Format your response as JSON:
     <div className="speaking-mode">
       <div className="speaking-header">
         <div className="speaking-header-inner">
-          <div className="book-info">
-            <h1>{book.title}</h1>
-            <div className="chapter-header">
-              <p className="chapter-info">{currentChapter.title}</p>
-              {chapterCompleted ? (
-                <span className="chapter-completed-badge">✓ 말하기 완료</span>
-              ) : (
-                <button
-                  className="mark-completed-btn"
-                  onClick={handleMarkCompleted}
-                  title="이 챕터의 말하기 학습을 완료로 표시합니다"
-                >
-                  🎤 말하기 완료
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="mode-controls">
+          {/* 상단: 책 제목 + 읽기 모드 버튼 */}
+          <div className="header-top-row">
+            <h1 className="book-title">{book.title}</h1>
             <button
               className="mode-switch-button reading"
               onClick={onSwitchToReading}
@@ -650,34 +647,54 @@ Format your response as JSON:
               <span>읽기</span>
             </button>
           </div>
+
+          {/* 하단: 챕터 선택 + 속도 + 완료 버튼 */}
+          <div className="header-controls-row">
+            <div className="chapter-selector-compact">
+              <select
+                value={currentChapterIndex}
+                onChange={(e) => setCurrentChapterIndex(parseInt(e.target.value))}
+              >
+                {book.chapters.map((chapter, index) => {
+                  const isSpeaking = completedChapters[chapter.id] || false;
+                  const statusIcon = isSpeaking ? '🎤 ' : '';
+                  return (
+                    <option key={chapter.id} value={index}>
+                      {statusIcon}{chapter.title}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div className="speed-control-compact">
+              <span className="speed-label">🔊 {playbackSpeed.toFixed(1)}x</span>
+              <input
+                type="range"
+                min="0.5"
+                max="1.5"
+                step="0.1"
+                value={playbackSpeed}
+                onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
+              />
+            </div>
+
+            {chapterCompleted ? (
+              <span className="chapter-completed-badge">✓ 완료</span>
+            ) : (
+              <button
+                className="mark-completed-btn"
+                onClick={handleMarkCompleted}
+                title="이 챕터의 말하기 학습을 완료로 표시합니다"
+              >
+                🎤 완료
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
       <div className="speaking-content">
-        {/* 진행 상황 바 */}
-        <div className="progress-bar-container">
-          <div className="progress-info">
-            <span>연습 진행률: {statistics.completedCount}/{sentences.length} 문장</span>
-            {statistics.completedCount > 0 && (
-              <span className="avg-score">평균 {statistics.averageAccuracy}점</span>
-            )}
-          </div>
-          <div className="progress-bar">
-            <div
-              className="progress-fill"
-              style={{ width: `${statistics.completionRate}%` }}
-            />
-          </div>
-          {statistics.completedCount > 0 && (
-            <button
-              className="summary-btn"
-              onClick={() => setShowSummary(true)}
-            >
-              📊 전체 결과 보기
-            </button>
-          )}
-        </div>
-
         <div className="sentence-navigation">
           <button
             onClick={handlePrevSentence}
@@ -900,33 +917,6 @@ Format your response as JSON:
           )}
         </div>
 
-        <div className="settings-panel">
-          <div className="speed-control">
-            <label>재생 속도: {playbackSpeed.toFixed(1)}x</label>
-            <input
-              type="range"
-              min="0.5"
-              max="1.5"
-              step="0.1"
-              value={playbackSpeed}
-              onChange={(e) => setPlaybackSpeed(parseFloat(e.target.value))}
-            />
-          </div>
-
-          <div className="chapter-selector">
-            <label>챕터 선택:</label>
-            <select
-              value={currentChapterIndex}
-              onChange={(e) => setCurrentChapterIndex(parseInt(e.target.value))}
-            >
-              {book.chapters.map((chapter, index) => (
-                <option key={chapter.id} value={index}>
-                  {chapter.title}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
       </div>
 
       {/* Summary 모달 */}

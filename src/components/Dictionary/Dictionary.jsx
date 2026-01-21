@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import './Dictionary.css';
 
@@ -9,6 +9,33 @@ const Dictionary = ({ word, onClose }) => {
   const [koreanMeaning, setKoreanMeaning] = useState(null);
   const [translatedDefinitions, setTranslatedDefinitions] = useState({});
   const translation = useTranslation();
+
+  // TTS로 단어 발음하기
+  const speakWord = useCallback((text) => {
+    if (!window.speechSynthesis) return;
+
+    // 기존 재생 중지
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = 0.8;
+    window.speechSynthesis.speak(utterance);
+  }, []);
+
+  // 단어가 열릴 때 자동으로 발음
+  useEffect(() => {
+    if (word) {
+      speakWord(word);
+    }
+
+    // 컴포넌트 언마운트 시 TTS 중지
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, [word, speakWord]);
 
   useEffect(() => {
     if (!word) return;
@@ -85,7 +112,16 @@ const Dictionary = ({ word, onClose }) => {
       <div className="dictionary-popup" onClick={(e) => e.stopPropagation()}>
         <div className="dictionary-header">
           <div className="word-title">
-            <h3>{word}</h3>
+            <div className="word-with-speaker">
+              <h3>{word}</h3>
+              <button
+                className="speaker-btn"
+                onClick={() => speakWord(word)}
+                title="발음 듣기"
+              >
+                🔊
+              </button>
+            </div>
             {koreanMeaning && (
               <span className="korean-meaning">{koreanMeaning}</span>
             )}

@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { useReadingProgress } from '../../hooks/useReadingProgress';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLearningProgress } from '../../hooks/useLearningProgress';
 import './BookReader.css';
@@ -29,9 +28,8 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
 
-  const { progress, updateProgress } = useReadingProgress(book.id);
   const translation = useTranslation();
-  const { markChapterCompleted } = useLearningProgress();
+  const { markChapterCompleted, getBookProgress } = useLearningProgress();
 
   const currentChapter = book.chapters[currentChapterIndex];
 
@@ -63,18 +61,30 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
       setBookmarks(JSON.parse(savedBookmarks));
     }
 
-    if (progress.currentChapter > 0) {
-      setCurrentChapterIndex(progress.currentChapter);
+    // 마지막 접근한 챕터 복원
+    const bookProgress = getBookProgress(book.id);
+    if (bookProgress.lastChapterIndex !== undefined && bookProgress.lastChapterIndex > 0) {
+      setCurrentChapterIndex(bookProgress.lastChapterIndex);
     }
-  }, [book.id, progress.currentChapter]);
+  }, [book.id, getBookProgress]);
 
   useEffect(() => {
-    updateProgress(currentChapterIndex, book.chapters.length);
+    // 현재 챕터 인덱스 저장
+    const saved = localStorage.getItem('learning-progress');
+    if (saved) {
+      const allProgress = JSON.parse(saved);
+      const bookProgress = allProgress[book.id] || { chapters: {} };
+      bookProgress.lastChapterIndex = currentChapterIndex;
+      bookProgress.lastAccessedAt = new Date().toISOString();
+      allProgress[book.id] = bookProgress;
+      localStorage.setItem('learning-progress', JSON.stringify(allProgress));
+    }
+
     setShowTranslation(false);
     setChapterTranslation('');
     // 챕터 변경 시 재생 중인 오디오 중지
     handleStop();
-  }, [currentChapterIndex]);
+  }, [currentChapterIndex, book.id]);
 
   // 단어 배열 업데이트
   useEffect(() => {
@@ -439,10 +449,12 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
           <div className="progress-bar">
             <div
               className="progress-fill"
-              style={{ width: `${progress.completionPercentage}%` }}
+              style={{ width: `${Math.round(((currentChapterIndex + 1) / book.chapters.length) * 100)}%` }}
             />
           </div>
-          <span className="progress-text">{progress.completionPercentage}% 완료</span>
+          <span className="progress-text">
+            {Object.values(completedChapters).filter(Boolean).length}/{book.chapters.length} 완료
+          </span>
         </div>
 
         <button
@@ -533,19 +545,44 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
         )}
       </article>
 
+      {/* 챕터 목록 */}
+      <div className="chapters-section">
+        <h3>📚 챕터 목록</h3>
+        <div className="chapter-list">
+          {book.chapters.map((chapter, index) => {
+            const isReadingDone = completedChapters[chapter.id] || false;
+            const isCurrent = index === currentChapterIndex;
+            return (
+              <button
+                key={chapter.id}
+                className={`chapter-item ${isCurrent ? 'current' : ''} ${isReadingDone ? 'completed' : ''}`}
+                onClick={() => setCurrentChapterIndex(index)}
+              >
+                <span className="chapter-status">
+                  {isReadingDone ? '✅' : '○'}
+                </span>
+                <span className="chapter-name">{chapter.title}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {bookmarks.length > 0 && (
         <div className="bookmarks-section">
-          <h3>내 북마크</h3>
+          <h3>⭐ 내 북마크</h3>
           <div className="bookmark-list">
             {bookmarks.map(chapterId => {
               const chapter = book.chapters.find(ch => ch.id === chapterId);
               if (!chapter) return null;
+              const isCompleted = completedChapters[chapter.id] || false;
               return (
                 <button
                   key={chapterId}
-                  className="bookmark-item"
+                  className={`bookmark-item ${isCompleted ? 'completed' : ''}`}
                   onClick={() => setCurrentChapterIndex(book.chapters.indexOf(chapter))}
                 >
+                  {isCompleted && <span className="bookmark-check">✓</span>}
                   {chapter.title}
                 </button>
               );

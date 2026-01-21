@@ -45,21 +45,13 @@ const BookCard = ({ book, onSelect, learningStats }) => {
 
       {hasProgress && (
         <div className="learning-progress-bar">
-          <div className="progress-track">
-            <div
-              className="progress-reading"
-              style={{ width: `${learningStats.readingPercentage}%` }}
-              title={`읽기 ${learningStats.readingPercentage}%`}
-            />
-            <div
-              className="progress-speaking"
-              style={{ width: `${learningStats.speakingPercentage}%` }}
-              title={`말하기 ${learningStats.speakingPercentage}%`}
-            />
-          </div>
-          <div className="progress-labels">
-            <span className="label-reading">📖 {learningStats.readingCompleted}/{learningStats.totalChapters}</span>
-            <span className="label-speaking">🎤 {learningStats.speakingCompleted}/{learningStats.totalChapters}</span>
+          <div className="progress-compact">
+            <span className="progress-item reading" title="읽기 진행률">
+              📖 {learningStats.readingCompleted}/{learningStats.totalChapters}
+            </span>
+            <span className="progress-item speaking" title="말하기 진행률">
+              🎤 {learningStats.speakingCompleted}/{learningStats.totalChapters}
+            </span>
           </div>
         </div>
       )}
