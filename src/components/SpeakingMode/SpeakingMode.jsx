@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useSTT } from '../../hooks/useSTT';
+import { useRecorder } from '../../hooks/useRecorder';
 import { usePronunciationAnalysis } from '../../hooks/usePronunciationAnalysis';
 import usePronunciationHistory from '../../hooks/usePronunciationHistory';
 import { useLearningProgress } from '../../hooks/useLearningProgress';
@@ -19,6 +20,7 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
   const [wordDetails, setWordDetails] = useState({}); // { word: { meaning, pronunciation, example, isLoading } }
   const [showSummary, setShowSummary] = useState(false);
   const [completedChapters, setCompletedChapters] = useState({});
+  const [isPlayingRecording, setIsPlayingRecording] = useState(false);
 
   // TTS 하이라이트 관련 상태
   const [isTTSPlaying, setIsTTSPlaying] = useState(false);
@@ -29,6 +31,7 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
 
   const translation = useTranslation();
   const stt = useSTT();
+  const recorder = useRecorder();
   const pronunciation = usePronunciationAnalysis();
 
   // 발음 연습 기록 관리
@@ -172,11 +175,53 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
     const currentChapter = book.chapters[currentChapterIndex];
     const text = currentChapter.content;
 
-    // 문장 분리 (마침표, 느낌표, 물음표 기준)
-    const sentenceArray = text
-      .split(/(?<=[.!?])\s+/)
-      .filter(s => s.trim().length > 0);
+    // 초중급 학습자를 위한 문장 분리 함수
+    const splitForLearners = (text) => {
+      const MAX_WORDS = 12; // 최대 단어 수
 
+      // 1단계: 마침표, 느낌표, 물음표로 기본 분리
+      const baseSentences = text
+        .split(/(?<=[.!?])\s+/)
+        .filter(s => s.trim().length > 0);
+
+      const result = [];
+
+      baseSentences.forEach(sentence => {
+        const wordCount = sentence.split(/\s+/).length;
+
+        // 문장이 충분히 짧으면 그대로 사용
+        if (wordCount <= MAX_WORDS) {
+          result.push(sentence.trim());
+          return;
+        }
+
+        // 2단계: 긴 문장은 쉼표, 세미콜론, 콜론, 접속사로 분리
+        // 접속사 앞에서 분리 (and, but, or, so, because, when, while, if, although, though)
+        const parts = sentence
+          .split(/,\s+(?=and\b|but\b|or\b|so\b|because\b|when\b|while\b|if\b|although\b|though\b|which\b|who\b)|;\s+|:\s+(?=[A-Z])|,\s+(?=[A-Z])/g)
+          .filter(s => s.trim().length > 0);
+
+        if (parts.length > 1) {
+          parts.forEach(part => {
+            const trimmed = part.trim();
+            // 끝에 구두점이 없으면 추가하지 않음 (자연스럽게)
+            result.push(trimmed);
+          });
+        } else {
+          // 분리가 안 되면 쉼표 기준으로 한번 더 시도
+          const commaParts = sentence.split(/,\s+/).filter(s => s.trim().length > 0);
+          if (commaParts.length > 1 && commaParts[0].split(/\s+/).length <= MAX_WORDS) {
+            commaParts.forEach(part => result.push(part.trim()));
+          } else {
+            result.push(sentence.trim());
+          }
+        }
+      });
+
+      return result;
+    };
+
+    const sentenceArray = splitForLearners(text);
     setSentences(sentenceArray);
     setCurrentSentenceIndex(0);
     stt.clearTranscript();
@@ -568,6 +613,7 @@ Format your response as JSON:
     // 이미 연습 중이면 중지하고 분석
     if (isPracticing && stt.isListening) {
       stt.stopListening();
+      recorder.stopRecording();
       setIsPracticing(false);
 
       // 발음 분석 실행
@@ -590,11 +636,13 @@ Format your response as JSON:
       }
     } else {
       // 새로운 연습 시작
-      tts.stop();
+      stopTTS();
       stt.clearTranscript();
       pronunciation.clearAnalysis();
+      recorder.clearRecording();
       setIsPracticing(true);
       stt.startListening();
+      recorder.startRecording();
     }
   };
 
@@ -810,15 +858,33 @@ Format your response as JSON:
                 </div>
               </div>
 
-              <button
-                className="retry-btn"
-                onClick={() => {
-                  pronunciation.clearAnalysis();
-                  stt.clearTranscript();
-                }}
-              >
-                🔄 다시 연습하기
-              </button>
+              <div className="analysis-actions">
+                {recorder.recordedAudio && (
+                  <button
+                    className="playback-btn"
+                    disabled={isPlayingRecording}
+                    onClick={() => {
+                      const audio = new Audio(recorder.recordedAudio);
+                      setIsPlayingRecording(true);
+                      audio.onended = () => setIsPlayingRecording(false);
+                      audio.onerror = () => setIsPlayingRecording(false);
+                      audio.play();
+                    }}
+                  >
+                    🎧 {isPlayingRecording ? '재생 중...' : '내 발음 듣기'}
+                  </button>
+                )}
+                <button
+                  className="retry-btn"
+                  onClick={() => {
+                    pronunciation.clearAnalysis();
+                    stt.clearTranscript();
+                    recorder.clearRecording();
+                  }}
+                >
+                  🔄 다시 연습하기
+                </button>
+              </div>
             </div>
           )}
 

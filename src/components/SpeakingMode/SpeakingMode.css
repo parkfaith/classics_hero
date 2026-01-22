@@ -514,8 +514,44 @@
   border: 2px solid #6366f1;
 }
 
+.analysis-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.playback-btn {
+  flex: 1;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+}
+
+.playback-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.playback-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  animation: pulse-playing 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-playing {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.9; }
+}
+
 .retry-btn {
-  width: 100%;
+  flex: 1;
   padding: 0.875rem 1rem;
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
   color: white;
