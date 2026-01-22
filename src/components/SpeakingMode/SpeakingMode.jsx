@@ -5,7 +5,9 @@ import { useRecorder } from '../../hooks/useRecorder';
 import { usePronunciationAnalysis } from '../../hooks/usePronunciationAnalysis';
 import usePronunciationHistory from '../../hooks/usePronunciationHistory';
 import { useLearningProgress } from '../../hooks/useLearningProgress';
+import { useLearningMotivation } from '../../hooks/useLearningMotivation';
 import PracticeSummary from './PracticeSummary';
+import MotivationPanel from './MotivationPanel';
 import './SpeakingMode.css';
 
 const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
@@ -21,6 +23,8 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
   const [showSummary, setShowSummary] = useState(false);
   const [completedChapters, setCompletedChapters] = useState({});
   const [isPlayingRecording, setIsPlayingRecording] = useState(false);
+  const [motivationMessage, setMotivationMessage] = useState(null);
+  const [improvementInfo, setImprovementInfo] = useState(null);
 
   // TTS 하이라이트 관련 상태
   const [isTTSPlaying, setIsTTSPlaying] = useState(false);
@@ -38,6 +42,9 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
   const currentChapter = book.chapters[currentChapterIndex];
   const pronunciationHistory = usePronunciationHistory(book.id, currentChapter.id);
   const { markChapterCompleted } = useLearningProgress();
+
+  // 동기부여 시스템
+  const motivation = useLearningMotivation();
 
   // 완료 상태 로드 함수
   const loadCompletedChapters = useCallback(() => {
@@ -624,6 +631,10 @@ Format your response as JSON:
 
         // 분석 결과를 기록에 저장
         if (analysisResult) {
+          // 이전 점수 가져오기 (동기부여 시스템용)
+          const previousRecord = pronunciationHistory.getRecordBySentence(currentSentenceIndex);
+          const previousScore = previousRecord ? previousRecord.accuracy : null;
+
           pronunciationHistory.addRecord({
             sentenceIndex: currentSentenceIndex,
             originalSentence: sentenceToAnalyze,
@@ -632,6 +643,40 @@ Format your response as JSON:
             wordAnalysis: analysisResult.wordAnalysis,
             feedback: analysisResult.feedback
           });
+
+          // 동기부여 시스템에 기록
+          motivation.recordPractice(analysisResult.accuracy, previousScore);
+
+          // 개선율 계산
+          const improvement = pronunciationHistory.getImprovementRate(currentSentenceIndex);
+          setImprovementInfo(improvement);
+
+          // 동기부여 메시지 설정
+          if (improvement) {
+            if (improvement.isFirstAttempt) {
+              setMotivationMessage({
+                type: 'encourage',
+                text: '첫 도전이에요! 계속 연습하면 더 좋아질 거예요! 💪'
+              });
+            } else if (improvement.recent >= 10) {
+              setMotivationMessage({
+                type: 'success',
+                text: `와! 이전보다 ${improvement.recent}점이나 올랐어요! 🎉`
+              });
+            } else if (improvement.recent >= 5) {
+              setMotivationMessage({
+                type: 'success',
+                text: `좋아요! ${improvement.recent}점 더 나아졌어요! 👏`
+              });
+            } else if (improvement.recent <= -5) {
+              setMotivationMessage({
+                type: 'encourage',
+                text: '괜찮아요. 다음에 더 잘할 수 있어요! 🌱'
+              });
+            } else {
+              setMotivationMessage(null);
+            }
+          }
         }
       }
     } else {
@@ -743,6 +788,17 @@ Format your response as JSON:
       </div>
 
       <div className="speaking-content">
+        {/* 동기부여 패널 */}
+        <MotivationPanel
+          streak={motivation.streak}
+          level={motivation.getCurrentLevel()}
+          levelProgress={motivation.getLevelProgress()}
+          todayProgress={motivation.getTodayProgress()}
+          earnedBadges={motivation.getEarnedBadges()}
+          newBadge={motivation.newBadge}
+          onDismissBadge={motivation.dismissNewBadge}
+        />
+
         <div className="sentence-navigation">
           <button
             onClick={handlePrevSentence}
@@ -835,6 +891,28 @@ Format your response as JSON:
                   </p>
                 </div>
               </div>
+
+              {improvementInfo && !improvementInfo.isFirstAttempt && (
+                <div className={`improvement-indicator ${
+                  improvementInfo.isImproved ? 'improvement-positive' : 'improvement-negative'
+                }`}>
+                  <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>
+                    {improvementInfo.isImproved ? '📈' : improvementInfo.recent < 0 ? '📉' : '➡️'}
+                  </div>
+                  <div style={{ fontSize: '0.875rem', fontWeight: '600' }}>
+                    이전보다 {improvementInfo.recent > 0 ? '+' : ''}{improvementInfo.recent}점
+                  </div>
+                  <div style={{ fontSize: '0.75rem', opacity: 0.7, marginTop: '0.25rem' }}>
+                    ({improvementInfo.previousScore}점 → {improvementInfo.latestScore}점)
+                  </div>
+                </div>
+              )}
+
+              {motivationMessage && (
+                <div className={`motivation-message motivation-${motivationMessage.type}`}>
+                  {motivationMessage.text}
+                </div>
+              )}
 
               {pronunciation.analysis.feedback && (
                 <div className="feedback-box">

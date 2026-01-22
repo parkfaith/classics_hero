@@ -50,25 +50,47 @@ const usePronunciationHistory = (bookId, chapterId) => {
       let updated;
 
       if (existingIndex >= 0) {
-        // 기존 기록보다 점수가 높거나 같으면 업데이트
-        if (record.accuracy >= prev[existingIndex].accuracy) {
-          updated = [...prev];
-          updated[existingIndex] = {
-            ...newRecord,
-            previousBest: prev[existingIndex].accuracy,
-            attempts: (prev[existingIndex].attempts || 1) + 1
-          };
-        } else {
-          // 점수가 낮으면 시도 횟수만 증가
-          updated = [...prev];
-          updated[existingIndex] = {
-            ...prev[existingIndex],
-            attempts: (prev[existingIndex].attempts || 1) + 1,
-            lastAttemptScore: record.accuracy
-          };
-        }
+        const existing = prev[existingIndex];
+
+        // attemptHistory 배열이 없으면 생성 (기존 데이터 마이그레이션)
+        const attemptHistory = existing.attemptHistory || [
+          {
+            accuracy: existing.accuracy,
+            timestamp: existing.timestamp,
+            spokenText: existing.spokenText,
+            feedback: existing.feedback
+          }
+        ];
+
+        // 새 시도 추가
+        attemptHistory.push({
+          accuracy: record.accuracy,
+          timestamp: newRecord.timestamp,
+          spokenText: record.spokenText,
+          feedback: record.feedback,
+          wordAnalysis: record.wordAnalysis
+        });
+
+        updated = [...prev];
+        updated[existingIndex] = {
+          ...newRecord,
+          attemptHistory,
+          accuracy: Math.max(...attemptHistory.map(a => a.accuracy)), // 최고 점수
+          attempts: attemptHistory.length
+        };
       } else {
-        updated = [...prev, { ...newRecord, attempts: 1 }];
+        // 첫 시도
+        updated = [...prev, {
+          ...newRecord,
+          attemptHistory: [{
+            accuracy: record.accuracy,
+            timestamp: newRecord.timestamp,
+            spokenText: record.spokenText,
+            feedback: record.feedback,
+            wordAnalysis: record.wordAnalysis
+          }],
+          attempts: 1
+        }];
       }
 
       saveToStorage(updated);
@@ -160,6 +182,29 @@ const usePronunciationHistory = (bookId, chapterId) => {
     });
   }, [saveToStorage]);
 
+  // 개선율 계산
+  const getImprovementRate = useCallback((sentenceIndex) => {
+    const record = history.find(r => r.sentenceIndex === sentenceIndex);
+
+    if (!record || !record.attemptHistory || record.attemptHistory.length < 2) {
+      return null;
+    }
+
+    const firstScore = record.attemptHistory[0].accuracy;
+    const latestScore = record.attemptHistory[record.attemptHistory.length - 1].accuracy;
+    const previousScore = record.attemptHistory[record.attemptHistory.length - 2].accuracy;
+
+    return {
+      overall: latestScore - firstScore,        // 전체 개선율
+      recent: latestScore - previousScore,      // 직전 대비
+      firstScore,
+      latestScore,
+      previousScore,
+      isImproved: latestScore > previousScore,
+      isFirstAttempt: record.attemptHistory.length === 1
+    };
+  }, [history]);
+
   return {
     history,
     isLoading,
@@ -168,7 +213,8 @@ const usePronunciationHistory = (bookId, chapterId) => {
     getCompletedSentences,
     getStatistics,
     clearHistory,
-    removeRecord
+    removeRecord,
+    getImprovementRate
   };
 };
 
