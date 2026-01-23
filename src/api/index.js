@@ -1,4 +1,5 @@
-const API_BASE = '/api';
+// 배포 환경: Render API URL, 로컬: Vite 프록시 사용
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 export const fetchBooks = async (difficulty = null) => {
   const url = difficulty ? `${API_BASE}/books?difficulty=${difficulty}` : `${API_BASE}/books`;
