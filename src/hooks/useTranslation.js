@@ -5,52 +5,36 @@ export const useTranslation = () => {
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState(null);
 
-  const getApiKey = () => {
-    return localStorage.getItem('openai_api_key');
-  };
-
   const translateWithOpenAI = async (text, targetLang = 'ko') => {
-    const apiKey = getApiKey();
-
-    if (!apiKey) {
-      throw new Error('NO_API_KEY');
-    }
-
     const targetLanguage = targetLang === 'ko' ? 'Korean' : 'English';
 
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: `You are a professional translator. Translate the given English text to ${targetLanguage}. Only provide the translation, no explanations.`
-            },
-            {
-              role: 'user',
-              content: text
-            }
-          ],
-          temperature: 0.3,
-          max_tokens: 1000
-        })
-      });
+    const response = await fetch('/api/openai/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            role: 'system',
+            content: `You are a professional translator. Translate the given English text to ${targetLanguage}. Only provide the translation, no explanations.`
+          },
+          {
+            role: 'user',
+            content: text
+          }
+        ],
+        temperature: 0.3,
+        max_tokens: 1000
+      })
+    });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API 오류: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.choices[0].message.content.trim();
-    } catch (err) {
-      throw err;
+    if (!response.ok) {
+      throw new Error(`OpenAI API 오류: ${response.status}`);
     }
+
+    const data = await response.json();
+    return data.content.trim();
   };
 
   const translateWithMyMemory = async (text, targetLang = 'ko') => {
@@ -115,11 +99,7 @@ export const useTranslation = () => {
         translatedText = await translateWithOpenAI(text, targetLang);
       } catch (openAIError) {
         // OpenAI 실패 시 MyMemory로 폴백
-        if (openAIError.message === 'NO_API_KEY') {
-          console.log('OpenAI API 키 없음, MyMemory 사용');
-        } else {
-          console.warn('OpenAI 번역 실패, MyMemory로 전환:', openAIError.message);
-        }
+        console.warn('OpenAI 번역 실패, MyMemory로 전환:', openAIError.message);
         translatedText = await translateWithMyMemory(text, targetLang);
       }
 

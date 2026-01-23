@@ -9,10 +9,6 @@ export const usePronunciationAnalysis = () => {
   const [analysis, setAnalysis] = useState(null);
   const [error, setError] = useState(null);
 
-  const getApiKey = () => {
-    return localStorage.getItem('openai_api_key');
-  };
-
   /**
    * Simple word-level comparison to identify differences
    */
@@ -68,12 +64,6 @@ export const usePronunciationAnalysis = () => {
    * Get AI-powered pronunciation feedback
    */
   const getAIFeedback = async (originalSentence, spokenText, wordAnalysis, accuracy) => {
-    const apiKey = getApiKey();
-
-    if (!apiKey) {
-      throw new Error('OpenAI API 키가 설정되지 않았습니다.');
-    }
-
     const incorrectWords = wordAnalysis
       .filter(w => w.status === 'incorrect')
       .map(w => `"${w.word}" → "${w.spokenWord}"`)
@@ -108,39 +98,33 @@ Please provide:
 Keep your response concise and constructive. Format in Korean.
 `;
 
-    try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a helpful English pronunciation coach who provides feedback in Korean.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 300
-        })
-      });
+    const response = await fetch('/api/openai/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a helpful English pronunciation coach who provides feedback in Korean.'
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 300
+      })
+    });
 
-      if (!response.ok) {
-        throw new Error(`API 요청 실패: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data.choices[0].message.content;
-    } catch (err) {
-      throw new Error(`AI 피드백 생성 실패: ${err.message}`);
+    if (!response.ok) {
+      throw new Error(`API 요청 실패: ${response.status}`);
     }
+
+    const data = await response.json();
+    return data.content;
   };
 
   /**

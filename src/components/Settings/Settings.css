@@ -305,6 +305,20 @@
   border-left: 4px solid #3b82f6;
 }
 
+.api-status-ok {
+  color: #059669;
+  font-weight: 600;
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.api-note {
+  color: #1e40af;
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
 .info-box ul {
   margin: 0;
   padding-left: 1.25rem;

@@ -18,25 +18,16 @@ IMPORTANT GUIDELINES:
 
   // 초기 인사 메시지 생성
   const initializeChat = useCallback(async () => {
-    const apiKey = localStorage.getItem('openai_api_key');
-
-    if (!apiKey) {
-      setError('OpenAI API 키가 설정되지 않았습니다. 설정에서 API 키를 입력해주세요.');
-      return;
-    }
-
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('/api/openai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
           messages: [
             {
               role: 'system',
@@ -54,11 +45,11 @@ IMPORTANT GUIDELINES:
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'API 요청 실패');
+        throw new Error(errorData.detail || 'API 요청 실패');
       }
 
       const data = await response.json();
-      const greeting = data.choices[0].message.content;
+      const greeting = data.content;
 
       const greetingMessage = {
         id: `msg_${Date.now()}`,
@@ -87,13 +78,6 @@ IMPORTANT GUIDELINES:
 
   // 메시지 전송
   const sendMessage = useCallback(async (userMessage) => {
-    const apiKey = localStorage.getItem('openai_api_key');
-
-    if (!apiKey) {
-      setError('OpenAI API 키가 설정되지 않았습니다.');
-      return;
-    }
-
     // 사용자 메시지 추가
     const newUserMessage = {
       id: `msg_${Date.now()}`,
@@ -124,14 +108,12 @@ IMPORTANT GUIDELINES:
         }
       ];
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('/api/openai/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
           messages: conversationMessages,
           temperature: 0.85,
           max_tokens: 100
@@ -140,11 +122,11 @@ IMPORTANT GUIDELINES:
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'API 요청 실패');
+        throw new Error(errorData.detail || 'API 요청 실패');
       }
 
       const data = await response.json();
-      const heroResponse = data.choices[0].message.content;
+      const heroResponse = data.content;
 
       // 영웅 응답 추가
       const heroMessage = {
