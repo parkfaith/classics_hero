@@ -43,39 +43,41 @@ const MotivationPanel = ({
           <span className="motivation-value">{todayProgress.current}/{todayProgress.goal}</span>
         </div>
 
-        {/* 뱃지 버튼 */}
+        {/* 뱃지 버튼 + 패널 */}
         {earnedBadges.length > 0 && (
-          <button
-            className="motivation-item badges-btn"
-            onClick={() => setShowBadges(!showBadges)}
-            title={`획득한 뱃지 ${earnedBadges.length}개`}
-          >
-            <span className="motivation-icon">🏅</span>
-            <span className="motivation-value">{earnedBadges.length}</span>
-          </button>
-        )}
-      </div>
+          <div className="badges-btn-wrapper">
+            <button
+              className="motivation-item badges-btn"
+              onClick={() => setShowBadges(!showBadges)}
+              title={`획득한 뱃지 ${earnedBadges.length}개`}
+            >
+              <span className="motivation-icon">🏅</span>
+              <span className="motivation-value">{earnedBadges.length}</span>
+            </button>
 
-      {/* 뱃지 목록 패널 */}
-      {showBadges && (
-        <div className="badges-panel">
-          <div className="badges-header">
-            <h4>🏅 획득한 뱃지</h4>
-            <button className="close-badges" onClick={() => setShowBadges(false)}>×</button>
-          </div>
-          <div className="badges-grid">
-            {earnedBadges.map(badge => (
-              <div key={badge.id} className="badge-item">
-                <span className="badge-icon">{badge.icon}</span>
-                <div className="badge-info">
-                  <span className="badge-name">{badge.name}</span>
-                  <span className="badge-desc">{badge.description}</span>
+            {/* 뱃지 목록 패널 */}
+            {showBadges && (
+              <div className="badges-panel">
+                <div className="badges-header">
+                  <h4>🏅 획득한 뱃지</h4>
+                  <button className="close-badges" onClick={() => setShowBadges(false)}>×</button>
+                </div>
+                <div className="badges-grid">
+                  {earnedBadges.map(badge => (
+                    <div key={badge.id} className="badge-item">
+                      <span className="badge-icon">{badge.icon}</span>
+                      <div className="badge-info">
+                        <span className="badge-name">{badge.name}</span>
+                        <span className="badge-desc">{badge.description}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
+            )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* 새 뱃지 알림 */}
       {newBadge && (

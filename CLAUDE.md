@@ -6,7 +6,7 @@ Claude Code를 위한 프로젝트 가이드
 
 **Classic Hero** - 공개 도메인 영어 고전 문학을 활용한 영어 학습 웹앱
 - **Frontend:** React 19 + Vite 7
-- **Backend:** FastAPI + SQLite
+- **Backend:** FastAPI + Turso (SQLite 호환 엣지 DB)
 - **학습 모드:** Reading, Speaking, Talk to Hero
 - AI 기반 발음 분석 및 역사적 인물과의 대화 기능
 - 음성 중심 UI (TTS/STT 기본 활성화)
@@ -17,6 +17,11 @@ Claude Code를 위한 프로젝트 가이드
 # Backend (터미널 1)
 cd backend
 pip install -r requirements.txt
+
+# Turso 설정 (선택사항 - 없으면 로컬 SQLite 사용)
+cp .env.example .env
+# .env 파일에 TURSO_DATABASE_URL, TURSO_AUTH_TOKEN 설정
+
 python seed_data.py          # 최초 1회 - DB 초기화
 uvicorn main:app --reload --port 8001
 
@@ -28,6 +33,32 @@ npm run lint                 # ESLint
 
 **주의:** 백엔드 포트는 `8001` 사용 (vite.config.js 프록시 설정 확인)
 
+### Turso 설정 (Vercel 배포용)
+
+```bash
+# 1. Turso CLI 설치
+curl -sSfL https://get.tur.so/install.sh | bash
+
+# 2. 로그인
+turso auth login
+
+# 3. 데이터베이스 생성
+turso db create classics-hero
+
+# 4. URL 확인
+turso db show classics-hero --url
+
+# 5. 토큰 생성
+turso db tokens create classics-hero
+
+# 6. .env 파일에 설정
+TURSO_DATABASE_URL=libsql://classics-hero-xxx.turso.io
+TURSO_AUTH_TOKEN=eyJhbGciOiJFZERTQSIsInR5cCI6...
+
+# 7. 데이터 시딩
+python seed_data.py
+```
+
 ## Architecture
 
 ### 전체 구조
@@ -36,7 +67,7 @@ npm run lint                 # ESLint
 classics_heros/
 ├── backend/                 # FastAPI 백엔드
 │   ├── main.py              # FastAPI 앱 진입점
-│   ├── database.py          # SQLite 연결 + 테이블 스키마
+│   ├── database.py          # Turso/SQLite 연결 + 테이블 스키마
 │   ├── models.py            # Pydantic 모델
 │   ├── seed_data.py         # 초기 데이터 시딩
 │   ├── requirements.txt
@@ -198,8 +229,10 @@ GET  /api/health                   # 헬스체크
 
 ## Data Storage
 
-**SQLite (backend/data/classics.db):**
-- books, chapters, heroes, archaic_words, semantic_shifts 테이블
+**Turso (Production) / SQLite (Development):**
+- 환경변수 `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` 설정 시 Turso 사용
+- 미설정 시 로컬 SQLite (`backend/data/classics.db`) 사용
+- 테이블: books, chapters, heroes, archaic_words, semantic_shifts
 
 **localStorage:**
 - `openai_api_key` - OpenAI API 키

@@ -1165,6 +1165,12 @@
   border-color: #fecaca;
 }
 
+.improvement-neutral {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  color: #475569;
+  border-color: #cbd5e1;
+}
+
 /* 동기부여 메시지 */
 .motivation-message {
   margin-top: 1rem;

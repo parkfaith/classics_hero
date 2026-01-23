@@ -1,24 +1,119 @@
-import sqlite3
 import os
 from contextlib import contextmanager
+from dotenv import load_dotenv
 
-DATABASE_PATH = os.path.join(os.path.dirname(__file__), "data", "classics.db")
+load_dotenv()
+
+# Turso 환경변수
+TURSO_DATABASE_URL = os.getenv("TURSO_DATABASE_URL")
+TURSO_AUTH_TOKEN = os.getenv("TURSO_AUTH_TOKEN")
+
+# 로컬 SQLite 경로 (폴백용)
+LOCAL_DATABASE_PATH = os.path.join(os.path.dirname(__file__), "data", "classics.db")
+
+# Turso 사용 여부
+USE_TURSO = bool(TURSO_DATABASE_URL and TURSO_AUTH_TOKEN)
+
+if USE_TURSO:
+    import libsql_client
+    print(f"Using Turso database: {TURSO_DATABASE_URL}")
+else:
+    import sqlite3
+    print(f"Using local SQLite database: {LOCAL_DATABASE_PATH}")
+
+
+# Turso용 동기 래퍼 클래스
+class TursoConnection:
+    """libsql_client를 동기적으로 사용하기 위한 래퍼"""
+    def __init__(self, url, auth_token):
+        self.url = url
+        self.auth_token = auth_token
+        self._client = None
+
+    def _get_client(self):
+        if self._client is None:
+            self._client = libsql_client.create_client_sync(
+                url=self.url,
+                auth_token=self.auth_token
+            )
+        return self._client
+
+    def cursor(self):
+        return TursoCursor(self._get_client())
+
+    def commit(self):
+        # libsql_client는 자동 커밋
+        pass
+
+    def rollback(self):
+        # libsql_client는 자동 커밋이므로 롤백 불가
+        pass
+
+    def close(self):
+        if self._client:
+            self._client.close()
+            self._client = None
+
+
+class TursoCursor:
+    """Turso용 커서 래퍼"""
+    def __init__(self, client):
+        self.client = client
+        self.lastrowid = None
+        self._result = None
+
+    def execute(self, sql, params=None):
+        if params:
+            # ? 플레이스홀더를 libsql 형식으로 변환
+            self._result = self.client.execute(sql, params)
+        else:
+            self._result = self.client.execute(sql)
+        return self
+
+    def executemany(self, sql, params_list):
+        for params in params_list:
+            self.execute(sql, params)
+        return self
+
+    def fetchone(self):
+        if self._result and self._result.rows:
+            row = self._result.rows[0]
+            return dict(zip(self._result.columns, row))
+        return None
+
+    def fetchall(self):
+        if self._result and self._result.rows:
+            return [dict(zip(self._result.columns, row)) for row in self._result.rows]
+        return []
+
 
 def get_connection():
-    conn = sqlite3.connect(DATABASE_PATH)
-    conn.row_factory = sqlite3.Row
+    """데이터베이스 연결 반환"""
+    if USE_TURSO:
+        conn = TursoConnection(
+            url=TURSO_DATABASE_URL,
+            auth_token=TURSO_AUTH_TOKEN
+        )
+    else:
+        conn = sqlite3.connect(LOCAL_DATABASE_PATH)
+        conn.row_factory = sqlite3.Row
     return conn
+
 
 @contextmanager
 def get_db():
+    """컨텍스트 매니저로 DB 연결 관리"""
     conn = get_connection()
     try:
         yield conn
     finally:
         conn.close()
 
+
 def init_db():
-    os.makedirs(os.path.dirname(DATABASE_PATH), exist_ok=True)
+    """데이터베이스 초기화 - 테이블 생성"""
+    if not USE_TURSO:
+        os.makedirs(os.path.dirname(LOCAL_DATABASE_PATH), exist_ok=True)
 
     with get_db() as conn:
         cursor = conn.cursor()
@@ -118,6 +213,8 @@ def init_db():
 
         conn.commit()
 
+
 if __name__ == "__main__":
     init_db()
-    print(f"Database initialized at {DATABASE_PATH}")
+    db_type = "Turso" if USE_TURSO else "Local SQLite"
+    print(f"Database initialized ({db_type})")

@@ -73,6 +73,11 @@
   color: #047857;
 }
 
+/* 뱃지 버튼 wrapper */
+.badges-btn-wrapper {
+  position: relative;
+}
+
 /* 뱃지 버튼 */
 .badges-btn {
   border: none;
@@ -87,7 +92,7 @@
 /* 뱃지 패널 */
 .badges-panel {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 0.5rem);
   right: 0;
   z-index: 100;
   width: 280px;
@@ -95,7 +100,6 @@
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  margin-top: 0.5rem;
   animation: slideDown 0.2s ease;
 }
 

@@ -1,7 +1,5 @@
-import sqlite3
 import json
-import os
-from database import DATABASE_PATH, init_db
+from database import init_db, get_db, USE_TURSO
 
 def clear_all_data(cursor):
     """기존 데이터 모두 삭제"""
@@ -1259,37 +1257,42 @@ def main():
     """메인 함수 - DB 초기화 및 시딩"""
     init_db()
 
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
+    with get_db() as conn:
+        cursor = conn.cursor()
 
-    try:
-        # 기존 데이터 삭제
-        clear_all_data(cursor)
+        try:
+            # 기존 데이터 삭제
+            clear_all_data(cursor)
 
-        # 새 데이터 시딩
-        seed_heroes(cursor)
-        seed_books_and_chapters(cursor)
-        conn.commit()
+            # 새 데이터 시딩
+            seed_heroes(cursor)
+            seed_books_and_chapters(cursor)
+            conn.commit()
 
-        # 결과 확인
-        cursor.execute("SELECT COUNT(*) FROM heroes")
-        hero_count = cursor.fetchone()[0]
-        cursor.execute("SELECT COUNT(*) FROM books")
-        book_count = cursor.fetchone()[0]
-        cursor.execute("SELECT COUNT(*) FROM chapters")
-        chapter_count = cursor.fetchone()[0]
+            # 결과 확인
+            cursor.execute("SELECT COUNT(*) as cnt FROM heroes")
+            result = cursor.fetchone()
+            hero_count = result['cnt'] if isinstance(result, dict) else result[0]
 
-        print(f"\n=== Database Seeding Complete ===")
-        print(f"Heroes: {hero_count}")
-        print(f"Books: {book_count}")
-        print(f"Chapters: {chapter_count}")
+            cursor.execute("SELECT COUNT(*) as cnt FROM books")
+            result = cursor.fetchone()
+            book_count = result['cnt'] if isinstance(result, dict) else result[0]
 
-    except Exception as e:
-        conn.rollback()
-        print(f"Error seeding database: {e}")
-        raise
-    finally:
-        conn.close()
+            cursor.execute("SELECT COUNT(*) as cnt FROM chapters")
+            result = cursor.fetchone()
+            chapter_count = result['cnt'] if isinstance(result, dict) else result[0]
+
+            db_type = "Turso" if USE_TURSO else "Local SQLite"
+            print(f"\n=== Database Seeding Complete ({db_type}) ===")
+            print(f"Heroes: {hero_count}")
+            print(f"Books: {book_count}")
+            print(f"Chapters: {chapter_count}")
+
+        except Exception as e:
+            if hasattr(conn, 'rollback'):
+                conn.rollback()
+            print(f"Error seeding database: {e}")
+            raise
 
 if __name__ == "__main__":
     main()

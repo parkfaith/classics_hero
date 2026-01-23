@@ -894,13 +894,15 @@ Format your response as JSON:
 
               {improvementInfo && !improvementInfo.isFirstAttempt && (
                 <div className={`improvement-indicator ${
-                  improvementInfo.isImproved ? 'improvement-positive' : 'improvement-negative'
+                  improvementInfo.recent > 0 ? 'improvement-positive' :
+                  improvementInfo.recent < 0 ? 'improvement-negative' : 'improvement-neutral'
                 }`}>
                   <div style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>
-                    {improvementInfo.isImproved ? '📈' : improvementInfo.recent < 0 ? '📉' : '➡️'}
+                    {improvementInfo.recent > 0 ? '📈' : improvementInfo.recent < 0 ? '📉' : '➡️'}
                   </div>
                   <div style={{ fontSize: '0.875rem', fontWeight: '600' }}>
-                    이전보다 {improvementInfo.recent > 0 ? '+' : ''}{improvementInfo.recent}점
+                    {improvementInfo.recent === 0 ? '동일한 점수' :
+                      `이전보다 ${improvementInfo.recent > 0 ? '+' : ''}${improvementInfo.recent}점`}
                   </div>
                   <div style={{ fontSize: '0.75rem', opacity: 0.7, marginTop: '0.25rem' }}>
                     ({improvementInfo.previousScore}점 → {improvementInfo.latestScore}점)
