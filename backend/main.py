@@ -1,14 +1,21 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import books, heroes, chapters, words
 from database import init_db
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="Classic Hero API", version="1.0.0")
 
-# CORS 설정
+# CORS 설정 - 환경변수 또는 기본값 사용
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173")
+allowed_origins = [origin.strip() for origin in cors_origins.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
