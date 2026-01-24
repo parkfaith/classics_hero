@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import BookCard from './BookCard';
+import LoadingScreen from '../LoadingScreen/LoadingScreen';
 import { fetchBooks } from '../../api';
 import { useLearningProgress } from '../../hooks/useLearningProgress';
 import './BookList.css';
 
-const BookList = ({ onBookSelect, onTalkToHero }) => {
+const BookList = ({ onBookSelect }) => {
   const [filter, setFilter] = useState('all');
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,11 +35,7 @@ const BookList = ({ onBookSelect, onTalkToHero }) => {
   });
 
   if (loading) {
-    return (
-      <div className="book-list-container">
-        <div className="loading">책 목록을 불러오는 중...</div>
-      </div>
-    );
+    return <LoadingScreen message="고전 문학을 불러오는 중" />;
   }
 
   if (error) {

@@ -1,0 +1,267 @@
+.loading-screen {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.loading-content {
+  text-align: center;
+  max-width: 500px;
+  width: 100%;
+}
+
+/* 책 애니메이션 */
+.loading-book-animation {
+  margin-bottom: 2rem;
+  perspective: 600px;
+}
+
+.book {
+  width: 100px;
+  height: 80px;
+  position: relative;
+  margin: 0 auto;
+  transform-style: preserve-3d;
+  animation: bookFloat 3s ease-in-out infinite;
+}
+
+@keyframes bookFloat {
+  0%, 100% { transform: translateY(0) rotateY(-10deg); }
+  50% { transform: translateY(-10px) rotateY(10deg); }
+}
+
+.book-cover {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  border-radius: 4px 8px 8px 4px;
+  transform: translateZ(10px);
+  box-shadow: 0 4px 20px rgba(30, 58, 138, 0.3);
+}
+
+.book-cover::before {
+  content: '📚';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+}
+
+.book-page {
+  position: absolute;
+  width: 90%;
+  height: 90%;
+  left: 5%;
+  top: 5%;
+  background: #fff;
+  border-radius: 2px 4px 4px 2px;
+  transform-origin: left center;
+}
+
+.page-1 {
+  animation: pageFlip 2s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.page-2 {
+  animation: pageFlip 2s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+.page-3 {
+  animation: pageFlip 2s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+@keyframes pageFlip {
+  0%, 40% { transform: rotateY(0deg); }
+  60%, 100% { transform: rotateY(-150deg); }
+}
+
+.book-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: 4px 8px 8px 4px;
+  transform: translateZ(-10px);
+}
+
+/* 로딩 메시지 */
+.loading-message {
+  margin-bottom: 2rem;
+}
+
+.loading-message h2 {
+  font-size: 1.5rem;
+  color: #1e3a8a;
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+  min-width: 280px;
+}
+
+.loading-submessage {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* 명언 섹션 */
+.loading-quote {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.quote-icon {
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  font-size: 3rem;
+  color: #dbeafe;
+  font-family: Georgia, serif;
+  line-height: 1;
+}
+
+.quote-text {
+  font-size: 1.1rem;
+  color: #334155;
+  line-height: 1.6;
+  margin: 0 0 0.75rem 0;
+  font-style: italic;
+  font-family: Georgia, serif;
+}
+
+.quote-translation {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 0.75rem 0;
+}
+
+.quote-author {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* 학습 팁 */
+.loading-tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  padding: 0.75rem 1.25rem;
+  border-radius: 50px;
+  margin-bottom: 1.5rem;
+}
+
+.tip-icon {
+  font-size: 1.1rem;
+}
+
+.tip-text {
+  font-size: 0.9rem;
+  color: #92400e;
+  font-weight: 500;
+}
+
+/* 진행 바 */
+.loading-progress {
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 30%;
+  background: linear-gradient(90deg, #3b82f6 0%, #1e3a8a 50%, #3b82f6 100%);
+  background-size: 200% 100%;
+  border-radius: 3px;
+  animation: progressMove 1.5s ease-in-out infinite;
+}
+
+@keyframes progressMove {
+  0% {
+    width: 0%;
+    margin-left: 0%;
+    background-position: 0% 0%;
+  }
+  50% {
+    width: 60%;
+    margin-left: 20%;
+    background-position: 100% 0%;
+  }
+  100% {
+    width: 0%;
+    margin-left: 100%;
+    background-position: 0% 0%;
+  }
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .loading-screen {
+    padding: 1.5rem;
+    min-height: 50vh;
+  }
+
+  .loading-message h2 {
+    font-size: 1.25rem;
+    min-width: auto;
+  }
+
+  .loading-submessage {
+    font-size: 0.875rem;
+  }
+
+  .quote-text {
+    font-size: 1rem;
+  }
+
+  .loading-quote {
+    padding: 1.25rem;
+  }
+
+  .book {
+    width: 80px;
+    height: 64px;
+  }
+
+  .book-cover::before {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .loading-message h2 {
+    font-size: 1.1rem;
+  }
+
+  .quote-text {
+    font-size: 0.95rem;
+  }
+
+  .quote-translation {
+    font-size: 0.85rem;
+  }
+
+  .tip-text {
+    font-size: 0.85rem;
+  }
+}
