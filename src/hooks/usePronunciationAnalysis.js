@@ -61,9 +61,42 @@ export const usePronunciationAnalysis = () => {
   };
 
   /**
+   * Generate local feedback without AI (fallback)
+   */
+  const generateLocalFeedback = (wordAnalysis, accuracy) => {
+    const incorrectWords = wordAnalysis.filter(w => w.status === 'incorrect');
+    const missingWords = wordAnalysis.filter(w => w.status === 'missing');
+
+    let feedback = '';
+
+    if (accuracy >= 90) {
+      feedback = '훌륭해요! 발음이 매우 정확합니다. 계속 이 조자를 유지해 주세요!';
+    } else if (accuracy >= 70) {
+      feedback = '잘했어요! ';
+      if (incorrectWords.length > 0) {
+        feedback += `"${incorrectWords.slice(0, 2).map(w => w.word).join('", "')}" 부분을 조금 더 연습해 보세요. `;
+      }
+      feedback += '꾸준히 연습하면 더 좋아질 거예요!';
+    } else if (accuracy >= 50) {
+      feedback = '좋은 시도예요! ';
+      if (missingWords.length > 0) {
+        feedback += `빠진 단어가 있어요. `;
+      }
+      if (incorrectWords.length > 0) {
+        feedback += `"${incorrectWords.slice(0, 2).map(w => w.word).join('", "')}" 발음에 주의해 보세요. `;
+      }
+      feedback += '천천히 따라 읽어보세요!';
+    } else {
+      feedback = '괜찮아요! 먼저 원문을 천천히 들어보고, 한 단어씩 따라해 보세요. 연습하면 반드시 나아져요!';
+    }
+
+    return feedback;
+  };
+
+  /**
    * Get AI-powered pronunciation feedback
    */
-  const getAIFeedback = async (originalSentence, spokenText, wordAnalysis, accuracy) => {
+  const getAIFeedback = useCallback(async (originalSentence, spokenText, wordAnalysis, accuracy) => {
     const incorrectWords = wordAnalysis
       .filter(w => w.status === 'incorrect')
       .map(w => `"${w.word}" → "${w.spokenWord}"`)
@@ -98,34 +131,42 @@ Please provide:
 Keep your response concise and constructive. Format in Korean.
 `;
 
-    const response = await fetch('/api/openai/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        messages: [
-          {
-            role: 'system',
-            content: 'You are a helpful English pronunciation coach who provides feedback in Korean.'
-          },
-          {
-            role: 'user',
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 300
-      })
-    });
+    try {
+      const response = await fetch('/api/openai/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a helpful English pronunciation coach who provides feedback in Korean.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 300
+        })
+      });
 
-    if (!response.ok) {
-      throw new Error(`API 요청 실패: ${response.status}`);
+      if (!response.ok) {
+        // API 실패 시 로컬 피드백 사용
+        console.warn('AI API 실패, 로컬 피드백 사용');
+        return generateLocalFeedback(wordAnalysis, accuracy);
+      }
+
+      const data = await response.json();
+      return data.content;
+    } catch (err) {
+      // 네트워크 오류 등의 경우 로컬 피드백 사용
+      console.warn('AI API 오류, 로컬 피드백 사용:', err);
+      return generateLocalFeedback(wordAnalysis, accuracy);
     }
-
-    const data = await response.json();
-    return data.content;
-  };
+  }, []);
 
   /**
    * Analyze pronunciation
@@ -165,7 +206,7 @@ Keep your response concise and constructive. Format in Korean.
       setIsAnalyzing(false);
       return null;
     }
-  }, []);
+  }, [getAIFeedback]);
 
   const clearAnalysis = useCallback(() => {
     setAnalysis(null);
