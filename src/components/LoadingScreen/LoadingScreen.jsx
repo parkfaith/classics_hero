@@ -46,29 +46,23 @@ const LoadingScreen = ({ message = "잠시만 기다려 주세요" }) => {
   return (
     <div className="loading-screen">
       <div className="loading-content">
-        {/* 책 애니메이션 */}
-        <div className="loading-book-animation">
-          <div className="book">
-            <div className="book-cover"></div>
-            <div className="book-page page-1"></div>
-            <div className="book-page page-2"></div>
-            <div className="book-page page-3"></div>
-            <div className="book-back"></div>
-          </div>
+        {/* 책 아이콘 */}
+        <div className="loading-icon">
+          <span className="loading-icon-emoji">📚</span>
         </div>
 
         {/* 로딩 메시지 */}
         <div className="loading-message">
           <h2>{message}{dots}</h2>
           <p className="loading-submessage">
-            서버에서 고전 문학들을 가져오고 있어요
+            서버에서 고전 문학들을 가져오고 있어요.<br />
+            잠시만 기다려 주세요!
           </p>
         </div>
 
         {/* 명언 섹션 */}
         <div className="loading-quote">
-          <div className="quote-icon">"</div>
-          <p className="quote-text">{quote.text}</p>
+          <p className="quote-text">"{quote.text}"</p>
           <p className="quote-translation">{quote.ko}</p>
           <p className="quote-author">— {quote.author}</p>
         </div>
