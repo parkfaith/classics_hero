@@ -114,14 +114,14 @@
   margin: 0 auto;
 }
 
-.progress-bar {
+.loading-progress-bar {
   height: 4px;
   background: #e2e8f0;
   border-radius: 2px;
   overflow: hidden;
 }
 
-.progress-fill {
+.loading-progress-fill {
   height: 100%;
   width: 30%;
   background: linear-gradient(90deg, #3b82f6, #1e3a8a);

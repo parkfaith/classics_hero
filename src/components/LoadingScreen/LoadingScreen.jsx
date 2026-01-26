@@ -75,8 +75,8 @@ const LoadingScreen = ({ message = "잠시만 기다려 주세요" }) => {
 
         {/* 진행 바 */}
         <div className="loading-progress">
-          <div className="progress-bar">
-            <div className="progress-fill"></div>
+          <div className="loading-progress-bar">
+            <div className="loading-progress-fill"></div>
           </div>
         </div>
       </div>
