@@ -1,3 +1,8 @@
+/* 모바일 상단 헤더 - 기본적으로 숨김 */
+.mobile-header {
+  display: none;
+}
+
 .navigation {
   background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
   color: white;
@@ -201,6 +206,54 @@
 
 /* 반응형 - 모바일: 하단 탭 바 */
 @media (max-width: 480px) {
+  /* 모바일 상단 헤더 표시 */
+  .mobile-header {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.625rem 1rem;
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    cursor: pointer;
+  }
+
+  .mobile-header-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 6px;
+    padding: 2px;
+  }
+
+  .mobile-header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .mobile-header-brand {
+    font-size: 0.5rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .mobile-header-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+
   .navigation {
     position: fixed;
     bottom: 0;
@@ -278,5 +331,10 @@
   .nav-item.settings-btn:hover {
     background: transparent;
     box-shadow: none;
+  }
+
+  /* 채팅 화면에서는 모바일 헤더 숨기기 */
+  body.in-chat .mobile-header {
+    display: none;
   }
 }

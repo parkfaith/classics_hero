@@ -2,9 +2,23 @@ import './Navigation.css';
 
 function Navigation({ currentPage, onNavigate, onOpenSettings }) {
   return (
-    <nav className="navigation">
-      <div className="nav-container">
-        <div className="nav-logo" onClick={() => onNavigate('library')}>
+    <>
+      {/* 모바일 상단 헤더 */}
+      <header className="mobile-header" onClick={() => onNavigate('library')}>
+        <img
+          src="/ClassicHero.png"
+          alt="Classic Hero"
+          className="mobile-header-logo"
+        />
+        <div className="mobile-header-text">
+          <span className="mobile-header-brand">Jobible</span>
+          <h1 className="mobile-header-title">Classic Heros</h1>
+        </div>
+      </header>
+
+      <nav className="navigation">
+        <div className="nav-container">
+          <div className="nav-logo" onClick={() => onNavigate('library')}>
           <img
             src="/ClassicHero.png"
             alt="Classic Hero"
@@ -52,6 +66,7 @@ function Navigation({ currentPage, onNavigate, onOpenSettings }) {
         </div>
       </div>
     </nav>
+    </>
   );
 }
 

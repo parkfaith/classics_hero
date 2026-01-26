@@ -19,6 +19,12 @@ const ChatInterface = ({ hero, onBack }) => {
     initializeChat();
   }, [initializeChat]);
 
+  // 채팅 화면에서는 모바일 헤더 숨기기
+  useEffect(() => {
+    document.body.classList.add('in-chat');
+    return () => document.body.classList.remove('in-chat');
+  }, []);
+
   // 새 메시지 도착 시 스크롤 (모바일 키보드 문제 방지)
   useEffect(() => {
     if (messagesEndRef.current) {
