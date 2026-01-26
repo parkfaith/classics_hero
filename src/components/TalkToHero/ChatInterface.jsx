@@ -19,9 +19,14 @@ const ChatInterface = ({ hero, onBack }) => {
     initializeChat();
   }, [initializeChat]);
 
-  // 새 메시지 도착 시 스크롤
+  // 새 메시지 도착 시 스크롤 (모바일 키보드 문제 방지)
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      // 약간의 지연을 주어 레이아웃 안정화 후 스크롤
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }, 100);
+    }
   }, [messages]);
 
   // 영웅 메시지 자동 TTS 재생

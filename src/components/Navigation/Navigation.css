@@ -199,26 +199,84 @@
   }
 }
 
+/* 반응형 - 모바일: 하단 탭 바 */
 @media (max-width: 480px) {
+  .navigation {
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    left: 0;
+    right: 0;
+    padding: 0;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+  }
+
   .nav-container {
-    padding: 0.4rem 0.75rem;
+    padding: 0.5rem 0;
+    gap: 0;
+    justify-content: center;
   }
 
-  .logo-title {
-    font-size: 0.875rem;
+  .nav-logo {
+    display: none;
   }
 
-  .logo-image {
-    width: 28px;
-    height: 28px;
+  .nav-menu {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    gap: 0;
   }
 
   .nav-item {
-    padding: 0.4rem 0.5rem;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0.25rem;
+    background: transparent;
+    border-radius: 0;
+    color: #6b7280;
+    font-size: 0.625rem;
+    border: none;
+  }
+
+  .nav-item span {
+    display: block;
+  }
+
+  .nav-item:hover {
+    background: transparent;
+    transform: none;
+    box-shadow: none;
+    color: #1e3a8a;
+  }
+
+  .nav-item.active {
+    background: transparent;
+    color: #1e3a8a;
+    box-shadow: none;
+  }
+
+  .nav-item.active .nav-icon {
+    color: #1e3a8a;
   }
 
   .nav-icon {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
+    stroke: currentColor;
+  }
+
+  .nav-item.settings-btn {
+    background: transparent;
+    border: none;
+  }
+
+  .nav-item.settings-btn:hover {
+    background: transparent;
+    box-shadow: none;
   }
 }

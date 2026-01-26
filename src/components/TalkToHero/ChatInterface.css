@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100vh;
+  height: 100dvh; /* iOS 키보드 대응 */
   background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
 }
 
@@ -425,5 +426,33 @@
   .intro-topic-btn {
     padding: 0.3125rem 0.625rem;
     font-size: 0.6875rem;
+  }
+}
+
+/* 모바일 하단 탭 바 여백 */
+@media (max-width: 480px) {
+  .chat-interface {
+    padding-bottom: 70px;
+  }
+
+  .back-button-chat {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  .hero-info-name {
+    font-size: 1rem;
+  }
+
+  .hero-info-occupation {
+    font-size: 0.75rem;
+  }
+
+  .auto-tts-btn,
+  .report-btn,
+  .reset-chat-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.125rem;
   }
 }

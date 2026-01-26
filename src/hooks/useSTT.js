@@ -46,8 +46,19 @@ export const useSTT = () => {
       };
 
       recognition.onerror = (event) => {
+        // 무시해도 되는 일반적인 오류들 (no-speech, aborted, 패턴 불일치 등)
+        const ignorableErrors = ['no-speech', 'aborted'];
+        if (ignorableErrors.includes(event.error) ||
+            event.message?.includes('pattern') ||
+            event.error === '') {
+          console.log('STT info:', event.error || 'minor error');
+          return;
+        }
         console.error('Speech recognition error:', event.error);
-        setError(`음성 인식 오류: ${event.error}`);
+        // 네트워크 오류만 사용자에게 표시
+        if (event.error === 'network') {
+          setError('네트워크 오류가 발생했습니다.');
+        }
         setIsListening(false);
       };
 

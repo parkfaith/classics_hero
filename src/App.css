@@ -10,3 +10,10 @@
   display: flex;
   flex-direction: column;
 }
+
+/* 모바일 하단 탭 바 여백 */
+@media (max-width: 480px) {
+  .app-main {
+    padding-bottom: 70px;
+  }
+}
