@@ -1,5 +1,8 @@
 import { useState, useCallback } from 'react';
 
+// 배포 환경: Render API URL, 로컬: Vite 프록시 사용
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 export const useHeroChat = (hero) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +25,7 @@ IMPORTANT GUIDELINES:
     setError(null);
 
     try {
-      const response = await fetch('/api/openai/chat', {
+      const response = await fetch(`${API_BASE}/openai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +111,7 @@ IMPORTANT GUIDELINES:
         }
       ];
 
-      const response = await fetch('/api/openai/chat', {
+      const response = await fetch(`${API_BASE}/openai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
