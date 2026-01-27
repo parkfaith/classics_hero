@@ -3,13 +3,15 @@ import { useState, useCallback } from 'react';
 // 배포 환경: Render API URL, 로컬: Vite 프록시 사용
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
-export const useHeroChat = (hero) => {
+export const useHeroChat = (hero, scenario = null) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // 시스템 프롬프트 보강 - 짧은 답변, 스몰토크 허용
-  const enhancedSystemPrompt = `${hero.conversationStyle.systemPrompt}
+  // 시스템 프롬프트 보강 - 시나리오가 있으면 시나리오 지시 추가
+  const basePrompt = hero.conversationStyle.systemPrompt;
+  const scenarioAddition = scenario ? `\n\n${scenario.systemPromptAddition}` : '';
+  const enhancedSystemPrompt = `${basePrompt}${scenarioAddition}
 
 IMPORTANT GUIDELINES:
 - Keep responses SHORT and CONCISE (2-3 sentences max, under 50 words)
@@ -25,6 +27,19 @@ IMPORTANT GUIDELINES:
     setError(null);
 
     try {
+      // 시나리오가 있으면 initialMessage 사용, 없으면 AI 생성
+      if (scenario && scenario.initialMessage) {
+        const scenarioMessage = {
+          id: `msg_${Date.now()}`,
+          role: 'hero',
+          content: scenario.initialMessage,
+          timestamp: Date.now()
+        };
+        setMessages([scenarioMessage]);
+        setIsLoading(false);
+        return;
+      }
+
       const response = await fetch(`${API_BASE}/openai/chat`, {
         method: 'POST',
         headers: {
@@ -77,7 +92,7 @@ IMPORTANT GUIDELINES:
     } finally {
       setIsLoading(false);
     }
-  }, [hero]);
+  }, [hero, scenario, enhancedSystemPrompt]);
 
   // 메시지 전송
   const sendMessage = useCallback(async (userMessage) => {

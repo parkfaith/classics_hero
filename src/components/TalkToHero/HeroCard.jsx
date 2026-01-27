@@ -44,6 +44,9 @@ const HeroCard = ({ hero, onSelect }) => {
         <div className="hero-card-header">
           <h3 className="hero-name">{hero.nameKo}</h3>
           <span className="hero-period">{hero.period}</span>
+          {hero.scenarios && hero.scenarios.length > 0 && (
+            <span className="roleplay-badge">🎭 롤플레이</span>
+          )}
         </div>
 
         <p className="hero-summary">{hero.profile?.summaryKo || ''}</p>

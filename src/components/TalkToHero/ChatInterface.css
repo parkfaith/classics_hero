@@ -456,3 +456,174 @@
     font-size: 1.125rem;
   }
 }
+
+/* 시나리오 모드 스타일 */
+.scenario-info {
+  font-size: 0.875rem;
+  color: #8b5cf6;
+  font-weight: 600;
+  margin: 0;
+}
+
+.scenario-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.progress-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.completed-badge {
+  background: #10b981;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+/* 배지 완료 모달 */
+.badge-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.badge-modal {
+  background: white;
+  padding: 3rem 2rem;
+  border-radius: 24px;
+  max-width: 500px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease;
+}
+
+.badge-celebration {
+  font-size: 4rem;
+  animation: bounce 0.6s ease infinite;
+}
+
+.badge-icon-large {
+  font-size: 6rem;
+  margin: 1rem 0;
+  animation: scaleIn 0.5s ease;
+}
+
+.badge-modal h2 {
+  font-size: 2rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.badge-name {
+  font-size: 1.5rem;
+  color: #8b5cf6;
+  margin-bottom: 1rem;
+}
+
+.badge-description {
+  color: #6b7280;
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.scenario-objectives-completed {
+  background: #f0fdf4;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.scenario-objectives-completed h4 {
+  color: #047857;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.scenario-objectives-completed ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scenario-objectives-completed li {
+  color: #065f46;
+  padding: 0.5rem 0;
+  font-size: 0.95rem;
+}
+
+.badge-close-btn {
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.badge-close-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(139, 92, 246, 0.5);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

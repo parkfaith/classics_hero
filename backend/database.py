@@ -141,7 +141,8 @@ def init_db():
                 recommended_topics TEXT,
                 tts_rate REAL DEFAULT 0.9,
                 tts_pitch REAL DEFAULT 1.0,
-                portrait_image TEXT
+                portrait_image TEXT,
+                scenarios TEXT
             )
         """)
 

@@ -35,7 +35,8 @@ def row_to_hero(row) -> dict:
             "rate": row["tts_rate"],
             "pitch": row["tts_pitch"]
         },
-        "portraitImage": row["portrait_image"]
+        "portraitImage": row["portrait_image"],
+        "scenarios": json.loads(row["scenarios"]) if row.get("scenarios") else []
     }
 
 @router.get("/heroes")
