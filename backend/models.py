@@ -58,3 +58,4 @@ class Hero(BaseModel):
     recommendedTopics: Optional[List[RecommendedTopic]] = None
     ttsConfig: Optional[dict] = None
     portraitImage: Optional[str] = None
+    scenarios: Optional[List[dict]] = None
