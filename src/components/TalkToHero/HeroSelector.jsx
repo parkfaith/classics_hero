@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import HeroCard from './HeroCard';
 import { fetchHeroes } from '../../api';
+import LoadingScreen from '../LoadingScreen/LoadingScreen';
 import './HeroSelector.css';
 
 const HeroSelector = ({ onHeroSelect }) => {
@@ -27,9 +28,16 @@ const HeroSelector = ({ onHeroSelect }) => {
 
   if (loading) {
     return (
-      <div className="hero-selector">
-        <div className="loading">영웅 목록을 불러오는 중...</div>
-      </div>
+      <LoadingScreen
+        message="영웅들을 불러오는 중"
+        subMessage={
+          <>
+            역사 속 위인들을 준비하고 있어요.<br />
+            곧 대화를 시작할 수 있어요!
+          </>
+        }
+        icon="🏛️"
+      />
     );
   }
 
