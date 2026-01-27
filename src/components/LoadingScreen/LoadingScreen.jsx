@@ -22,7 +22,7 @@ const tips = [
   "반복 학습이 영어 실력의 비결이에요",
 ];
 
-const LoadingScreen = ({ message = "잠시만 기다려 주세요" }) => {
+const LoadingScreen = ({ message = "잠시만 기다려 주세요", subMessage, icon = "📚" }) => {
   const [quote, setQuote] = useState(quotes[0]);
   const [tip, setTip] = useState(tips[0]);
   const [dots, setDots] = useState('');
@@ -46,17 +46,21 @@ const LoadingScreen = ({ message = "잠시만 기다려 주세요" }) => {
   return (
     <div className="loading-screen">
       <div className="loading-content">
-        {/* 책 아이콘 */}
+        {/* 아이콘 */}
         <div className="loading-icon">
-          <span className="loading-icon-emoji">📚</span>
+          <span className="loading-icon-emoji">{icon}</span>
         </div>
 
         {/* 로딩 메시지 */}
         <div className="loading-message">
           <h2>{message}{dots}</h2>
           <p className="loading-submessage">
-            서버에서 고전 문학들을 가져오고 있어요.<br />
-            잠시만 기다려 주세요!
+            {subMessage || (
+              <>
+                서버에서 고전 문학들을 가져오고 있어요.<br />
+                잠시만 기다려 주세요!
+              </>
+            )}
           </p>
         </div>
 

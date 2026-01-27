@@ -4,6 +4,7 @@ import { useTTS } from '../../hooks/useTTS';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
 import InsightReport from './InsightReport';
+import LoadingScreen from '../LoadingScreen/LoadingScreen';
 import './ChatInterface.css';
 
 const ChatInterface = ({ hero, onBack }) => {
@@ -45,6 +46,22 @@ const ChatInterface = ({ hero, onBack }) => {
       tts.speak(lastMessage.content, hero.ttsConfig);
     }
   }, [messages, autoTTS, hero.ttsConfig, tts]);
+
+  // 초기 로딩 화면 (메시지가 없고 로딩 중일 때)
+  if (messages.length === 0 && isLoading) {
+    return (
+      <LoadingScreen
+        message={`${hero.nameKo}를 만나는 중`}
+        subMessage={
+          <>
+            {hero.name}이(가) 인사를 준비하고 있어요.<br />
+            곧 대화를 시작할 수 있어요!
+          </>
+        }
+        icon={hero.avatar}
+      />
+    );
+  }
 
   return (
     <div className="chat-interface">
