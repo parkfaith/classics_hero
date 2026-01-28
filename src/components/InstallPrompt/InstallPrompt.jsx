@@ -21,6 +21,15 @@ function InstallPrompt() {
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     setIsIOS(isIOSDevice);
 
+    // Android에서 Chrome이 아닌 경우 프롬프트 표시하지 않음
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isAndroid = /android/.test(userAgent);
+    const isChrome = /chrome/.test(userAgent) && !/edg/.test(userAgent) && !/opr/.test(userAgent);
+
+    if (isAndroid && !isChrome) {
+      return;
+    }
+
     // 이미 설치되었거나 최근에 거부한 경우 표시하지 않음
     const installDismissed = localStorage.getItem('install-prompt-dismissed');
     if (isInStandaloneMode || installDismissed) {

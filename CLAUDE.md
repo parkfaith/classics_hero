@@ -107,9 +107,13 @@ classics_heros/
 │   │   │   ├── ChatInput.jsx
 │   │   │   ├── MessageBubble.jsx
 │   │   │   └── InsightReport.jsx
+│   │   ├── BrowserCheck/    # Chrome 브라우저 체크
+│   │   │   ├── BrowserCheck.jsx
+│   │   │   └── BrowserCheck.css
 │   │   ├── InstallPrompt/   # PWA 홈화면 추가 안내
 │   │   │   ├── InstallPrompt.jsx
 │   │   │   └── InstallPrompt.css
+│   │   ├── SplashScreen/    # 스플래시 화면
 │   │   ├── Dictionary/      # 단어 사전
 │   │   └── ...
 │   └── hooks/               # 커스텀 훅
@@ -121,6 +125,8 @@ classics_heros/
 
 ```
 App.jsx (Mode Router)
+├── SplashScreen → 로딩 화면 (made by ParkJunHyoung)
+├── BrowserCheck → Chrome 브라우저 체크 (Android)
 ├── InstallPrompt → PWA 홈화면 추가 안내 (자동 표시)
 ├── BookList → 도서관 (API: /api/books)
 ├── BookReader → 읽기 모드 (mode: 'reading')
@@ -214,6 +220,10 @@ GET  /api/health                   # 헬스체크
 ## Key Features
 
 ### PWA (Progressive Web App)
+- **Chrome 브라우저 필수**: Android에서 Chrome이 아닌 브라우저 접속 시 Chrome 설치 안내
+  - STT/TTS 기능은 Chrome에서만 안정적으로 동작
+  - Chrome이 아닌 브라우저 접속 시 자동으로 설치 안내 표시
+  - iOS는 Safari 사용 (WebKit 강제)
 - **홈화면 추가**: 모바일 기기 홈화면에 앱 아이콘 추가 가능
 - **자동 설치 안내**: 앱 시작 3초 후 설치 프롬프트 자동 표시
   - Android Chrome: 원클릭 설치 버튼
@@ -221,6 +231,7 @@ GET  /api/health                   # 헬스체크
 - **Service Worker**: 오프라인 지원 및 빠른 로딩
 - **Web App Manifest**: 앱 메타데이터 (이름, 아이콘, 테마 색상)
 - **설치 거부 시**: 7일간 프롬프트 미표시
+- **크레딧**: 스플래시 화면에 "made by ParkJunHyoung" 표시
 
 ### Talk to Hero (영웅과 대화)
 - 6명의 역사적 인물과 영어 대화
@@ -344,7 +355,9 @@ TalkToHero.jsx
 - 영웅 프로필 이미지는 `public/heroes/` 폴더에 저장
 - TTS/STT는 브라우저 Web Speech API 사용 (Chrome 권장)
 - **PWA**: 모바일 홈화면 추가 가능
-  - Android: 자동 설치 프롬프트 (Chrome)
-  - iOS: Safari 공유 메뉴 > "홈 화면에 추가"
+  - **Chrome 필수**: Android는 Chrome 브라우저 필수 (자동 안내)
+  - Android Chrome: 자동 설치 프롬프트
+  - iOS Safari: 공유 메뉴 > "홈 화면에 추가"
   - Service Worker로 오프라인 지원
   - 설치 거부 시 7일간 미표시
+- **크레딧**: 스플래시 화면 하단에 "made by ParkJunHyoung" 표시

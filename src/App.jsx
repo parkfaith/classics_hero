@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import SplashScreen from './components/SplashScreen/SplashScreen';
+import BrowserCheck from './components/BrowserCheck/BrowserCheck';
 import Navigation from './components/Navigation/Navigation';
 import Footer from './components/Footer/Footer';
 import BookList from './components/BookList/BookList';
@@ -90,6 +91,9 @@ function App() {
 
   return (
     <div className="app">
+      {/* Chrome 브라우저 체크 */}
+      <BrowserCheck />
+
       <Navigation
         currentPage={currentPage}
         onNavigate={handleNavigate}

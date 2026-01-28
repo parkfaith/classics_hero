@@ -133,6 +133,14 @@
   }
 }
 
+.splash-credit {
+  margin-top: 3rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+}
+
 @media (max-width: 768px) {
   .splash-logo-container {
     width: 140px;
@@ -160,5 +168,10 @@
 
   .splash-loading {
     width: 160px;
+  }
+
+  .splash-credit {
+    font-size: 0.75rem;
+    margin-top: 2rem;
   }
 }

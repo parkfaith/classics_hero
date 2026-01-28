@@ -39,6 +39,7 @@ const SplashScreen = ({ onComplete }) => {
         <div className="splash-loading">
           <div className="splash-loading-bar"></div>
         </div>
+        <p className="splash-credit">made by ParkJunHyoung</p>
       </div>
     </div>
   );
