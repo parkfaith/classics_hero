@@ -8,6 +8,7 @@ import SpeakingMode from './components/SpeakingMode/SpeakingMode';
 import Dictionary from './components/Dictionary/Dictionary';
 import TalkToHero from './components/TalkToHero/TalkToHero';
 import Settings from './components/Settings/Settings';
+import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import './App.css';
 
 // 학습 데이터 마이그레이션 버전 (형식 변경 시 증가)
@@ -118,6 +119,9 @@ function App() {
       </main>
 
       <Footer />
+
+      {/* 홈화면 추가 프롬프트 */}
+      <InstallPrompt />
 
       {selectedWord && (
         <Dictionary word={selectedWord} onClose={handleDictionaryClose} />

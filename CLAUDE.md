@@ -10,6 +10,7 @@ Claude Code를 위한 프로젝트 가이드
 - **학습 모드:** Reading, Speaking, Talk to Hero
 - AI 기반 발음 분석 및 역사적 인물과의 대화 기능
 - 음성 중심 UI (TTS/STT 기본 활성화)
+- **PWA 지원:** 모바일 홈화면 추가 가능
 
 ## Development Commands
 
@@ -80,6 +81,9 @@ classics_heros/
 │       └── classics.db      # SQLite DB 파일
 │
 ├── public/
+│   ├── manifest.json        # PWA 웹 앱 매니페스트
+│   ├── service-worker.js    # PWA Service Worker
+│   ├── ClassicHero.png      # 앱 아이콘 (512x512)
 │   └── heroes/              # 영웅 프로필 이미지 (지브리 스타일)
 │       ├── aesop.png
 │       ├── grimm.png
@@ -103,6 +107,9 @@ classics_heros/
 │   │   │   ├── ChatInput.jsx
 │   │   │   ├── MessageBubble.jsx
 │   │   │   └── InsightReport.jsx
+│   │   ├── InstallPrompt/   # PWA 홈화면 추가 안내
+│   │   │   ├── InstallPrompt.jsx
+│   │   │   └── InstallPrompt.css
 │   │   ├── Dictionary/      # 단어 사전
 │   │   └── ...
 │   └── hooks/               # 커스텀 훅
@@ -114,6 +121,7 @@ classics_heros/
 
 ```
 App.jsx (Mode Router)
+├── InstallPrompt → PWA 홈화면 추가 안내 (자동 표시)
 ├── BookList → 도서관 (API: /api/books)
 ├── BookReader → 읽기 모드 (mode: 'reading')
 ├── SpeakingMode → 말하기 모드 (mode: 'speaking')
@@ -204,6 +212,15 @@ GET  /api/health                   # 헬스체크
 | `useReadingProgress` | 독서 진행률 (localStorage) |
 
 ## Key Features
+
+### PWA (Progressive Web App)
+- **홈화면 추가**: 모바일 기기 홈화면에 앱 아이콘 추가 가능
+- **자동 설치 안내**: 앱 시작 3초 후 설치 프롬프트 자동 표시
+  - Android Chrome: 원클릭 설치 버튼
+  - iOS Safari: 단계별 설치 안내
+- **Service Worker**: 오프라인 지원 및 빠른 로딩
+- **Web App Manifest**: 앱 메타데이터 (이름, 아이콘, 테마 색상)
+- **설치 거부 시**: 7일간 프롬프트 미표시
 
 ### Talk to Hero (영웅과 대화)
 - 6명의 역사적 인물과 영어 대화
@@ -326,3 +343,8 @@ TalkToHero.jsx
 - OpenAI API 키 필요 (Talk to Hero, 발음 분석)
 - 영웅 프로필 이미지는 `public/heroes/` 폴더에 저장
 - TTS/STT는 브라우저 Web Speech API 사용 (Chrome 권장)
+- **PWA**: 모바일 홈화면 추가 가능
+  - Android: 자동 설치 프롬프트 (Chrome)
+  - iOS: Safari 공유 메뉴 > "홈 화면에 추가"
+  - Service Worker로 오프라인 지원
+  - 설치 거부 시 7일간 미표시
