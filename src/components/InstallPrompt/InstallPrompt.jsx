@@ -21,12 +21,17 @@ function InstallPrompt() {
     const isIOSDevice = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     setIsIOS(isIOSDevice);
 
-    // Android에서 Chrome이 아닌 경우 프롬프트 표시하지 않음
+    // Chrome이 아닌 경우 프롬프트 표시하지 않음
     const userAgent = navigator.userAgent.toLowerCase();
     const isAndroid = /android/.test(userAgent);
-    const isChrome = /chrome/.test(userAgent) && !/edg/.test(userAgent) && !/opr/.test(userAgent);
 
-    if (isAndroid && !isChrome) {
+    // Chrome 브라우저 확인
+    const isChrome = isAndroid
+      ? (/chrome/.test(userAgent) && !/edg/.test(userAgent) && !/opr/.test(userAgent))
+      : /crios/.test(userAgent); // iOS Chrome
+
+    // Chrome이 아니면 프롬프트 표시하지 않음
+    if ((isAndroid || isIOSDevice) && !isChrome) {
       return;
     }
 
@@ -103,14 +108,14 @@ function InstallPrompt() {
         <h3 className="install-prompt-title">Classic Hero 설치</h3>
 
         {isIOS ? (
-          // iOS 안내
+          // iOS Chrome 안내
           <div className="install-prompt-content">
             <p className="install-prompt-description">
               홈화면에 추가하여 앱처럼 사용하세요!
             </p>
             <ol className="install-prompt-steps">
               <li>
-                하단의 <span className="ios-share-icon">⎙</span> (공유) 버튼을 누르세요
+                우측 상단 <span className="ios-share-icon">⋯</span> (더보기) 메뉴를 누르세요
               </li>
               <li>
                 <strong>"홈 화면에 추가"</strong>를 선택하세요

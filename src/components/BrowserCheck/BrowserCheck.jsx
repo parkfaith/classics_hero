@@ -16,13 +16,20 @@ function BrowserCheck() {
     const isAndroidDevice = /android/.test(userAgent);
     setIsAndroid(isAndroidDevice);
 
-    // iOS는 모든 브라우저가 WebKit을 사용하므로 체크 불필요
-    if (!isAndroidDevice) {
+    // iOS 기기 확인
+    const isIOSDevice = /ipad|iphone|ipod/.test(userAgent) && !window.MSStream;
+
+    // 모바일 기기가 아니면 체크 불필요
+    if (!isAndroidDevice && !isIOSDevice) {
       return;
     }
 
     // Chrome 브라우저 확인
-    const isChrome = /chrome/.test(userAgent) && !/edg/.test(userAgent) && !/opr/.test(userAgent);
+    // Android: chrome이 있고 edge, opera가 아님
+    // iOS: CriOS (Chrome iOS)
+    const isChrome = isAndroidDevice
+      ? (/chrome/.test(userAgent) && !/edg/.test(userAgent) && !/opr/.test(userAgent))
+      : /crios/.test(userAgent);
 
     // Chrome이 아니고, 이전에 경고를 닫지 않았다면 표시
     if (!isChrome) {
@@ -40,7 +47,10 @@ function BrowserCheck() {
 
   const handleInstallChrome = () => {
     // Chrome 다운로드 페이지로 이동
-    window.open('https://play.google.com/store/apps/details?id=com.android.chrome', '_blank');
+    const chromeUrl = isAndroid
+      ? 'https://play.google.com/store/apps/details?id=com.android.chrome'
+      : 'https://apps.apple.com/app/google-chrome/id535886823';
+    window.open(chromeUrl, '_blank');
   };
 
   if (!showWarning) {
@@ -74,13 +84,16 @@ function BrowserCheck() {
               <span>텍스트 음성 변환 (TTS)</span>
             </div>
             <div className="browser-check-feature">
-              <span className="feature-icon">📱</span>
-              <span>홈화면 추가 (PWA)</span>
+              <span className="feature-icon">💬</span>
+              <span>영웅과 음성 대화</span>
             </div>
           </div>
 
           <p className="browser-check-note">
-            최상의 경험을 위해 Chrome 브라우저를 설치하고 이 페이지를 다시 열어주세요.
+            {isAndroid
+              ? '최상의 경험을 위해 Chrome 브라우저를 설치하고 이 페이지를 다시 열어주세요.'
+              : 'Safari는 음성 인식 기능을 지원하지 않습니다. Chrome 브라우저를 설치하고 이 페이지를 다시 열어주세요.'
+            }
           </p>
         </div>
 
