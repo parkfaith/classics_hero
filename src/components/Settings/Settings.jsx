@@ -13,7 +13,7 @@ const Settings = ({ onClose }) => {
           <section className="settings-section">
             <h3>AI 언어 모델</h3>
             <div className="info-box">
-              <p className="api-status-ok">OpenAI GPT-3.5 사용 중</p>
+              <p className="api-status-ok">OpenAI GPT-4o-mini 사용 중</p>
               <p className="api-note">
                 서버에 설정된 API 키를 사용하여 번역, 대화, 발음 분석 기능이 제공됩니다.
               </p>
