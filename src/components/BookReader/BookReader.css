@@ -1172,3 +1172,157 @@
     width: 80px;
   }
 }
+
+/* 중요 단어 하이라이트 */
+.vocabulary-highlight {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  border-bottom: 2px solid #f59e0b;
+  cursor: help;
+  transition: all 0.2s ease;
+}
+
+.vocabulary-highlight:hover {
+  background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* 중요 단어 설명 섹션 */
+.vocabulary-section {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  padding: 2rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+  border: 2px solid #bae6fd;
+}
+
+.vocabulary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.vocabulary-header h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0c4a6e;
+}
+
+.extracting-badge {
+  font-size: 0.75rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 100px;
+  font-weight: 600;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.vocabulary-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.vocabulary-item {
+  background: white;
+  padding: 1.25rem;
+  border-radius: 10px;
+  border: 2px solid #e0f2fe;
+  transition: all 0.3s ease;
+}
+
+.vocabulary-item:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-2px);
+}
+
+.vocabulary-word {
+  margin-bottom: 0.75rem;
+}
+
+.vocabulary-word mark {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.vocabulary-definition {
+  color: #1e3a8a;
+  font-size: 0.938rem;
+  font-weight: 600;
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+
+.vocabulary-example {
+  color: #64748b;
+  font-size: 0.813rem;
+  line-height: 1.5;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+  margin-top: 0.5rem;
+}
+
+.vocabulary-example em {
+  color: #475569;
+  font-weight: 600;
+  font-style: normal;
+}
+
+/* 반응형 - Vocabulary */
+@media (max-width: 768px) {
+  .vocabulary-section {
+    padding: 1.5rem;
+  }
+
+  .vocabulary-list {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .vocabulary-item {
+    padding: 1rem;
+  }
+
+  .vocabulary-header h3 {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .vocabulary-section {
+    padding: 1rem;
+  }
+
+  .vocabulary-item {
+    padding: 0.875rem;
+  }
+
+  .vocabulary-word mark {
+    font-size: 1rem;
+  }
+
+  .vocabulary-definition {
+    font-size: 0.875rem;
+  }
+
+  .vocabulary-example {
+    font-size: 0.75rem;
+  }
+}

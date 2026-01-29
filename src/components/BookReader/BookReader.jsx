@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLearningProgress } from '../../hooks/useLearningProgress';
+import { useVocabularyExtraction } from '../../hooks/useVocabularyExtraction';
 import './BookReader.css';
 
 // 기본 책 아이콘 컴포넌트
@@ -28,8 +29,13 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
   const timerRef = useRef(null);
   const startTimeRef = useRef(null);
 
+  // 중요 단어 추출
+  const [vocabulary, setVocabulary] = useState([]);
+  const [showVocabulary, setShowVocabulary] = useState(true);
+
   const translation = useTranslation();
   const { markChapterCompleted, getBookProgress } = useLearningProgress();
+  const { extractVocabulary, isExtracting } = useVocabularyExtraction();
 
   const currentChapter = book.chapters[currentChapterIndex];
 
@@ -85,6 +91,22 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     // 챕터 변경 시 재생 중인 오디오 중지
     handleStop();
   }, [currentChapterIndex, book.id]);
+
+  // 챕터 변경 시 중요 단어 추출
+  useEffect(() => {
+    const loadVocabulary = async () => {
+      const vocab = await extractVocabulary(
+        currentChapter.content,
+        book.difficulty,
+        currentChapter.id
+      );
+      if (vocab) {
+        setVocabulary(vocab);
+      }
+    };
+
+    loadVocabulary();
+  }, [currentChapter.id, currentChapter.content, book.difficulty, extractVocabulary]);
 
   // 단어 배열 업데이트
   useEffect(() => {
@@ -294,14 +316,82 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     }));
   };
 
-  // 하이라이트된 텍스트 렌더링
+  // 중요 단어가 하이라이트된 텍스트 렌더링
+  const renderTextWithVocabulary = (content) => {
+    if (!showVocabulary || vocabulary.length === 0) {
+      return content;
+    }
+
+    // 단어/숙어를 찾아서 하이라이트
+    let result = content;
+    const parts = [];
+    let lastIndex = 0;
+
+    // 긴 구문부터 짧은 단어 순으로 정렬 (긴 매칭 우선)
+    const sortedVocab = [...vocabulary].sort((a, b) => b.word.length - a.word.length);
+
+    // 이미 매칭된 위치를 추적
+    const matchedRanges = [];
+
+    sortedVocab.forEach((item, idx) => {
+      const word = item.word;
+      // 대소문자 구분 없이 검색 (단어 경계 포함)
+      const regex = new RegExp(`\\b(${word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})\\b`, 'gi');
+      let match;
+
+      while ((match = regex.exec(content)) !== null) {
+        const start = match.index;
+        const end = start + match[0].length;
+
+        // 이미 매칭된 범위와 겹치는지 확인
+        const overlaps = matchedRanges.some(
+          range => (start >= range.start && start < range.end) || (end > range.start && end <= range.end)
+        );
+
+        if (!overlaps) {
+          matchedRanges.push({ start, end, word: match[0], idx });
+        }
+      }
+    });
+
+    // 시작 위치 순으로 정렬
+    matchedRanges.sort((a, b) => a.start - b.start);
+
+    // 텍스트를 조각내서 렌더링
+    matchedRanges.forEach((range, index) => {
+      // 매칭 이전 텍스트
+      if (range.start > lastIndex) {
+        parts.push(
+          <span key={`text-${index}`}>{content.substring(lastIndex, range.start)}</span>
+        );
+      }
+
+      // 하이라이트된 단어
+      parts.push(
+        <mark key={`vocab-${index}`} className="vocabulary-highlight" data-vocab-index={range.idx}>
+          {range.word}
+        </mark>
+      );
+
+      lastIndex = range.end;
+    });
+
+    // 남은 텍스트
+    if (lastIndex < content.length) {
+      parts.push(<span key="text-end">{content.substring(lastIndex)}</span>);
+    }
+
+    return parts.length > 0 ? parts : content;
+  };
+
+  // 하이라이트된 텍스트 렌더링 (TTS용)
   const renderHighlightedText = () => {
     const words = wordsRef.current;
     const content = currentChapter.content;
 
     if (!isPlaying || currentWordIndex < 0) {
-      // 재생 중이 아닐 때는 일반 텍스트로 표시
-      return <span className="chapter-text-content">{content}</span>;
+      // 재생 중이 아닐 때는 vocabulary 하이라이트 적용
+      return <span className="chapter-text-content">{renderTextWithVocabulary(content)}</span>;
     }
 
     // 단어별로 하이라이트 적용
@@ -541,6 +631,31 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
             ) : chapterTranslation ? (
               <p>{chapterTranslation}</p>
             ) : null}
+          </div>
+        )}
+
+        {/* 중요 단어 설명 */}
+        {showVocabulary && vocabulary.length > 0 && (
+          <div className="vocabulary-section">
+            <div className="vocabulary-header">
+              <h3>📚 중요 단어 & 숙어</h3>
+              {isExtracting && <span className="extracting-badge">분석 중...</span>}
+            </div>
+            <div className="vocabulary-list">
+              {vocabulary.map((item, index) => (
+                <div key={index} className="vocabulary-item">
+                  <div className="vocabulary-word">
+                    <mark className="vocabulary-highlight">{item.word}</mark>
+                  </div>
+                  <div className="vocabulary-definition">{item.definition}</div>
+                  {item.example && (
+                    <div className="vocabulary-example">
+                      <em>예문:</em> {item.example}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </article>
