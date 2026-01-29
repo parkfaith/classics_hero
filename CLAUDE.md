@@ -269,7 +269,7 @@ GET  /api/health                   # 헬스체크
 
 ## External APIs
 
-**OpenAI API (gpt-3.5-turbo):**
+**OpenAI API (gpt-4o-mini):**
 - Talk to Hero 대화
 - 발음 분석 및 피드백
 - 번역 (우선)
