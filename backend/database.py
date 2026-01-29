@@ -212,6 +212,20 @@ def init_db():
             )
         """)
 
+        # Chapter Vocabulary 테이블 (챕터별 중요 단어/숙어 - GPT 추출 결과 캐싱)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS chapter_vocabulary (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                chapter_id INTEGER NOT NULL,
+                word TEXT NOT NULL,
+                definition TEXT NOT NULL,
+                example TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (chapter_id) REFERENCES chapters(id),
+                UNIQUE(chapter_id, word)
+            )
+        """)
+
         conn.commit()
 
 

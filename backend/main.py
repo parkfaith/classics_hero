@@ -1,7 +1,7 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routers import books, heroes, chapters, words, openai_proxy
+from routers import books, heroes, chapters, words, openai_proxy, vocabulary
 from database import init_db
 from dotenv import load_dotenv
 
@@ -27,6 +27,7 @@ app.include_router(heroes.router, prefix="/api")
 app.include_router(chapters.router, prefix="/api")
 app.include_router(words.router, prefix="/api")
 app.include_router(openai_proxy.router, prefix="/api")
+app.include_router(vocabulary.router, prefix="/api")
 
 @app.on_event("startup")
 def startup():
