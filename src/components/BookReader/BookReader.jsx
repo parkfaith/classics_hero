@@ -634,28 +634,54 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
           </div>
         )}
 
-        {/* 중요 단어 설명 */}
-        {showVocabulary && vocabulary.length > 0 && (
+        {/* 중요 단어 설명 - 항상 섹션 표시 */}
+        {showVocabulary && (
           <div className="vocabulary-section">
             <div className="vocabulary-header">
               <h3>📚 중요 단어 & 숙어</h3>
               {isExtracting && <span className="extracting-badge">분석 중...</span>}
             </div>
-            <div className="vocabulary-list">
-              {vocabulary.map((item, index) => (
-                <div key={index} className="vocabulary-item">
-                  <div className="vocabulary-word">
-                    <mark className="vocabulary-highlight">{item.word}</mark>
+
+            {/* 로딩 중: 스켈레톤 UI */}
+            {isExtracting && (
+              <div className="vocabulary-list">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="vocabulary-item skeleton">
+                    <div className="skeleton-word"></div>
+                    <div className="skeleton-definition"></div>
+                    <div className="skeleton-example"></div>
                   </div>
-                  <div className="vocabulary-definition">{item.definition}</div>
-                  {item.example && (
-                    <div className="vocabulary-example">
-                      <em>예문:</em> {item.example}
+                ))}
+              </div>
+            )}
+
+            {/* 로딩 완료 + 단어 있음: 실제 단어 목록 */}
+            {!isExtracting && vocabulary.length > 0 && (
+              <div className="vocabulary-list vocabulary-fade-in">
+                {vocabulary.map((item, index) => (
+                  <div key={index} className="vocabulary-item">
+                    <div className="vocabulary-word">
+                      <mark className="vocabulary-highlight">{item.word}</mark>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+                    <div className="vocabulary-definition">{item.definition}</div>
+                    {item.example && (
+                      <div className="vocabulary-example">
+                        <em>예문:</em> {item.example}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 로딩 완료 + 단어 없음: 빈 상태 메시지 */}
+            {!isExtracting && vocabulary.length === 0 && (
+              <div className="vocabulary-empty">
+                <span className="empty-icon">📖</span>
+                <p>이 챕터에서는 추출된 중요 단어가 없습니다.</p>
+                <span className="empty-hint">다른 챕터에서 더 많은 단어를 학습해보세요!</span>
+              </div>
+            )}
           </div>
         )}
       </article>

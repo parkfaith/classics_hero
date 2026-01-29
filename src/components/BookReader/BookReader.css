@@ -1285,6 +1285,91 @@
   font-style: normal;
 }
 
+/* 스켈레톤 로딩 UI */
+.vocabulary-item.skeleton {
+  pointer-events: none;
+}
+
+.skeleton-word,
+.skeleton-definition,
+.skeleton-example {
+  background: linear-gradient(90deg, #e0f2fe 25%, #bae6fd 50%, #e0f2fe 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-word {
+  width: 120px;
+  height: 28px;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-definition {
+  width: 100%;
+  height: 20px;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-example {
+  width: 80%;
+  height: 16px;
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 빈 상태 메시지 */
+.vocabulary-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  color: #64748b;
+}
+
+.vocabulary-empty .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.vocabulary-empty p {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.vocabulary-empty .empty-hint {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+/* 페이드인 애니메이션 */
+.vocabulary-fade-in {
+  animation: vocabulary-fade-in 0.4s ease-out;
+}
+
+@keyframes vocabulary-fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* 반응형 - Vocabulary */
 @media (max-width: 768px) {
   .vocabulary-section {

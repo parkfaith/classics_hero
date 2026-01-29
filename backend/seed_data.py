@@ -45,11 +45,11 @@ def seed_heroes(cursor):
                     "description": "Work with Aesop to create your own moral tale",
                     "descriptionKo": "이솝과 함께 나만의 우화를 만들어보세요",
                     "difficulty": "easy",
-                    "estimatedTime": "10분",
+                    "estimatedTime": "5분",
                     "objectives": ["Choose animal characters", "Create a simple story", "Find a moral lesson"],
                     "initialMessage": "Hello, my friend! Today, shall we create a fable together? Every good fable needs animals and a lesson. What animals do you like?",
                     "systemPromptAddition": "Guide the student to create a simple fable. Help them choose animals, create a short story, and find a moral lesson. Keep it simple and encouraging.",
-                    "successCriteria": {"minMessages": 8, "keyTopics": ["animals", "story", "moral", "lesson"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["animals", "story", "moral", "lesson"]},
                     "badge": {"icon": "🦊", "name": "Fable Creator", "nameKo": "우화 창작자"}
                 },
                 {
@@ -59,11 +59,11 @@ def seed_heroes(cursor):
                     "description": "Discuss life problems and learn wisdom from Aesop",
                     "descriptionKo": "인생의 고민을 나누고 이솝의 지혜를 배워보세요",
                     "difficulty": "easy",
-                    "estimatedTime": "12분",
+                    "estimatedTime": "5분",
                     "objectives": ["Share a personal challenge", "Listen to a relevant fable", "Apply the lesson"],
                     "initialMessage": "Welcome! Do you have something troubling you? I have many stories that might help. What is on your mind?",
                     "systemPromptAddition": "Listen to the student's problem and share a relevant fable. Explain the moral and help them apply it to their situation.",
-                    "successCriteria": {"minMessages": 10, "keyTopics": ["problem", "story", "wisdom", "advice"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["problem", "story", "wisdom", "advice"]},
                     "badge": {"icon": "💡", "name": "Wisdom Seeker", "nameKo": "지혜 탐구자"}
                 }
             ])
@@ -101,11 +101,11 @@ def seed_heroes(cursor):
                     "description": "Listen to a fairy tale and discuss its magic",
                     "descriptionKo": "동화를 듣고 그 속의 마법에 대해 이야기해보세요",
                     "difficulty": "easy",
-                    "estimatedTime": "10분",
+                    "estimatedTime": "5분",
                     "objectives": ["Choose a fairy tale", "Discuss the magic elements", "Understand the hidden meaning"],
                     "initialMessage": "Greetings! We have collected many wonderful tales from the old days. Which interests you more: magic spells, brave heroes, or talking animals?",
                     "systemPromptAddition": "Share a short fairy tale based on the student's interest. Discuss the magical elements and deeper meanings. Keep language simple.",
-                    "successCriteria": {"minMessages": 8, "keyTopics": ["magic", "tale", "meaning", "wonder"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["magic", "tale", "meaning", "wonder"]},
                     "badge": {"icon": "🏰", "name": "Tale Listener", "nameKo": "이야기 청취자"}
                 },
                 {
@@ -115,11 +115,11 @@ def seed_heroes(cursor):
                     "description": "Rewrite the ending of a classic fairy tale",
                     "descriptionKo": "고전 동화의 결말을 새롭게 바꿔보세요",
                     "difficulty": "easy",
-                    "estimatedTime": "12분",
+                    "estimatedTime": "5분",
                     "objectives": ["Choose a fairy tale", "Discuss what you'd change", "Create a new ending"],
                     "initialMessage": "Hello! Sometimes we wonder: what if a tale ended differently? Which of our tales would you like to change?",
                     "systemPromptAddition": "Help the student reimagine a fairy tale ending. Encourage creativity while keeping the core message.",
-                    "successCriteria": {"minMessages": 10, "keyTopics": ["tale", "ending", "change", "idea"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["tale", "ending", "change", "idea"]},
                     "badge": {"icon": "✨", "name": "Story Weaver", "nameKo": "이야기 직조자"}
                 }
             ])
@@ -158,11 +158,11 @@ def seed_heroes(cursor):
                     "description": "Learn how to create surprising plot twists",
                     "descriptionKo": "놀라운 반전 결말을 만드는 법을 배워보세요",
                     "difficulty": "medium",
-                    "estimatedTime": "15분",
+                    "estimatedTime": "5분",
                     "objectives": ["Discuss famous twist endings", "Learn storytelling techniques", "Create your own twist"],
                     "initialMessage": "Ah, hello there! You want to know the secret of a good surprise ending? Well, it's all about making the reader look one way while truth hides in another. Shall we explore this art together?",
                     "systemPromptAddition": "Teach about plot twists using examples from your stories. Help the student understand irony and unexpected endings. Guide them to create their own twist.",
-                    "successCriteria": {"minMessages": 12, "keyTopics": ["twist", "surprise", "irony", "story", "ending"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["twist", "surprise", "irony", "story", "ending"]},
                     "badge": {"icon": "🎭", "name": "Plot Twister", "nameKo": "반전의 달인"}
                 },
                 {
@@ -172,11 +172,11 @@ def seed_heroes(cursor):
                     "description": "Discuss the meaning of true sacrifice",
                     "descriptionKo": "진정한 희생의 의미에 대해 이야기해보세요",
                     "difficulty": "medium",
-                    "estimatedTime": "12분",
+                    "estimatedTime": "5분",
                     "objectives": ["Discuss 'The Gift of the Magi'", "Share personal stories", "Understand true love"],
                     "initialMessage": "Welcome, friend! I've always believed the greatest stories are about ordinary people doing extraordinary things for love. Have you ever sacrificed something important for someone you care about?",
                     "systemPromptAddition": "Discuss themes of love and sacrifice from your stories, especially 'The Gift of the Magi'. Help the student reflect on their own experiences with love and giving.",
-                    "successCriteria": {"minMessages": 10, "keyTopics": ["love", "sacrifice", "giving", "gift"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["love", "sacrifice", "giving", "gift"]},
                     "badge": {"icon": "💝", "name": "Heart of Gold", "nameKo": "황금빛 마음"}
                 }
             ])
@@ -214,11 +214,11 @@ def seed_heroes(cursor):
                     "description": "Create a daily routine with Franklin's wisdom",
                     "descriptionKo": "프랭클린의 지혜로 일과를 만들어보세요",
                     "difficulty": "medium",
-                    "estimatedTime": "15분",
+                    "estimatedTime": "5분",
                     "objectives": ["Learn Franklin's daily schedule", "Discuss time management", "Create your own routine"],
                     "initialMessage": "Good day! I've always believed that 'time is money.' Let me share my daily routine with you. I wake at 5 AM and ask myself: 'What good shall I do this day?' Shall we design a productive schedule for you?",
                     "systemPromptAddition": "Share your famous daily routine and the 13 virtues. Help the student design a practical schedule that balances work, learning, and rest.",
-                    "successCriteria": {"minMessages": 12, "keyTopics": ["routine", "time", "productivity", "schedule"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["routine", "time", "productivity", "schedule"]},
                     "badge": {"icon": "⏰", "name": "Time Master", "nameKo": "시간 관리자"}
                 },
                 {
@@ -228,11 +228,11 @@ def seed_heroes(cursor):
                     "description": "Think of solutions to everyday problems",
                     "descriptionKo": "일상의 문제를 해결할 아이디어를 생각해보세요",
                     "difficulty": "medium",
-                    "estimatedTime": "15분",
+                    "estimatedTime": "5분",
                     "objectives": ["Identify a problem", "Brainstorm solutions", "Design a simple invention"],
                     "initialMessage": "Hello there! I invented bifocals because I was tired of switching glasses. The best inventions solve real problems. What annoys you in your daily life? Perhaps we can invent something!",
                     "systemPromptAddition": "Guide the student through the invention process: identify problem, brainstorm solutions, refine ideas. Encourage practical thinking.",
-                    "successCriteria": {"minMessages": 12, "keyTopics": ["problem", "solution", "invention", "idea"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["problem", "solution", "invention", "idea"]},
                     "badge": {"icon": "💡", "name": "Young Inventor", "nameKo": "젊은 발명가"}
                 },
                 {
@@ -242,11 +242,11 @@ def seed_heroes(cursor):
                     "description": "Learn Franklin's self-improvement system",
                     "descriptionKo": "프랭클린의 자기계발 시스템을 배워보세요",
                     "difficulty": "medium",
-                    "estimatedTime": "12분",
+                    "estimatedTime": "5분",
                     "objectives": ["Learn the 13 virtues", "Choose one to practice", "Make an action plan"],
                     "initialMessage": "Welcome! At age 20, I created a list of 13 virtues to improve myself: Temperance, Silence, Order, Resolution, and so on. Would you like to learn them and choose one to practice?",
                     "systemPromptAddition": "Explain your 13 virtues system. Help the student choose one virtue to focus on and create a concrete plan to practice it.",
-                    "successCriteria": {"minMessages": 10, "keyTopics": ["virtues", "improvement", "practice", "habit"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["virtues", "improvement", "practice", "habit"]},
                     "badge": {"icon": "📜", "name": "Virtue Seeker", "nameKo": "덕목 추구자"}
                 }
             ])
@@ -285,11 +285,11 @@ def seed_heroes(cursor):
                     "description": "Practice Stoic morning reflection with Marcus",
                     "descriptionKo": "마르쿠스와 함께 스토아식 아침 성찰을 연습하세요",
                     "difficulty": "advanced",
-                    "estimatedTime": "15분",
+                    "estimatedTime": "5분",
                     "objectives": ["Learn the morning meditation", "Prepare for daily challenges", "Practice acceptance"],
                     "initialMessage": "Greetings. Each morning, I remind myself: 'Today I shall meet interference, ingratitude, and selfishness.' This prepares my mind. Shall we practice this together?",
                     "systemPromptAddition": "Guide the student through your morning meditation practice. Help them anticipate challenges and prepare mentally using Stoic principles.",
-                    "successCriteria": {"minMessages": 12, "keyTopics": ["meditation", "preparation", "acceptance", "stoicism"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["meditation", "preparation", "acceptance", "stoicism"]},
                     "badge": {"icon": "🏛️", "name": "Stoic Student", "nameKo": "스토아 수련생"}
                 },
                 {
@@ -303,7 +303,7 @@ def seed_heroes(cursor):
                     "objectives": ["Understand Stoic view of emotions", "Practice emotional control", "Find inner peace"],
                     "initialMessage": "Even as Emperor, I face anger and fear. But remember: you have power over your mind, not outside events. What emotion troubles you most?",
                     "systemPromptAddition": "Discuss Stoic philosophy of emotions. Help the student understand what they can control vs. what they cannot. Provide practical techniques for emotional management.",
-                    "successCriteria": {"minMessages": 15, "keyTopics": ["control", "emotions", "peace", "mind", "stoicism"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["control", "emotions", "peace", "mind", "stoicism"]},
                     "badge": {"icon": "🧘", "name": "Mind Master", "nameKo": "마음의 달인"}
                 },
                 {
@@ -317,7 +317,7 @@ def seed_heroes(cursor):
                     "objectives": ["Reflect on your nature", "Understand your duty", "Find meaning"],
                     "initialMessage": "A man must stand upright, not be kept upright by others. What is your purpose? What gift can you give to the world? Let us contemplate together.",
                     "systemPromptAddition": "Help the student reflect deeply on their purpose and duty. Use Stoic philosophy to guide them toward understanding their role in society.",
-                    "successCriteria": {"minMessages": 15, "keyTopics": ["purpose", "duty", "meaning", "nature"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["purpose", "duty", "meaning", "nature"]},
                     "badge": {"icon": "⭐", "name": "Purpose Finder", "nameKo": "목적 탐구자"}
                 }
             ])
@@ -359,7 +359,7 @@ def seed_heroes(cursor):
                     "objectives": ["Understand the Civil War context", "Discuss the speech's purpose", "Analyze key phrases"],
                     "initialMessage": "Good day. I must speak at Gettysburg, where many brave men fell. The world will little note what I say here, but I must speak from the heart. Will you help me think through this?",
                     "systemPromptAddition": "Discuss the Gettysburg Address. Help the student understand the historical context, the purpose of the speech, and the rhetorical devices used. Analyze key phrases like 'government of the people, by the people, for the people.'",
-                    "successCriteria": {"minMessages": 15, "keyTopics": ["speech", "equality", "democracy", "freedom", "sacrifice"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["speech", "equality", "democracy", "freedom", "sacrifice"]},
                     "badge": {"icon": "🎤", "name": "Great Orator", "nameKo": "위대한 연사"}
                 },
                 {
@@ -373,7 +373,7 @@ def seed_heroes(cursor):
                     "objectives": ["Define freedom", "Discuss equality", "Understand democracy"],
                     "initialMessage": "My friend, I have always thought that all men are created equal. But what does freedom truly mean? Is it just the absence of chains, or something more? Let us explore this together.",
                     "systemPromptAddition": "Engage in deep discussion about freedom, equality, and human rights. Connect to the Emancipation Proclamation and modern civil rights. Help the student think critically about these concepts.",
-                    "successCriteria": {"minMessages": 15, "keyTopics": ["freedom", "equality", "rights", "justice"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["freedom", "equality", "rights", "justice"]},
                     "badge": {"icon": "🗽", "name": "Freedom Fighter", "nameKo": "자유의 수호자"}
                 },
                 {
@@ -387,7 +387,7 @@ def seed_heroes(cursor):
                     "objectives": ["Discuss leadership challenges", "Learn from Civil War decisions", "Apply to modern life"],
                     "initialMessage": "Leadership is not easy. During the war, I faced impossible choices. Every decision affected thousands of lives. What leadership challenges do you face? Perhaps we can learn from each other.",
                     "systemPromptAddition": "Share your leadership experiences during the Civil War. Discuss how you handled criticism, made tough decisions, and stayed true to your principles. Help the student apply these lessons to their own life.",
-                    "successCriteria": {"minMessages": 18, "keyTopics": ["leadership", "decision", "crisis", "courage", "principle"]},
+                    "successCriteria": {"minMessages": 5, "keyTopics": ["leadership", "decision", "crisis", "courage", "principle"]},
                     "badge": {"icon": "🎖️", "name": "Crisis Leader", "nameKo": "위기의 리더"}
                 }
             ])

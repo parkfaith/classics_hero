@@ -123,10 +123,14 @@ const ScenarioSelector = ({ hero, onScenarioSelect, onBack, onSkip }) => {
         </div>
       )}
 
-      {selectedScenario && (
+      {hero.scenarios && hero.scenarios.length > 0 && (
         <div className="scenario-actions">
-          <button className="start-scenario-btn" onClick={handleStart}>
-            🎬 시나리오 시작하기
+          <button
+            className={`start-scenario-btn ${!selectedScenario ? 'disabled' : ''}`}
+            onClick={handleStart}
+            disabled={!selectedScenario}
+          >
+            {selectedScenario ? '🎬 시나리오 시작하기' : '👆 시나리오를 선택하세요'}
           </button>
         </div>
       )}

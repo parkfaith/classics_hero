@@ -6,7 +6,15 @@ from models import Hero
 
 router = APIRouter(tags=["heroes"])
 
+def safe_get(row, key, default=None):
+    """sqlite3.Row에서 안전하게 값 가져오기"""
+    try:
+        return row[key]
+    except (KeyError, IndexError):
+        return default
+
 def row_to_hero(row) -> dict:
+    scenarios_raw = safe_get(row, "scenarios")
     return {
         "id": row["id"],
         "name": row["name"],
@@ -36,7 +44,7 @@ def row_to_hero(row) -> dict:
             "pitch": row["tts_pitch"]
         },
         "portraitImage": row["portrait_image"],
-        "scenarios": json.loads(row["scenarios"]) if row.get("scenarios") else []
+        "scenarios": json.loads(scenarios_raw) if scenarios_raw else []
     }
 
 @router.get("/heroes")
