@@ -1,7 +1,11 @@
 import { useState, useCallback } from 'react';
 
 // 배포 환경: Render API URL, 로컬: Vite 프록시 사용
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const API_BASE = import.meta.env.VITE_API_URL || (
+  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? '/api'
+    : 'https://classics-hero-api.onrender.com/api'
+);
 
 export const useHeroChat = (hero, scenario = null) => {
   const [messages, setMessages] = useState([]);
