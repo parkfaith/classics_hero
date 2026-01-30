@@ -17,16 +17,15 @@ aesop_scenarios = [
         "description": "Aesop teaches you one of his famous fables and its moral lesson.",
         "descriptionKo": "이솝이 유명한 우화와 그 교훈을 가르쳐줍니다.",
         "difficulty": "easy",
-        "estimatedTime": "5-10분",
+        "estimatedTime": "3-5분",
         "objectives": [
-            "Listen to a complete fable",
-            "Understand the moral of the story",
-            "Ask questions about the characters"
+            "Listen to a fable",
+            "Learn the moral"
         ],
         "initialMessage": "Welcome, young learner! I am Aesop, and I have many tales to share. Would you like to hear about the Tortoise and the Hare, or perhaps the Fox and the Grapes? Choose one, and I shall tell you the story!",
-        "systemPromptAddition": "In this scenario, you will tell one of your famous fables in full, then explain its moral. Guide the student to understand the lesson. Keep the story simple but engaging.",
+        "systemPromptAddition": "Tell one fable concisely (in 2-3 short paragraphs), then explain its moral in 1-2 sentences. Answer 1-2 student questions briefly. Keep it under 5 minutes total - be concise and focused.",
         "successCriteria": {
-            "minMessages": 4,
+            "minMessages": 6,
             "keyTopics": ["moral", "lesson", "story", "tortoise", "hare", "fox", "grapes"]
         },
         "badge": {
@@ -42,16 +41,16 @@ aesop_scenarios = [
         "description": "Work with Aesop to create your own short fable with a moral.",
         "descriptionKo": "이솝과 함께 교훈이 담긴 나만의 짧은 우화를 만들어봅니다.",
         "difficulty": "medium",
-        "estimatedTime": "10-15분",
+        "estimatedTime": "4-7분",
         "objectives": [
-            "Choose animal characters",
-            "Create a simple plot",
-            "Define a moral lesson"
+            "Pick 2 animals",
+            "Make simple story",
+            "Add moral"
         ],
         "initialMessage": "Ah, you wish to become a storyteller yourself! Wonderful! Let us create a fable together. First, tell me - what two animals shall be in your story? Perhaps a clever one and a foolish one?",
-        "systemPromptAddition": "Help the student create their own simple fable. Guide them step by step: 1) Choose animals, 2) Create a simple conflict, 3) Decide the ending, 4) Define the moral. Be encouraging and helpful.",
+        "systemPromptAddition": "Quick fable creation in 3 steps: 1) Student picks 2 animals, 2) You suggest a simple 2-sentence conflict, 3) Student adds ending and moral. Keep it brief and fun - aim for 5-7 minutes total. Don't overthink, just create!",
         "successCriteria": {
-            "minMessages": 6,
+            "minMessages": 8,
             "keyTopics": ["animal", "story", "moral", "character", "ending", "lesson"]
         },
         "badge": {
@@ -71,16 +70,15 @@ franklin_scenarios = [
         "description": "Franklin teaches you about his famous 13 virtues for self-improvement.",
         "descriptionKo": "프랭클린이 자기계발을 위한 유명한 13가지 덕목을 가르쳐줍니다.",
         "difficulty": "medium",
-        "estimatedTime": "5-10분",
+        "estimatedTime": "4-7분",
         "objectives": [
-            "Learn about Franklin's 13 virtues",
-            "Understand practical self-improvement",
-            "Set a personal goal"
+            "Learn 3-4 key virtues",
+            "Pick one to practice"
         ],
         "initialMessage": "Good day! I spent much of my life trying to arrive at moral perfection through 13 virtues. Would you like to hear about them? I can share how I practiced them daily, and perhaps you can choose one to focus on yourself!",
-        "systemPromptAddition": "Explain your 13 virtues system: Temperance, Silence, Order, Resolution, Frugality, Industry, Sincerity, Justice, Moderation, Cleanliness, Tranquility, Chastity, Humility. Help the student choose one to practice.",
+        "systemPromptAddition": "Briefly introduce your 13 virtues concept, then focus on 3-4 most practical ones: Temperance, Industry, Sincerity, Order. Let student pick one and give 1-2 quick tips. Keep under 7 minutes - be practical, not exhaustive.",
         "successCriteria": {
-            "minMessages": 4,
+            "minMessages": 8,
             "keyTopics": ["virtue", "practice", "improve", "temperance", "industry", "goal"]
         },
         "badge": {
@@ -100,16 +98,15 @@ lincoln_scenarios = [
         "description": "Lincoln explains the meaning behind his famous Gettysburg Address.",
         "descriptionKo": "링컨이 유명한 게티즈버그 연설의 의미를 설명합니다.",
         "difficulty": "advanced",
-        "estimatedTime": "10-15분",
+        "estimatedTime": "5-8분",
         "objectives": [
-            "Understand the historical context",
-            "Learn key phrases from the speech",
-            "Discuss the meaning of democracy"
+            "Learn 2-3 key phrases",
+            "Understand main message"
         ],
         "initialMessage": "Four score and seven years ago... Do you know these words? They are from my address at Gettysburg. It was a short speech, but it carried the weight of our nation's ideals. Shall I explain what it means?",
-        "systemPromptAddition": "Explain the Gettysburg Address phrase by phrase. Discuss its historical context (Civil War), key concepts (democracy, equality, sacrifice), and why it remains important today. Keep explanations clear for language learners.",
+        "systemPromptAddition": "Focus on 2-3 most famous phrases: 'Four score and seven years ago', 'all men are created equal', 'government of the people, by the people, for the people'. Quick context (Civil War), main idea (democracy, equality), why it matters. Concise explanations - target 8 minutes max.",
         "successCriteria": {
-            "minMessages": 5,
+            "minMessages": 10,
             "keyTopics": ["people", "democracy", "freedom", "nation", "equal", "liberty"]
         },
         "badge": {
@@ -163,14 +160,14 @@ if __name__ == "__main__":
         conn = sqlite3.connect("data/classics.db")
         cursor = conn.cursor()
 
-        # 시나리오 컬럼 추가
+        # Add scenarios column
         try:
             cursor.execute("ALTER TABLE heroes ADD COLUMN scenarios TEXT")
-            print("scenarios 컬럼 추가됨")
+            print("[OK] scenarios column added")
         except:
-            print("scenarios 컬럼이 이미 존재함")
+            print("[OK] scenarios column already exists")
 
-        # 각 영웅에게 시나리오 추가
+        # Add scenarios to each hero
         for hero_id, scenarios in [
             ("aesop", aesop_scenarios),
             ("franklin", franklin_scenarios),
@@ -181,8 +178,8 @@ if __name__ == "__main__":
                 "UPDATE heroes SET scenarios = ? WHERE id = ?",
                 (scenarios_json, hero_id)
             )
-            print(f"✓ {hero_id} 시나리오 추가 완료 ({len(scenarios)}개)")
+            print(f"[OK] {hero_id} scenarios updated ({len(scenarios)} scenarios)")
 
         conn.commit()
         conn.close()
-        print("\n시나리오 데이터 추가 완료!")
+        print("\n[DONE] Scenarios data updated!")
