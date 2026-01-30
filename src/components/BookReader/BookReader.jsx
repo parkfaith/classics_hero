@@ -662,7 +662,27 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
                   <div key={index} className="vocabulary-item">
                     <div className="vocabulary-word">
                       <mark className="vocabulary-highlight">{item.word}</mark>
+                      {!item.is_idiom && (
+                        <button
+                          className="vocab-speak-btn"
+                          onClick={() => {
+                            if (window.speechSynthesis) {
+                              window.speechSynthesis.cancel();
+                              const utterance = new SpeechSynthesisUtterance(item.word);
+                              utterance.lang = 'en-US';
+                              utterance.rate = 0.8;
+                              window.speechSynthesis.speak(utterance);
+                            }
+                          }}
+                          title="발음 듣기"
+                        >
+                          🔊
+                        </button>
+                      )}
                     </div>
+                    {!item.is_idiom && item.phonetic && (
+                      <div className="vocabulary-phonetic">{item.phonetic}</div>
+                    )}
                     <div className="vocabulary-definition">{item.definition}</div>
                     {item.example && (
                       <div className="vocabulary-example">

@@ -10,6 +10,8 @@ class VocabularyItem(BaseModel):
     word: str
     definition: str
     example: Optional[str] = None
+    phonetic: Optional[str] = None
+    is_idiom: Optional[bool] = False
 
 
 class VocabularyCreate(BaseModel):
@@ -23,6 +25,8 @@ class VocabularyResponse(BaseModel):
     word: str
     definition: str
     example: Optional[str] = None
+    phonetic: Optional[str] = None
+    is_idiom: Optional[bool] = False
 
 
 @router.get("/chapter/{chapter_id}", response_model=List[VocabularyResponse])
@@ -32,7 +36,7 @@ def get_chapter_vocabulary(chapter_id: int):
         cursor = conn.cursor()
         cursor.execute(
             """
-            SELECT id, chapter_id, word, definition, example
+            SELECT id, chapter_id, word, definition, example, phonetic, is_idiom
             FROM chapter_vocabulary
             WHERE chapter_id = ?
             ORDER BY id
@@ -47,7 +51,9 @@ def get_chapter_vocabulary(chapter_id: int):
                 chapter_id=row["chapter_id"],
                 word=row["word"],
                 definition=row["definition"],
-                example=row["example"]
+                example=row["example"],
+                phonetic=row["phonetic"],
+                is_idiom=bool(row["is_idiom"]) if row["is_idiom"] is not None else False
             )
             for row in rows
         ]
@@ -72,10 +78,10 @@ def save_chapter_vocabulary(chapter_id: int, data: VocabularyCreate):
         for item in data.items:
             cursor.execute(
                 """
-                INSERT INTO chapter_vocabulary (chapter_id, word, definition, example)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """,
-                (chapter_id, item.word, item.definition, item.example)
+                (chapter_id, item.word, item.definition, item.example, item.phonetic, 1 if item.is_idiom else 0)
             )
 
         conn.commit()
@@ -83,7 +89,7 @@ def save_chapter_vocabulary(chapter_id: int, data: VocabularyCreate):
         # 저장된 데이터 반환
         cursor.execute(
             """
-            SELECT id, chapter_id, word, definition, example
+            SELECT id, chapter_id, word, definition, example, phonetic, is_idiom
             FROM chapter_vocabulary
             WHERE chapter_id = ?
             ORDER BY id
@@ -98,7 +104,9 @@ def save_chapter_vocabulary(chapter_id: int, data: VocabularyCreate):
                 chapter_id=row["chapter_id"],
                 word=row["word"],
                 definition=row["definition"],
-                example=row["example"]
+                example=row["example"],
+                phonetic=row["phonetic"],
+                is_idiom=bool(row["is_idiom"]) if row["is_idiom"] is not None else False
             )
             for row in rows
         ]

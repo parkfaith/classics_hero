@@ -22,7 +22,9 @@ export const useVocabularyExtraction = () => {
           return data.map(item => ({
             word: item.word,
             definition: item.definition,
-            example: item.example
+            example: item.example,
+            is_idiom: item.is_idiom || false,
+            phonetic: item.phonetic || null
           }));
         }
       }
@@ -72,16 +74,22 @@ Please extract:
 - Useful idioms or phrases
 - Words that are essential for understanding the text
 
+For each item, indicate:
+- "is_idiom": true if it's an idiom/phrase (multiple words), false if it's a single word
+- "phonetic": IPA pronunciation notation ONLY for single words (not idioms). e.g. "/kʌrɪdʒ/"
+
 Return ONLY a valid JSON array in this exact format:
 [
   {
     "word": "the word or phrase",
     "definition": "한글 뜻",
-    "example": "example sentence from the text (if available)"
+    "example": "example sentence from the text (if available)",
+    "is_idiom": false,
+    "phonetic": "/fəˈnetɪk/"
   }
 ]
 
-Important: Return ONLY the JSON array, no other text.
+Important: Return ONLY the JSON array, no other text. For idioms, set phonetic to null.
 `;
 
     const response = await fetch(`${API_BASE}/openai/chat`, {

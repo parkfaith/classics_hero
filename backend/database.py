@@ -221,11 +221,23 @@ def init_db():
                 word TEXT NOT NULL,
                 definition TEXT NOT NULL,
                 example TEXT,
+                phonetic TEXT,
+                is_idiom INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(chapter_id, word),
                 FOREIGN KEY (chapter_id) REFERENCES chapters(id)
             )
         """)
+
+        # 기존 chapter_vocabulary 테이블에 새 컬럼 추가 (마이그레이션)
+        try:
+            cursor.execute("ALTER TABLE chapter_vocabulary ADD COLUMN phonetic TEXT")
+        except Exception:
+            pass  # 이미 존재하는 경우 무시
+        try:
+            cursor.execute("ALTER TABLE chapter_vocabulary ADD COLUMN is_idiom INTEGER DEFAULT 0")
+        except Exception:
+            pass  # 이미 존재하는 경우 무시
 
         conn.commit()
 
