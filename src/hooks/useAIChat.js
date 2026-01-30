@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { API_BASE } from '../api/index.js';
 
 export const useAIChat = () => {
   const [messages, setMessages] = useState([]);
@@ -23,7 +24,7 @@ export const useAIChat = () => {
         ? `You are a helpful English literature tutor. You're discussing the following text: "${context}". Help the student understand the text, answer questions about it, and practice English conversation. Always respond in a friendly and educational manner.`
         : 'You are a helpful English literature tutor. Help students understand classic English literature and practice English conversation.';
 
-      const response = await fetch('/api/openai/chat', {
+      const response = await fetch(`${API_BASE}/openai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

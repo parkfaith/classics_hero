@@ -1,5 +1,5 @@
 // 배포 환경: Render API URL, 로컬: Vite 프록시 사용
-const API_BASE = import.meta.env.VITE_API_URL || (
+export const API_BASE = import.meta.env.VITE_API_URL || (
   // 개발 환경(localhost)인지 확인
   window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? '/api'  // 로컬: Vite 프록시 사용

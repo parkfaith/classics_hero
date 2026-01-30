@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { API_BASE } from '../api/index.js';
 
 /**
  * Pronunciation analysis hook using OpenAI API
@@ -132,7 +133,7 @@ Keep your response concise and constructive. Format in Korean.
 `;
 
     try {
-      const response = await fetch('/api/openai/chat', {
+      const response = await fetch(`${API_BASE}/openai/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

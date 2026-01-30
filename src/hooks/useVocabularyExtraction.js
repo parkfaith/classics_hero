@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { API_BASE } from '../api/index.js';
 
 /**
  * 챕터의 중요 단어/숙어를 추출하고 DB에 캐싱
@@ -14,7 +15,7 @@ export const useVocabularyExtraction = () => {
    */
   const fetchFromDB = async (chapterId) => {
     try {
-      const response = await fetch(`/api/vocabulary/chapter/${chapterId}`);
+      const response = await fetch(`${API_BASE}/vocabulary/chapter/${chapterId}`);
       if (response.ok) {
         const data = await response.json();
         if (data && data.length > 0) {
@@ -37,7 +38,7 @@ export const useVocabularyExtraction = () => {
    */
   const saveToDB = async (chapterId, vocabulary) => {
     try {
-      await fetch(`/api/vocabulary/chapter/${chapterId}`, {
+      await fetch(`${API_BASE}/vocabulary/chapter/${chapterId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +84,7 @@ Return ONLY a valid JSON array in this exact format:
 Important: Return ONLY the JSON array, no other text.
 `;
 
-    const response = await fetch('/api/openai/chat', {
+    const response = await fetch(`${API_BASE}/openai/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -165,7 +166,7 @@ Important: Return ONLY the JSON array, no other text.
   const clearCache = useCallback(async (chapterId) => {
     if (chapterId) {
       try {
-        await fetch(`/api/vocabulary/chapter/${chapterId}`, {
+        await fetch(`${API_BASE}/vocabulary/chapter/${chapterId}`, {
           method: 'DELETE'
         });
       } catch (err) {

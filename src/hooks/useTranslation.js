@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { API_BASE } from '../api/index.js';
 
 export const useTranslation = () => {
   const [translationCache, setTranslationCache] = useState({});
@@ -8,7 +9,7 @@ export const useTranslation = () => {
   const translateWithOpenAI = async (text, targetLang = 'ko') => {
     const targetLanguage = targetLang === 'ko' ? 'Korean' : 'English';
 
-    const response = await fetch('/api/openai/chat', {
+    const response = await fetch(`${API_BASE}/openai/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
