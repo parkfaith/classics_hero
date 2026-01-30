@@ -82,6 +82,31 @@
   border-color: rgba(156, 163, 175, 0.5);
 }
 
+.voice-cancel-btn {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-cancel-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.voice-cancel-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .voice-send-btn {
   width: 44px;
   height: 44px;
@@ -269,6 +294,7 @@
 
   .keyboard-toggle-btn,
   .mic-toggle-btn,
+  .voice-cancel-btn,
   .voice-send-btn {
     width: 40px;
     height: 40px;

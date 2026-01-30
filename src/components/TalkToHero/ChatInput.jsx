@@ -22,18 +22,6 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking }) => {
     }
   }, [transcript, interimTranscript]);
 
-  // STT 종료 후 텍스트가 있으면 자동 전송
-  useEffect(() => {
-    if (!isListening && transcript.trim() && !isLoading) {
-      const timer = setTimeout(() => {
-        onSendMessage(transcript.trim());
-        setMessage('');
-        clearTranscript();
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [isListening, transcript, isLoading, onSendMessage, clearTranscript]);
-
   const handleMicClick = () => {
     if (isListening) {
       stopListening();
@@ -42,6 +30,15 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking }) => {
       setMessage('');
       startListening();
     }
+  };
+
+  // 취소 버튼 - STT 결과 삭제하고 초기화
+  const handleCancel = () => {
+    if (isListening) {
+      stopListening();
+    }
+    setMessage('');
+    clearTranscript();
   };
 
   const handleSubmit = (e) => {
@@ -102,6 +99,20 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking }) => {
             )}
           </button>
 
+          {/* 취소 버튼 - STT 중이거나 메시지가 있을 때 표시 */}
+          {(isListening || message.trim()) && (
+            <button
+              type="button"
+              className="voice-cancel-btn"
+              onClick={handleCancel}
+              disabled={isLoading}
+              title="취소하고 다시 시작"
+            >
+              ✖️
+            </button>
+          )}
+
+          {/* 전송 버튼 - STT 완료 후 메시지가 있을 때만 표시 */}
           {message.trim() && !isListening && (
             <button
               type="button"
