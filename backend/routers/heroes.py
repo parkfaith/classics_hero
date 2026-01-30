@@ -15,6 +15,16 @@ def safe_get(row, key, default=None):
 
 def row_to_hero(row) -> dict:
     scenarios_raw = safe_get(row, "scenarios")
+
+    # scenarios JSON 파싱 시 에러 처리
+    scenarios = []
+    if scenarios_raw:
+        try:
+            scenarios = json.loads(scenarios_raw)
+        except json.JSONDecodeError as e:
+            print(f"Warning: Failed to parse scenarios for hero {row['id']}: {e}")
+            scenarios = []
+
     return {
         "id": row["id"],
         "name": row["name"],
@@ -44,7 +54,7 @@ def row_to_hero(row) -> dict:
             "pitch": row["tts_pitch"]
         },
         "portraitImage": row["portrait_image"],
-        "scenarios": json.loads(scenarios_raw) if scenarios_raw else []
+        "scenarios": scenarios
     }
 
 @router.get("/heroes")
