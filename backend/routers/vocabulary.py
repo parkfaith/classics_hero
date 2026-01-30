@@ -6,6 +6,24 @@ from database import get_db
 router = APIRouter(prefix="/vocabulary", tags=["vocabulary"])
 
 
+# 새 컬럼(phonetic, is_idiom) 존재 여부 캐시
+_has_new_columns = None
+
+
+def _check_new_columns(cursor):
+    """chapter_vocabulary 테이블에 phonetic, is_idiom 컬럼이 있는지 확인"""
+    global _has_new_columns
+    if _has_new_columns is not None:
+        return _has_new_columns
+    try:
+        # 실제 쿼리로 컬럼 존재 여부 확인 (PRAGMA는 Turso에서 미지원)
+        cursor.execute("SELECT phonetic, is_idiom FROM chapter_vocabulary LIMIT 0")
+        _has_new_columns = True
+    except Exception:
+        _has_new_columns = False
+    return _has_new_columns
+
+
 class VocabularyItem(BaseModel):
     word: str
     definition: str
@@ -34,15 +52,28 @@ def get_chapter_vocabulary(chapter_id: str):
     """챕터의 저장된 중요 단어/숙어 조회"""
     with get_db() as conn:
         cursor = conn.cursor()
-        cursor.execute(
-            """
-            SELECT id, chapter_id, word, definition, example, phonetic, is_idiom
-            FROM chapter_vocabulary
-            WHERE chapter_id = ?
-            ORDER BY id
-            """,
-            (chapter_id,)
-        )
+        has_new = _check_new_columns(cursor)
+
+        if has_new:
+            cursor.execute(
+                """
+                SELECT id, chapter_id, word, definition, example, phonetic, is_idiom
+                FROM chapter_vocabulary
+                WHERE chapter_id = ?
+                ORDER BY id
+                """,
+                (chapter_id,)
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT id, chapter_id, word, definition, example
+                FROM chapter_vocabulary
+                WHERE chapter_id = ?
+                ORDER BY id
+                """,
+                (chapter_id,)
+            )
         rows = cursor.fetchall()
 
         return [
@@ -52,8 +83,8 @@ def get_chapter_vocabulary(chapter_id: str):
                 word=row["word"],
                 definition=row["definition"],
                 example=row["example"],
-                phonetic=row["phonetic"],
-                is_idiom=bool(row["is_idiom"]) if row["is_idiom"] is not None else False
+                phonetic=row["phonetic"] if has_new else None,
+                is_idiom=bool(row["is_idiom"]) if has_new and row["is_idiom"] is not None else False
             )
             for row in rows
         ]
@@ -67,6 +98,7 @@ def save_chapter_vocabulary(chapter_id: str, data: VocabularyCreate):
 
     with get_db() as conn:
         cursor = conn.cursor()
+        has_new = _check_new_columns(cursor)
 
         # 기존 데이터 삭제 (재추출 시)
         cursor.execute(
@@ -76,26 +108,46 @@ def save_chapter_vocabulary(chapter_id: str, data: VocabularyCreate):
 
         # 새 데이터 삽입
         for item in data.items:
-            cursor.execute(
-                """
-                INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom)
-                VALUES (?, ?, ?, ?, ?, ?)
-                """,
-                (chapter_id, item.word, item.definition, item.example, item.phonetic, 1 if item.is_idiom else 0)
-            )
+            if has_new:
+                cursor.execute(
+                    """
+                    INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    """,
+                    (chapter_id, item.word, item.definition, item.example, item.phonetic, 1 if item.is_idiom else 0)
+                )
+            else:
+                cursor.execute(
+                    """
+                    INSERT INTO chapter_vocabulary (chapter_id, word, definition, example)
+                    VALUES (?, ?, ?, ?)
+                    """,
+                    (chapter_id, item.word, item.definition, item.example)
+                )
 
         conn.commit()
 
         # 저장된 데이터 반환
-        cursor.execute(
-            """
-            SELECT id, chapter_id, word, definition, example, phonetic, is_idiom
-            FROM chapter_vocabulary
-            WHERE chapter_id = ?
-            ORDER BY id
-            """,
-            (chapter_id,)
-        )
+        if has_new:
+            cursor.execute(
+                """
+                SELECT id, chapter_id, word, definition, example, phonetic, is_idiom
+                FROM chapter_vocabulary
+                WHERE chapter_id = ?
+                ORDER BY id
+                """,
+                (chapter_id,)
+            )
+        else:
+            cursor.execute(
+                """
+                SELECT id, chapter_id, word, definition, example
+                FROM chapter_vocabulary
+                WHERE chapter_id = ?
+                ORDER BY id
+                """,
+                (chapter_id,)
+            )
         rows = cursor.fetchall()
 
         return [
@@ -105,8 +157,8 @@ def save_chapter_vocabulary(chapter_id: str, data: VocabularyCreate):
                 word=row["word"],
                 definition=row["definition"],
                 example=row["example"],
-                phonetic=row["phonetic"],
-                is_idiom=bool(row["is_idiom"]) if row["is_idiom"] is not None else False
+                phonetic=row["phonetic"] if has_new else None,
+                is_idiom=bool(row["is_idiom"]) if has_new and row["is_idiom"] is not None else False
             )
             for row in rows
         ]
