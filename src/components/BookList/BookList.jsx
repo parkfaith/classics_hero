@@ -35,7 +35,18 @@ const BookList = ({ onBookSelect }) => {
   });
 
   if (loading) {
-    return <LoadingScreen message="고전 문학을 불러오는 중" />;
+    return (
+      <LoadingScreen
+        message="고전 문학을 불러오는 중"
+        subMessage={
+          <>
+            서버에서 영어 고전 명작들을 가져오고 있어요.<br />
+            잠시만 기다려 주세요!
+          </>
+        }
+        icon="📚"
+      />
+    );
   }
 
   if (error) {

@@ -52,16 +52,22 @@ function App() {
       setCurrentPage('talk-to-hero');
       setSelectedBook(null);
     }
+    // 페이지 전환 시 화면 상단으로 스크롤
+    window.scrollTo(0, 0);
   };
 
   const handleBookSelect = (book) => {
     setSelectedBook(book);
     setMode('reading');
+    // 책 선택 시 화면 상단으로 스크롤
+    window.scrollTo(0, 0);
   };
 
   const handleBackToLibrary = () => {
     setSelectedBook(null);
     setMode('reading');
+    // 도서관으로 돌아갈 때 화면 상단으로 스크롤
+    window.scrollTo(0, 0);
   };
 
   const handleWordSelect = (word) => {
@@ -83,6 +89,8 @@ function App() {
   const handleBackFromHero = () => {
     setCurrentPage('library');
     setSelectedBook(null);
+    // Talk to Hero에서 돌아갈 때 화면 상단으로 스크롤
+    window.scrollTo(0, 0);
   };
 
   if (showSplash) {

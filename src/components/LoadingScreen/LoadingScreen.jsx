@@ -26,6 +26,8 @@ const LoadingScreen = ({ message = "잠시만 기다려 주세요", subMessage, 
   const [quote, setQuote] = useState(quotes[0]);
   const [tip, setTip] = useState(tips[0]);
   const [dots, setDots] = useState('');
+  const [loadingTime, setLoadingTime] = useState(0);
+  const [serverWakingMessage, setServerWakingMessage] = useState('');
 
   // 랜덤 명언 선택
   useEffect(() => {
@@ -41,6 +43,27 @@ const LoadingScreen = ({ message = "잠시만 기다려 주세요", subMessage, 
       setDots(prev => prev.length >= 3 ? '' : prev + '.');
     }, 500);
     return () => clearInterval(interval);
+  }, []);
+
+  // 로딩 시간 추적 및 서버 깨우기 메시지
+  useEffect(() => {
+    const startTime = Date.now();
+
+    const timer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      setLoadingTime(elapsed);
+
+      // 5초 이상이면 서버 깨우기 메시지 표시
+      if (elapsed >= 5 && elapsed < 15) {
+        setServerWakingMessage('서버를 깨우는 중입니다...');
+      } else if (elapsed >= 15 && elapsed < 30) {
+        setServerWakingMessage('서버를 시작하는 중입니다... 조금만 더 기다려주세요!');
+      } else if (elapsed >= 30) {
+        setServerWakingMessage('거의 다 됐어요! 서버가 곧 응답할 거예요.');
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   return (
@@ -62,6 +85,14 @@ const LoadingScreen = ({ message = "잠시만 기다려 주세요", subMessage, 
               </>
             )}
           </p>
+          {/* 서버 깨우기 메시지 (5초 이상일 때만 표시) */}
+          {serverWakingMessage && (
+            <p className="server-waking-message">
+              ⏳ {serverWakingMessage}
+              <br />
+              <span className="elapsed-time">({loadingTime}초 경과)</span>
+            </p>
+          )}
         </div>
 
         {/* 명언 섹션 */}
