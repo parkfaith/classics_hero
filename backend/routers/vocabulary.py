@@ -15,13 +15,13 @@ class VocabularyItem(BaseModel):
 
 
 class VocabularyCreate(BaseModel):
-    chapter_id: int
+    chapter_id: str
     items: List[VocabularyItem]
 
 
 class VocabularyResponse(BaseModel):
     id: int
-    chapter_id: int
+    chapter_id: str
     word: str
     definition: str
     example: Optional[str] = None
@@ -30,7 +30,7 @@ class VocabularyResponse(BaseModel):
 
 
 @router.get("/chapter/{chapter_id}", response_model=List[VocabularyResponse])
-def get_chapter_vocabulary(chapter_id: int):
+def get_chapter_vocabulary(chapter_id: str):
     """챕터의 저장된 중요 단어/숙어 조회"""
     with get_db() as conn:
         cursor = conn.cursor()
@@ -60,7 +60,7 @@ def get_chapter_vocabulary(chapter_id: int):
 
 
 @router.post("/chapter/{chapter_id}", response_model=List[VocabularyResponse])
-def save_chapter_vocabulary(chapter_id: int, data: VocabularyCreate):
+def save_chapter_vocabulary(chapter_id: str, data: VocabularyCreate):
     """챕터의 중요 단어/숙어 저장 (GPT 추출 결과)"""
     if data.chapter_id != chapter_id:
         raise HTTPException(status_code=400, detail="chapter_id mismatch")
@@ -113,7 +113,7 @@ def save_chapter_vocabulary(chapter_id: int, data: VocabularyCreate):
 
 
 @router.delete("/chapter/{chapter_id}")
-def delete_chapter_vocabulary(chapter_id: int):
+def delete_chapter_vocabulary(chapter_id: str):
     """챕터의 중요 단어/숙어 삭제 (재추출용)"""
     with get_db() as conn:
         cursor = conn.cursor()
