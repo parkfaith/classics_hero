@@ -90,6 +90,8 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     setChapterTranslation('');
     // 챕터 변경 시 재생 중인 오디오 중지
     handleStop();
+    // 챕터 변경 시 최상단으로 스크롤
+    window.scrollTo(0, 0);
   }, [currentChapterIndex, book.id]);
 
   // 챕터 변경 시 중요 단어 추출

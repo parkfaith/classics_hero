@@ -63,11 +63,17 @@ class TursoCursor:
         self._result = None
 
     def execute(self, sql, params=None):
-        if params:
-            # ? 플레이스홀더를 libsql 형식으로 변환
-            self._result = self.client.execute(sql, params)
-        else:
-            self._result = self.client.execute(sql)
+        try:
+            if params:
+                # libsql_client는 params를 list로 받음
+                self._result = self.client.execute(sql, list(params))
+            else:
+                self._result = self.client.execute(sql)
+        except Exception as e:
+            print(f"[TursoCursor] SQL 실행 에러: {e}")
+            print(f"[TursoCursor] SQL: {sql}")
+            print(f"[TursoCursor] Params: {params}")
+            raise
         return self
 
     def executemany(self, sql, params_list):
