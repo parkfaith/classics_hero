@@ -218,7 +218,7 @@ const ChatInterface = ({ hero, scenario = null, onBack }) => {
         </div>
       </div>
 
-      <ChatInput onSendMessage={sendMessage} isLoading={isLoading} isTTSSpeaking={tts.isSpeaking} />
+      <ChatInput onSendMessage={sendMessage} isLoading={isLoading} isTTSSpeaking={tts.isPlaying} onStopTTS={tts.stop} />
 
       {showReport && (
         <InsightReport

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSTT } from '../../hooks/useSTT';
 import './ChatInput.css';
 
-const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking }) => {
+const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS }) => {
   const [message, setMessage] = useState('');
   const [showTextInput, setShowTextInput] = useState(false);
   const textareaRef = useRef(null);
@@ -26,6 +26,10 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking }) => {
     if (isListening) {
       stopListening();
     } else {
+      // TTS 재생 중이면 중지하고 STT 시작
+      if (isTTSSpeaking && onStopTTS) {
+        onStopTTS();
+      }
       clearTranscript();
       setMessage('');
       startListening();
@@ -68,8 +72,8 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking }) => {
     }
   };
 
-  // TTS 재생 중이거나 로딩 중일 때는 비활성화
-  const isDisabled = isLoading || isTTSSpeaking;
+  // 로딩 중일 때만 비활성화 (TTS 중에는 마이크로 중지 가능)
+  const isDisabled = isLoading;
 
   return (
     <div className="chat-input-container">

@@ -2,7 +2,9 @@
   background: white;
   border-top: 1px solid rgba(229, 231, 235, 0.5);
   padding: 1.25rem;
+  padding-bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px));
   box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
 }
 
 /* 음성 입력 모드 (기본) */

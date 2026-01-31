@@ -4,6 +4,7 @@
   height: 100vh;
   height: 100dvh; /* iOS 키보드 대응 */
   background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+  overflow: hidden; /* 전체 페이지 스크롤 방지 */
 }
 
 .chat-header {
@@ -432,7 +433,7 @@
 /* 모바일 하단 탭 바 여백 */
 @media (max-width: 480px) {
   .chat-interface {
-    padding-bottom: 70px;
+    padding-bottom: 0;
   }
 
   .back-button-chat {
