@@ -41,6 +41,12 @@ class TursoConnection:
     def cursor(self):
         return TursoCursor(self._get_client())
 
+    def batch(self, statements):
+        """여러 SQL을 한 번의 HTTP 요청으로 실행 (batch API)"""
+        client = self._get_client()
+        results = client.batch(statements)
+        return results
+
     def commit(self):
         # libsql_client는 자동 커밋
         pass
@@ -63,22 +69,11 @@ class TursoCursor:
         self._result = None
 
     def execute(self, sql, params=None):
-        try:
-            if params:
-                # libsql_client는 params를 list로 받음
-                result = self.client.execute(sql, list(params))
-            else:
-                result = self.client.execute(sql)
-            # 디버그: result 객체 구조 확인
-            print(f"[TursoCursor] result type={type(result)}, dir={[a for a in dir(result) if not a.startswith('_')]}")
-            self._result = result
-        except Exception as e:
-            print(f"[TursoCursor] SQL 실행 에러: {e}")
-            print(f"[TursoCursor] SQL: {sql}")
-            print(f"[TursoCursor] Params: {params}")
-            import traceback
-            traceback.print_exc()
-            raise
+        if params:
+            # libsql_client는 params를 list로 받음
+            self._result = self.client.execute(sql, list(params))
+        else:
+            self._result = self.client.execute(sql)
         return self
 
     def executemany(self, sql, params_list):

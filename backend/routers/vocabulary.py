@@ -2,7 +2,7 @@ import traceback
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
-from database import get_db
+from database import get_db, USE_TURSO
 
 router = APIRouter(prefix="/vocabulary", tags=["vocabulary"])
 
@@ -102,36 +102,42 @@ def save_chapter_vocabulary(chapter_id: str, data: VocabularyCreate):
             cursor = conn.cursor()
             has_new = _check_new_columns(cursor)
 
-            # 기존 데이터 삭제 (재추출 시)
-            cursor.execute(
-                "DELETE FROM chapter_vocabulary WHERE chapter_id = ?",
-                (chapter_id,)
-            )
+            if USE_TURSO:
+                # Turso: batch()로 DELETE + INSERT를 한 번의 HTTP 요청으로 실행
+                statements = [
+                    ("DELETE FROM chapter_vocabulary WHERE chapter_id = ?", [chapter_id])
+                ]
+                for item in data.items:
+                    if has_new:
+                        statements.append((
+                            "INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom) VALUES (?, ?, ?, ?, ?, ?)",
+                            [chapter_id, item.word, item.definition, item.example, item.phonetic, 1 if item.is_idiom else 0]
+                        ))
+                    else:
+                        statements.append((
+                            "INSERT INTO chapter_vocabulary (chapter_id, word, definition, example) VALUES (?, ?, ?, ?)",
+                            [chapter_id, item.word, item.definition, item.example]
+                        ))
 
-            # 새 데이터 삽입 - 중복 단어는 건너뛰기
-            for item in data.items:
-                try:
+                conn.batch(statements)
+            else:
+                # 로컬 SQLite: 기존 방식
+                cursor.execute(
+                    "DELETE FROM chapter_vocabulary WHERE chapter_id = ?",
+                    (chapter_id,)
+                )
+                for item in data.items:
                     if has_new:
                         cursor.execute(
-                            """
-                            INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom)
-                            VALUES (?, ?, ?, ?, ?, ?)
-                            """,
+                            "INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom) VALUES (?, ?, ?, ?, ?, ?)",
                             (chapter_id, item.word, item.definition, item.example, item.phonetic, 1 if item.is_idiom else 0)
                         )
                     else:
                         cursor.execute(
-                            """
-                            INSERT INTO chapter_vocabulary (chapter_id, word, definition, example)
-                            VALUES (?, ?, ?, ?)
-                            """,
+                            "INSERT INTO chapter_vocabulary (chapter_id, word, definition, example) VALUES (?, ?, ?, ?)",
                             (chapter_id, item.word, item.definition, item.example)
                         )
-                except Exception as insert_err:
-                    print(f"[vocabulary] INSERT 실패 (word={item.word}): {insert_err}")
-                    continue
-
-            conn.commit()
+                conn.commit()
 
             # 저장된 데이터 반환
             if has_new:
