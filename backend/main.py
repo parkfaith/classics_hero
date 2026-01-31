@@ -1,5 +1,7 @@
 import os
-from fastapi import FastAPI
+import traceback
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from routers import books, heroes, chapters, words, openai_proxy, vocabulary
 from database import init_db
@@ -32,6 +34,17 @@ app.include_router(vocabulary.router, prefix="/api")
 @app.on_event("startup")
 def startup():
     init_db()
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """500 에러 시에도 CORS 헤더가 포함되도록 처리"""
+    print(f"[ERROR] {request.method} {request.url}: {exc}")
+    traceback.print_exc()
+    return JSONResponse(
+        status_code=500,
+        content={"detail": str(exc)},
+    )
+
 
 @app.get("/")
 def root():

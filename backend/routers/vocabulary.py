@@ -1,3 +1,4 @@
+import traceback
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
@@ -96,72 +97,83 @@ def save_chapter_vocabulary(chapter_id: str, data: VocabularyCreate):
     if data.chapter_id != chapter_id:
         raise HTTPException(status_code=400, detail="chapter_id mismatch")
 
-    with get_db() as conn:
-        cursor = conn.cursor()
-        has_new = _check_new_columns(cursor)
+    try:
+        with get_db() as conn:
+            cursor = conn.cursor()
+            has_new = _check_new_columns(cursor)
 
-        # 기존 데이터 삭제 (재추출 시)
-        cursor.execute(
-            "DELETE FROM chapter_vocabulary WHERE chapter_id = ?",
-            (chapter_id,)
-        )
+            # 기존 데이터 삭제 (재추출 시)
+            cursor.execute(
+                "DELETE FROM chapter_vocabulary WHERE chapter_id = ?",
+                (chapter_id,)
+            )
 
-        # 새 데이터 삽입
-        for item in data.items:
+            # 새 데이터 삽입 - 중복 단어는 건너뛰기
+            for item in data.items:
+                try:
+                    if has_new:
+                        cursor.execute(
+                            """
+                            INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom)
+                            VALUES (?, ?, ?, ?, ?, ?)
+                            """,
+                            (chapter_id, item.word, item.definition, item.example, item.phonetic, 1 if item.is_idiom else 0)
+                        )
+                    else:
+                        cursor.execute(
+                            """
+                            INSERT INTO chapter_vocabulary (chapter_id, word, definition, example)
+                            VALUES (?, ?, ?, ?)
+                            """,
+                            (chapter_id, item.word, item.definition, item.example)
+                        )
+                except Exception as insert_err:
+                    print(f"[vocabulary] INSERT 실패 (word={item.word}): {insert_err}")
+                    continue
+
+            conn.commit()
+
+            # 저장된 데이터 반환
             if has_new:
                 cursor.execute(
                     """
-                    INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom)
-                    VALUES (?, ?, ?, ?, ?, ?)
+                    SELECT id, chapter_id, word, definition, example, phonetic, is_idiom
+                    FROM chapter_vocabulary
+                    WHERE chapter_id = ?
+                    ORDER BY id
                     """,
-                    (chapter_id, item.word, item.definition, item.example, item.phonetic, 1 if item.is_idiom else 0)
+                    (chapter_id,)
                 )
             else:
                 cursor.execute(
                     """
-                    INSERT INTO chapter_vocabulary (chapter_id, word, definition, example)
-                    VALUES (?, ?, ?, ?)
+                    SELECT id, chapter_id, word, definition, example
+                    FROM chapter_vocabulary
+                    WHERE chapter_id = ?
+                    ORDER BY id
                     """,
-                    (chapter_id, item.word, item.definition, item.example)
+                    (chapter_id,)
                 )
+            rows = cursor.fetchall()
 
-        conn.commit()
-
-        # 저장된 데이터 반환
-        if has_new:
-            cursor.execute(
-                """
-                SELECT id, chapter_id, word, definition, example, phonetic, is_idiom
-                FROM chapter_vocabulary
-                WHERE chapter_id = ?
-                ORDER BY id
-                """,
-                (chapter_id,)
-            )
-        else:
-            cursor.execute(
-                """
-                SELECT id, chapter_id, word, definition, example
-                FROM chapter_vocabulary
-                WHERE chapter_id = ?
-                ORDER BY id
-                """,
-                (chapter_id,)
-            )
-        rows = cursor.fetchall()
-
-        return [
-            VocabularyResponse(
-                id=row["id"],
-                chapter_id=row["chapter_id"],
-                word=row["word"],
-                definition=row["definition"],
-                example=row["example"],
-                phonetic=row["phonetic"] if has_new else None,
-                is_idiom=bool(row["is_idiom"]) if has_new and row["is_idiom"] is not None else False
-            )
-            for row in rows
-        ]
+            return [
+                VocabularyResponse(
+                    id=row["id"],
+                    chapter_id=row["chapter_id"],
+                    word=row["word"],
+                    definition=row["definition"],
+                    example=row["example"],
+                    phonetic=row["phonetic"] if has_new else None,
+                    is_idiom=bool(row["is_idiom"]) if has_new and row["is_idiom"] is not None else False
+                )
+                for row in rows
+            ]
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[vocabulary] POST /chapter/{chapter_id} 에러: {e}")
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"DB 저장 실패: {str(e)}")
 
 
 @router.delete("/chapter/{chapter_id}")
