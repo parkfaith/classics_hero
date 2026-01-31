@@ -42,3 +42,8 @@ body.in-chat .app {
   height: 100dvh;
   overflow: hidden;
 }
+
+body.in-chat .app-main {
+  flex: 1;
+  min-height: 0;
+}

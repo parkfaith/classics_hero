@@ -3,8 +3,6 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  height: 100vh;
-  height: 100dvh;
   background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
   overflow: hidden;
 }
