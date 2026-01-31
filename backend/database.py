@@ -116,6 +116,75 @@ def get_db():
         conn.close()
 
 
+def _migrate_chapter_vocabulary_fk(cursor, conn):
+    """chapter_vocabulary 테이블에서 FOREIGN KEY 제거 마이그레이션"""
+    try:
+        cursor.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='chapter_vocabulary'"
+        )
+        row = cursor.fetchone()
+        if not row:
+            return
+
+        table_sql = row.get("sql", "") if isinstance(row, dict) else row[0]
+        if "FOREIGN KEY" not in table_sql:
+            return  # FK 없음 - 마이그레이션 불필요
+
+        print("[migrate] chapter_vocabulary FK 제거 마이그레이션 시작")
+
+        # 1. 기존 데이터 백업
+        cursor.execute("SELECT chapter_id, word, definition, example, phonetic, is_idiom FROM chapter_vocabulary")
+        rows = cursor.fetchall()
+
+        # 2. 기존 테이블 삭제 + FK 없이 새 테이블 생성 + 데이터 복원
+        if USE_TURSO:
+            statements = [
+                ("DROP TABLE chapter_vocabulary", []),
+                ("""CREATE TABLE chapter_vocabulary (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    chapter_id TEXT NOT NULL,
+                    word TEXT NOT NULL,
+                    definition TEXT NOT NULL,
+                    example TEXT,
+                    phonetic TEXT,
+                    is_idiom INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(chapter_id, word)
+                )""", []),
+            ]
+            for r in rows:
+                statements.append((
+                    "INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom) VALUES (?, ?, ?, ?, ?, ?)",
+                    [r["chapter_id"], r["word"], r["definition"], r.get("example"), r.get("phonetic"), r.get("is_idiom", 0)]
+                ))
+            conn.batch(statements)
+        else:
+            cursor.execute("DROP TABLE chapter_vocabulary")
+            cursor.execute("""
+                CREATE TABLE chapter_vocabulary (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    chapter_id TEXT NOT NULL,
+                    word TEXT NOT NULL,
+                    definition TEXT NOT NULL,
+                    example TEXT,
+                    phonetic TEXT,
+                    is_idiom INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    UNIQUE(chapter_id, word)
+                )
+            """)
+            for r in rows:
+                cursor.execute(
+                    "INSERT INTO chapter_vocabulary (chapter_id, word, definition, example, phonetic, is_idiom) VALUES (?, ?, ?, ?, ?, ?)",
+                    (r["chapter_id"], r["word"], r["definition"], r.get("example"), r.get("phonetic"), r.get("is_idiom", 0))
+                )
+            conn.commit()
+
+        print(f"[migrate] chapter_vocabulary FK 제거 완료 ({len(rows)}건 복원)")
+    except Exception as e:
+        print(f"[migrate] FK 마이그레이션 실패 (무시): {e}")
+
+
 def init_db():
     """데이터베이스 초기화 - 테이블 생성"""
     if not USE_TURSO:
@@ -219,7 +288,7 @@ def init_db():
         """)
 
         # Chapter Vocabulary 테이블 (챕터별 중요 단어/숙어 - GPT 추출 결과 캐싱)
-        # chapter_id는 챕터 문자열 ID (예: "aesop-fables-ch1")
+        # chapter_id는 문자열 ID (예: "aesop-fables-ch1") - FK 없음
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS chapter_vocabulary (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -230,8 +299,7 @@ def init_db():
                 phonetic TEXT,
                 is_idiom INTEGER DEFAULT 0,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                UNIQUE(chapter_id, word),
-                FOREIGN KEY (chapter_id) REFERENCES chapters(id)
+                UNIQUE(chapter_id, word)
             )
         """)
 
@@ -244,6 +312,9 @@ def init_db():
             cursor.execute("ALTER TABLE chapter_vocabulary ADD COLUMN is_idiom INTEGER DEFAULT 0")
         except Exception:
             pass  # 이미 존재하는 경우 무시
+
+        # 마이그레이션: FK가 있는 기존 테이블을 FK 없이 재생성
+        _migrate_chapter_vocabulary_fk(cursor, conn)
 
         conn.commit()
 
