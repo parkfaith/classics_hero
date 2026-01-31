@@ -66,13 +66,18 @@ class TursoCursor:
         try:
             if params:
                 # libsql_client는 params를 list로 받음
-                self._result = self.client.execute(sql, list(params))
+                result = self.client.execute(sql, list(params))
             else:
-                self._result = self.client.execute(sql)
+                result = self.client.execute(sql)
+            # 디버그: result 객체 구조 확인
+            print(f"[TursoCursor] result type={type(result)}, dir={[a for a in dir(result) if not a.startswith('_')]}")
+            self._result = result
         except Exception as e:
             print(f"[TursoCursor] SQL 실행 에러: {e}")
             print(f"[TursoCursor] SQL: {sql}")
             print(f"[TursoCursor] Params: {params}")
+            import traceback
+            traceback.print_exc()
             raise
         return self
 
