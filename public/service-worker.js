@@ -33,6 +33,11 @@ self.addEventListener('activate', (event) => {
 
 // 네트워크 요청 처리 (Network First 전략)
 self.addEventListener('fetch', (event) => {
+  // Cache API는 GET 요청만 지원 - POST, DELETE 등은 그대로 통과
+  if (event.request.method !== 'GET') {
+    return;
+  }
+
   event.respondWith(
     fetch(event.request)
       .then((response) => {
