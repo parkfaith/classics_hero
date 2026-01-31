@@ -64,7 +64,13 @@ export const useSTT = () => {
 
       recognition.onend = () => {
         setIsListening(false);
-        setInterimTranscript('');
+        // interim 결과가 남아있으면 final transcript에 합치기
+        setInterimTranscript(prev => {
+          if (prev) {
+            setTranscript(t => t + prev);
+          }
+          return '';
+        });
       };
 
       recognitionRef.current = recognition;

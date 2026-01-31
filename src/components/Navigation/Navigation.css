@@ -1,3 +1,9 @@
+/* 채팅 화면에서는 네비게이션 전체 숨기기 */
+body.in-chat .navigation,
+body.in-chat .mobile-header {
+  display: none;
+}
+
 /* 모바일 상단 헤더 - 기본적으로 숨김 */
 .mobile-header {
   display: none;
@@ -333,8 +339,12 @@
     box-shadow: none;
   }
 
-  /* 채팅 화면에서는 모바일 헤더 숨기기 */
+  /* 채팅 화면에서는 모바일 헤더와 하단 탭 바 숨기기 */
   body.in-chat .mobile-header {
+    display: none;
+  }
+
+  body.in-chat .navigation {
     display: none;
   }
 }

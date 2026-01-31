@@ -16,4 +16,29 @@
   .app-main {
     padding-bottom: 70px;
   }
+
+  /* 채팅 화면에서는 하단 탭 바 여백 제거 */
+  body.in-chat .app-main {
+    padding-bottom: 0;
+  }
+}
+
+/* TalkToHero 래퍼가 flex 체인을 유지하도록 */
+body.in-chat .talk-to-hero {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* 채팅 화면에서는 Footer 숨기기 */
+body.in-chat .footer {
+  display: none;
+}
+
+/* 채팅 화면에서는 외부 스크롤 방지 */
+body.in-chat .app {
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }

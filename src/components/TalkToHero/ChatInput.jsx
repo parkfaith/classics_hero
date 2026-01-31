@@ -5,6 +5,7 @@ import './ChatInput.css';
 const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS }) => {
   const [message, setMessage] = useState('');
   const [showTextInput, setShowTextInput] = useState(false);
+  const [pendingAutoSend, setPendingAutoSend] = useState(false);
   const textareaRef = useRef(null);
   const {
     isListening,
@@ -22,14 +23,27 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS }) => {
     }
   }, [transcript, interimTranscript]);
 
+  // 자동 전송: STT가 끝나고 transcript가 확정되면 전송
+  useEffect(() => {
+    if (pendingAutoSend && !isListening && transcript.trim()) {
+      const finalMessage = transcript.trim();
+      onSendMessage(finalMessage);
+      setMessage('');
+      clearTranscript();
+      setPendingAutoSend(false);
+    }
+  }, [pendingAutoSend, isListening, transcript, onSendMessage, clearTranscript]);
+
   const handleMicClick = () => {
     if (isListening) {
+      setPendingAutoSend(true);
       stopListening();
     } else {
       // TTS 재생 중이면 중지하고 STT 시작
       if (isTTSSpeaking && onStopTTS) {
         onStopTTS();
       }
+      setPendingAutoSend(false);
       clearTranscript();
       setMessage('');
       startListening();
@@ -38,6 +52,7 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS }) => {
 
   // 취소 버튼 - STT 결과 삭제하고 초기화
   const handleCancel = () => {
+    setPendingAutoSend(false);
     if (isListening) {
       stopListening();
     }
@@ -46,7 +61,7 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS }) => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
 
     if (message.trim() && !isLoading) {
       if (isListening) {
@@ -55,6 +70,7 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS }) => {
       onSendMessage(message.trim());
       setMessage('');
       clearTranscript();
+      setPendingAutoSend(false);
     }
   };
 
