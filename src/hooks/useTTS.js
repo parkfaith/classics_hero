@@ -1,5 +1,33 @@
 import { useState, useEffect, useRef } from 'react';
 
+// 자연스러운 음성 우선순위 (높을수록 우선)
+const VOICE_PRIORITY = [
+  // Google Neural / Natural 음성 (Chrome에서 가장 자연스러움)
+  { pattern: /Google US English/i, score: 100 },
+  { pattern: /Google UK English Male/i, score: 95 },
+  { pattern: /Google UK English Female/i, score: 90 },
+  // Microsoft Online (Neural) 음성 (Edge/Windows)
+  { pattern: /Microsoft.*Online.*Natural/i, score: 98 },
+  { pattern: /Microsoft (Guy|Ryan|Christopher|Eric|Andrew)/i, score: 92 },
+  { pattern: /Microsoft (Jenny|Aria|Sara|Michelle)/i, score: 88 },
+  // Apple 고품질 음성 (Safari/macOS/iOS)
+  { pattern: /Samantha/i, score: 85 },
+  { pattern: /Daniel/i, score: 87 },
+  { pattern: /Alex$/i, score: 83 },
+  // 일반 en-US 음성 (fallback)
+  { pattern: /en-US/i, score: 50 },
+  // 기타 영어 음성
+  { pattern: /en-/i, score: 30 },
+];
+
+const getVoiceScore = (voice) => {
+  const nameAndLang = `${voice.name} ${voice.lang}`;
+  for (const { pattern, score } of VOICE_PRIORITY) {
+    if (pattern.test(nameAndLang)) return score;
+  }
+  return 0;
+};
+
 export const useTTS = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -17,11 +45,13 @@ export const useTTS = () => {
       );
       setVoices(englishVoices);
 
-      // 기본 음성 설정 (US English 선호)
-      const defaultVoice = englishVoices.find(voice =>
-        voice.lang === 'en-US'
-      ) || englishVoices[0];
-      setSelectedVoice(defaultVoice);
+      // 자연스러운 음성 우선순위로 정렬 후 최고 점수 선택
+      if (englishVoices.length > 0) {
+        const scored = englishVoices
+          .map(voice => ({ voice, score: getVoiceScore(voice) }))
+          .sort((a, b) => b.score - a.score);
+        setSelectedVoice(scored[0].voice);
+      }
     };
 
     loadVoices();
