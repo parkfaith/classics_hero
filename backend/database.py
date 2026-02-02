@@ -316,6 +316,15 @@ def init_db():
         # 마이그레이션: FK가 있는 기존 테이블을 FK 없이 재생성
         _migrate_chapter_vocabulary_fk(cursor, conn)
 
+        # Chapter Translations 테이블 (챕터별 번역 캐싱)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS chapter_translations (
+                chapter_id TEXT PRIMARY KEY,
+                translation TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
         conn.commit()
 
 

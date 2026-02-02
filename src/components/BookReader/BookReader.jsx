@@ -292,14 +292,18 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     };
   }, []);
 
-  // 번역 토글
+  // 번역 토글 (DB 캐시 사용)
   const handleTranslationToggle = async () => {
     if (showTranslation) {
       setShowTranslation(false);
     } else {
       setShowTranslation(true);
       if (!chapterTranslation) {
-        const translated = await translation.translate(currentChapter.content);
+        // 챕터 ID를 사용해 DB 캐시 우선 조회
+        const translated = await translation.translateChapter(
+          currentChapter.id,
+          currentChapter.content
+        );
         if (translated) {
           setChapterTranslation(translated);
         }

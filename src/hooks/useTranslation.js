@@ -6,6 +6,34 @@ export const useTranslation = () => {
   const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState(null);
 
+  // DB에서 챕터 번역 캐시 조회
+  const fetchCachedTranslation = async (chapterId) => {
+    try {
+      const response = await fetch(`${API_BASE}/translations/chapter/${chapterId}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data?.translation || null;
+      }
+      return null;
+    } catch (err) {
+      console.warn('캐시 조회 실패:', err);
+      return null;
+    }
+  };
+
+  // DB에 챕터 번역 캐시 저장
+  const saveCachedTranslation = async (chapterId, translation) => {
+    try {
+      await fetch(`${API_BASE}/translations/chapter/${chapterId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ translation })
+      });
+    } catch (err) {
+      console.warn('캐시 저장 실패:', err);
+    }
+  };
+
   const translateWithOpenAI = async (text, targetLang = 'ko') => {
     const targetLanguage = targetLang === 'ko' ? 'Korean' : 'English';
 
@@ -124,8 +152,55 @@ export const useTranslation = () => {
     setTranslationCache({});
   }, []);
 
+  // 챕터 번역 (DB 캐시 우선 사용)
+  const translateChapter = useCallback(async (chapterId, content, targetLang = 'ko') => {
+    // 1. 메모리 캐시 확인
+    const cacheKey = `chapter_${chapterId}_${targetLang}`;
+    if (translationCache[cacheKey]) {
+      return translationCache[cacheKey];
+    }
+
+    setIsTranslating(true);
+    setError(null);
+
+    try {
+      // 2. DB 캐시 확인
+      const cachedTranslation = await fetchCachedTranslation(chapterId);
+      if (cachedTranslation) {
+        // 메모리 캐시에도 저장
+        setTranslationCache(prev => ({ ...prev, [cacheKey]: cachedTranslation }));
+        setIsTranslating(false);
+        return cachedTranslation;
+      }
+
+      // 3. LLM으로 번역
+      let translatedText;
+      try {
+        translatedText = await translateWithOpenAI(content, targetLang);
+      } catch (openAIError) {
+        console.warn('OpenAI 번역 실패, MyMemory로 전환:', openAIError.message);
+        translatedText = await translateWithMyMemory(content, targetLang);
+      }
+
+      // 4. DB에 캐시 저장
+      await saveCachedTranslation(chapterId, translatedText);
+
+      // 5. 메모리 캐시에도 저장
+      setTranslationCache(prev => ({ ...prev, [cacheKey]: translatedText }));
+
+      setIsTranslating(false);
+      return translatedText;
+    } catch (err) {
+      console.error('Chapter translation error:', err);
+      setError(err.message);
+      setIsTranslating(false);
+      return null;
+    }
+  }, [translationCache]);
+
   return {
     translate,
+    translateChapter,
     isTranslating,
     error,
     clearCache,
