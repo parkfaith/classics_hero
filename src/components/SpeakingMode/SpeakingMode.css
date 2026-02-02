@@ -403,6 +403,47 @@
   font-style: italic;
 }
 
+.recording-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.recording-cancel-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  color: #78350f;
+  border: 1.5px solid #d97706;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recording-cancel-btn:hover {
+  background: #fef3c7;
+}
+
+.recording-restart-btn {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recording-restart-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+}
+
 .analysis-result {
   background: white;
   border-radius: 12px;

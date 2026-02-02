@@ -691,6 +691,15 @@ Format your response as JSON:
     }
   };
 
+  // 녹음 취소 (분석 없이 초기 상태로)
+  const handleCancelPractice = () => {
+    stt.stopListening();
+    recorder.stopRecording();
+    stt.clearTranscript();
+    recorder.clearRecording();
+    setIsPracticing(false);
+  };
+
   const currentSentence = sentences[currentSentenceIndex] || '';
 
   // 연습 기록이 있는 문장인지 확인
@@ -872,6 +881,25 @@ Format your response as JSON:
               {stt.transcript && (
                 <p className="interim-transcript">인식된 내용: {stt.transcript}</p>
               )}
+              <div className="recording-actions">
+                <button
+                  className="recording-cancel-btn"
+                  onClick={handleCancelPractice}
+                >
+                  ✕ 취소
+                </button>
+                <button
+                  className="recording-restart-btn"
+                  onClick={() => {
+                    handleCancelPractice();
+                    setTimeout(() => {
+                      handlePracticePronunciation();
+                    }, 100);
+                  }}
+                >
+                  ↻ 다시 녹음
+                </button>
+              </div>
             </div>
           )}
 
