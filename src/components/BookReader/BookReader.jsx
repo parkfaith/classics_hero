@@ -456,6 +456,11 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
                   alt={book.title}
                   className="book-cover-image"
                   onError={() => setImageError(true)}
+                  onLoad={(e) => {
+                    if (e.target.naturalWidth < 10 || e.target.naturalHeight < 10) {
+                      setImageError(true);
+                    }
+                  }}
                 />
               ) : (
                 <DefaultBookIcon />

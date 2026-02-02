@@ -21,6 +21,14 @@ const BookCard = ({ book, onSelect, learningStats }) => {
     setImageError(true);
   };
 
+  // 이미지 로드 성공 후 크기 체크 (Open Library는 없는 이미지에 1x1 픽셀 반환)
+  const handleImageLoad = (e) => {
+    const img = e.target;
+    if (img.naturalWidth < 10 || img.naturalHeight < 10) {
+      setImageError(true);
+    }
+  };
+
   return (
     <div className={`book-card ${isFullyCompleted ? 'completed' : ''}`} onClick={() => onSelect(book)}>
       <div className="book-card-cover" style={{ background: book.coverColor || '#3b82f6' }}>
@@ -30,6 +38,7 @@ const BookCard = ({ book, onSelect, learningStats }) => {
             alt={book.title}
             className="book-card-image"
             onError={handleImageError}
+            onLoad={handleImageLoad}
           />
         ) : (
           <DefaultBookCover title={book.title} />
