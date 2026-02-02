@@ -50,6 +50,7 @@ async def global_exception_handler(request: Request, exc: Exception):
 def root():
     return {"message": "Classic Hero API", "version": "1.0.0"}
 
-@app.get("/api/health")
+@app.api_route("/api/health", methods=["GET", "HEAD"])
 def health():
+    """Health check 엔드포인트 - UptimeRobot keep-alive용"""
     return {"status": "ok"}
