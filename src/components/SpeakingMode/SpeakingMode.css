@@ -317,6 +317,24 @@
   cursor: not-allowed;
 }
 
+.practice-btn.has-result {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  animation: pulseRetry 2s ease-in-out infinite;
+}
+
+.practice-btn.has-result:hover:not(:disabled) {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+@keyframes pulseRetry {
+  0%, 100% {
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.5);
+  }
+}
+
 @keyframes pulse {
   0%, 100% {
     box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3);
@@ -568,6 +586,102 @@
 .retry-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.next-sentence-btn {
+  flex: 1;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.next-sentence-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.next-sentence-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 플로팅 다시하기 바 */
+.floating-retry-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.75rem 1rem;
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 2px solid #e5e7eb;
+  box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 0.75rem;
+  z-index: 50;
+  animation: slideUp 0.3s ease-out;
+}
+
+.floating-retry-btn {
+  flex: 2;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.floating-retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+.floating-next-btn {
+  flex: 1;
+  padding: 0.875rem 1rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.floating-next-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.floating-next-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* 플로팅 바에 가려지지 않도록 하단 여백 */
+.sentence-card.has-floating-bar {
+  padding-bottom: 5rem;
 }
 
 .analyzing-status {
@@ -1225,6 +1339,51 @@
 
   .motivation-message {
     padding: 0.75rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* 반응형 - 플로팅 바 & 분석 액션 */
+@media (max-width: 768px) {
+  .floating-retry-bar {
+    padding: 0.625rem 0.75rem;
+    padding-bottom: calc(0.625rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .analysis-actions {
+    flex-wrap: wrap;
+  }
+
+  .analysis-actions .retry-btn {
+    flex: 2;
+  }
+
+  .analysis-actions .next-sentence-btn {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .floating-retry-bar {
+    padding: 0.5rem 0.625rem;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom, 0px));
+    gap: 0.5rem;
+  }
+
+  .floating-retry-btn,
+  .floating-next-btn {
+    padding: 0.75rem 0.75rem;
+    font-size: 0.8125rem;
+  }
+
+  .analysis-actions {
+    gap: 0.5rem;
+  }
+
+  .analysis-actions .retry-btn,
+  .analysis-actions .playback-btn,
+  .analysis-actions .next-sentence-btn {
+    padding: 0.75rem 0.75rem;
     font-size: 0.8125rem;
   }
 }

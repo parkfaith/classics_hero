@@ -1,6 +1,16 @@
 import { useState, useCallback } from 'react';
 import { API_BASE } from '../api/index.js';
 
+// 텍스트 해시 생성 (SHA-256)
+const makeTextHash = async (text, targetLang) => {
+  const key = `${text.trim()}_${targetLang}`;
+  const encoder = new TextEncoder();
+  const data = encoder.encode(key);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
 export const useTranslation = () => {
   const [translationCache, setTranslationCache] = useState({});
   const [isTranslating, setIsTranslating] = useState(false);
@@ -31,6 +41,38 @@ export const useTranslation = () => {
       });
     } catch (err) {
       console.warn('캐시 저장 실패:', err);
+    }
+  };
+
+  // DB에서 문장 번역 캐시 조회
+  const fetchCachedSentenceTranslation = async (textHash) => {
+    try {
+      const response = await fetch(`${API_BASE}/translations/sentence/${textHash}`);
+      if (response.ok) {
+        const data = await response.json();
+        return data?.translated_text || null;
+      }
+      return null;
+    } catch (err) {
+      console.warn('문장 캐시 조회 실패:', err);
+      return null;
+    }
+  };
+
+  // DB에 문장 번역 캐시 저장
+  const saveCachedSentenceTranslation = async (sourceText, translatedText, targetLang) => {
+    try {
+      await fetch(`${API_BASE}/translations/sentence`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          source_text: sourceText,
+          translated_text: translatedText,
+          target_lang: targetLang
+        })
+      });
+    } catch (err) {
+      console.warn('문장 캐시 저장 실패:', err);
     }
   };
 
@@ -111,7 +153,7 @@ export const useTranslation = () => {
   };
 
   const translate = useCallback(async (text, targetLang = 'ko') => {
-    // 캐시 확인
+    // 1. 메모리 캐시 확인
     const cacheKey = `${text}_${targetLang}`;
     if (translationCache[cacheKey]) {
       return translationCache[cacheKey];
@@ -121,18 +163,28 @@ export const useTranslation = () => {
     setError(null);
 
     try {
-      let translatedText;
+      // 2. DB 캐시 확인
+      const textHash = await makeTextHash(text, targetLang);
+      const cachedTranslation = await fetchCachedSentenceTranslation(textHash);
+      if (cachedTranslation) {
+        setTranslationCache(prev => ({ ...prev, [cacheKey]: cachedTranslation }));
+        setIsTranslating(false);
+        return cachedTranslation;
+      }
 
-      // OpenAI API 우선 시도
+      // 3. LLM으로 번역
+      let translatedText;
       try {
         translatedText = await translateWithOpenAI(text, targetLang);
       } catch (openAIError) {
-        // OpenAI 실패 시 MyMemory로 폴백
         console.warn('OpenAI 번역 실패, MyMemory로 전환:', openAIError.message);
         translatedText = await translateWithMyMemory(text, targetLang);
       }
 
-      // 캐시에 저장
+      // 4. DB에 캐시 저장
+      await saveCachedSentenceTranslation(text, translatedText, targetLang);
+
+      // 5. 메모리 캐시에도 저장
       setTranslationCache(prev => ({
         ...prev,
         [cacheKey]: translatedText

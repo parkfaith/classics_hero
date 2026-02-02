@@ -325,6 +325,17 @@ def init_db():
             )
         """)
 
+        # Sentence Translations 테이블 (문장/텍스트 단위 번역 캐싱)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS sentence_translations (
+                text_hash TEXT PRIMARY KEY,
+                source_text TEXT NOT NULL,
+                translated_text TEXT NOT NULL,
+                target_lang TEXT NOT NULL DEFAULT 'ko',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+
         conn.commit()
 
 

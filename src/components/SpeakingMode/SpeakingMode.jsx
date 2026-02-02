@@ -824,7 +824,7 @@ Format your response as JSON:
           </button>
         </div>
 
-        <div className="sentence-card">
+        <div className={`sentence-card ${pronunciation.analysis ? 'has-floating-bar' : ''}`}>
           <p
             className={`current-sentence ${isTTSPlaying ? 'tts-active' : ''}`}
             onMouseUp={handleTextSelection}
@@ -849,11 +849,11 @@ Format your response as JSON:
             </button>
 
             <button
-              className={`action-btn practice-btn ${isPracticing ? 'active' : ''}`}
+              className={`action-btn practice-btn ${isPracticing ? 'active' : ''} ${pronunciation.analysis ? 'has-result' : ''}`}
               onClick={handlePracticePronunciation}
               disabled={!stt.isSupported || pronunciation.isAnalyzing}
             >
-              🎤 {isPracticing ? '분석하기' : '따라하기'}
+              {isPracticing ? '🎤 분석하기' : pronunciation.analysis ? '🔄 다시 따라하기' : '🎤 따라하기'}
             </button>
           </div>
 
@@ -890,6 +890,37 @@ Format your response as JSON:
                      pronunciation.analysis.accuracy >= 50 ? '💪 조금만 더!' : '📚 연습이 필요해요'}
                   </p>
                 </div>
+              </div>
+
+              <div className="analysis-actions">
+                <button
+                  className="retry-btn"
+                  onClick={handlePracticePronunciation}
+                >
+                  🔄 다시 따라하기
+                </button>
+                {recorder.recordedAudio && (
+                  <button
+                    className="playback-btn"
+                    disabled={isPlayingRecording}
+                    onClick={() => {
+                      const audio = new Audio(recorder.recordedAudio);
+                      setIsPlayingRecording(true);
+                      audio.onended = () => setIsPlayingRecording(false);
+                      audio.onerror = () => setIsPlayingRecording(false);
+                      audio.play();
+                    }}
+                  >
+                    🎧 {isPlayingRecording ? '재생 중...' : '내 발음 듣기'}
+                  </button>
+                )}
+                <button
+                  className="next-sentence-btn"
+                  onClick={handleNextSentence}
+                  disabled={currentSentenceIndex >= sentences.length - 1}
+                >
+                  다음 문장 →
+                </button>
               </div>
 
               {improvementInfo && !improvementInfo.isFirstAttempt && (
@@ -938,33 +969,6 @@ Format your response as JSON:
                 </div>
               </div>
 
-              <div className="analysis-actions">
-                {recorder.recordedAudio && (
-                  <button
-                    className="playback-btn"
-                    disabled={isPlayingRecording}
-                    onClick={() => {
-                      const audio = new Audio(recorder.recordedAudio);
-                      setIsPlayingRecording(true);
-                      audio.onended = () => setIsPlayingRecording(false);
-                      audio.onerror = () => setIsPlayingRecording(false);
-                      audio.play();
-                    }}
-                  >
-                    🎧 {isPlayingRecording ? '재생 중...' : '내 발음 듣기'}
-                  </button>
-                )}
-                <button
-                  className="retry-btn"
-                  onClick={() => {
-                    pronunciation.clearAnalysis();
-                    stt.clearTranscript();
-                    recorder.clearRecording();
-                  }}
-                >
-                  🔄 다시 연습하기
-                </button>
-              </div>
             </div>
           )}
 
@@ -1064,6 +1068,25 @@ Format your response as JSON:
         </div>
 
       </div>
+
+      {/* 플로팅 다시하기 바 */}
+      {pronunciation.analysis && !isPracticing && (
+        <div className="floating-retry-bar">
+          <button
+            className="floating-retry-btn"
+            onClick={handlePracticePronunciation}
+          >
+            🔄 다시 따라하기
+          </button>
+          <button
+            className="floating-next-btn"
+            onClick={handleNextSentence}
+            disabled={currentSentenceIndex >= sentences.length - 1}
+          >
+            다음 문장 →
+          </button>
+        </div>
+      )}
 
       {/* Summary 모달 */}
       <PracticeSummary
