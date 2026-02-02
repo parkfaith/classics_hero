@@ -36,13 +36,15 @@ const usePronunciationHistory = (bookId, chapterId) => {
     }
   }, [storageKey]);
 
-  // 새 연습 결과 추가
+  // 새 연습 결과 추가 (개선율 정보도 함께 반환)
   const addRecord = useCallback((record) => {
     const newRecord = {
       ...record,
       id: Date.now(),
       timestamp: new Date().toISOString()
     };
+
+    let improvementResult = null;
 
     setHistory(prev => {
       // 같은 문장의 이전 기록이 있으면 업데이트, 없으면 추가
@@ -62,6 +64,19 @@ const usePronunciationHistory = (bookId, chapterId) => {
           }
         ];
 
+        // 개선율 계산 (새 시도 추가 전에, 현재 점수와 직전 점수로 비교)
+        const previousScore = attemptHistory[attemptHistory.length - 1].accuracy;
+        const firstScore = attemptHistory[0].accuracy;
+        improvementResult = {
+          overall: record.accuracy - firstScore,
+          recent: record.accuracy - previousScore,
+          firstScore,
+          latestScore: record.accuracy,
+          previousScore,
+          isImproved: record.accuracy > previousScore,
+          isFirstAttempt: false
+        };
+
         // 새 시도 추가
         attemptHistory.push({
           accuracy: record.accuracy,
@@ -75,11 +90,22 @@ const usePronunciationHistory = (bookId, chapterId) => {
         updated[existingIndex] = {
           ...newRecord,
           attemptHistory,
-          accuracy: Math.max(...attemptHistory.map(a => a.accuracy)), // 최고 점수
+          accuracy: record.accuracy,
+          bestScore: Math.max(...attemptHistory.map(a => a.accuracy)),
           attempts: attemptHistory.length
         };
       } else {
         // 첫 시도
+        improvementResult = {
+          overall: 0,
+          recent: 0,
+          firstScore: record.accuracy,
+          latestScore: record.accuracy,
+          previousScore: null,
+          isImproved: false,
+          isFirstAttempt: true
+        };
+
         updated = [...prev, {
           ...newRecord,
           attemptHistory: [{
@@ -97,7 +123,7 @@ const usePronunciationHistory = (bookId, chapterId) => {
       return updated;
     });
 
-    return newRecord;
+    return { record: newRecord, improvement: improvementResult };
   }, [saveToStorage]);
 
   // 특정 문장의 기록 가져오기

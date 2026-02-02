@@ -635,7 +635,7 @@ Format your response as JSON:
           const previousRecord = pronunciationHistory.getRecordBySentence(currentSentenceIndex);
           const previousScore = previousRecord ? previousRecord.accuracy : null;
 
-          pronunciationHistory.addRecord({
+          const { improvement } = pronunciationHistory.addRecord({
             sentenceIndex: currentSentenceIndex,
             originalSentence: sentenceToAnalyze,
             spokenText: spokenText,
@@ -647,8 +647,7 @@ Format your response as JSON:
           // 동기부여 시스템에 기록
           motivation.recordPractice(analysisResult.accuracy, previousScore);
 
-          // 개선율 계산
-          const improvement = pronunciationHistory.getImprovementRate(currentSentenceIndex);
+          // 개선율 표시
           setImprovementInfo(improvement);
 
           // 동기부여 메시지 설정
