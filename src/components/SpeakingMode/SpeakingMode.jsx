@@ -840,7 +840,7 @@ Format your response as JSON:
           </button>
         </div>
 
-        <div className={`sentence-card ${pronunciation.analysis ? 'has-floating-bar' : ''}`}>
+        <div className="sentence-card">
           <p
             className={`current-sentence ${isTTSPlaying ? 'tts-active' : ''}`}
             onMouseUp={handleTextSelection}
@@ -1103,25 +1103,6 @@ Format your response as JSON:
         </div>
 
       </div>
-
-      {/* 플로팅 다시하기 바 */}
-      {pronunciation.analysis && !isPracticing && (
-        <div className="floating-retry-bar">
-          <button
-            className="floating-retry-btn"
-            onClick={handlePracticePronunciation}
-          >
-            🔄 다시 따라하기
-          </button>
-          <button
-            className="floating-next-btn"
-            onClick={handleNextSentence}
-            disabled={currentSentenceIndex >= sentences.length - 1}
-          >
-            다음 문장 →
-          </button>
-        </div>
-      )}
 
       {/* 자동 완료 제안 토스트 */}
       {autoCompleteShown && !chapterCompleted && (
