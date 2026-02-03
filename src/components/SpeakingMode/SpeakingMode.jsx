@@ -928,12 +928,6 @@ Format your response as JSON:
               </div>
 
               <div className="analysis-actions">
-                <button
-                  className="retry-btn"
-                  onClick={handlePracticePronunciation}
-                >
-                  🔄 다시 따라하기
-                </button>
                 {recorder.recordedAudio && (
                   <button
                     className="playback-btn"
