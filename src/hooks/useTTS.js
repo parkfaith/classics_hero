@@ -1,31 +1,72 @@
 import { useState, useEffect, useRef } from 'react';
 
-// 자연스러운 음성 우선순위 (높을수록 우선)
-const VOICE_PRIORITY = [
-  // Google Neural / Natural 음성 (Chrome에서 가장 자연스러움)
+// 남성 음성 우선순위 (높을수록 우선)
+const MALE_VOICE_PRIORITY = [
+  // Google 남성 음성
   { pattern: /Google US English/i, score: 100 },
-  { pattern: /Google UK English Male/i, score: 95 },
-  { pattern: /Google UK English Female/i, score: 90 },
-  // Microsoft Online (Neural) 음성 (Edge/Windows)
-  { pattern: /Microsoft.*Online.*Natural/i, score: 98 },
+  { pattern: /Google UK English Male/i, score: 98 },
+  // Microsoft 남성 음성 (Neural)
+  { pattern: /Microsoft.*Guy.*Online.*Natural/i, score: 97 },
+  { pattern: /Microsoft.*Ryan.*Online.*Natural/i, score: 96 },
   { pattern: /Microsoft (Guy|Ryan|Christopher|Eric|Andrew)/i, score: 92 },
-  { pattern: /Microsoft (Jenny|Aria|Sara|Michelle)/i, score: 88 },
-  // Apple 고품질 음성 (Safari/macOS/iOS)
-  { pattern: /Samantha/i, score: 85 },
+  // Apple 남성 음성
   { pattern: /Daniel/i, score: 87 },
   { pattern: /Alex$/i, score: 83 },
-  // 일반 en-US 음성 (fallback)
+  // 일반 en-US (fallback)
   { pattern: /en-US/i, score: 50 },
-  // 기타 영어 음성
   { pattern: /en-/i, score: 30 },
 ];
 
-const getVoiceScore = (voice) => {
+// 여성 음성 우선순위
+const FEMALE_VOICE_PRIORITY = [
+  // Google 여성 음성
+  { pattern: /Google UK English Female/i, score: 100 },
+  // Microsoft 여성 음성 (Neural)
+  { pattern: /Microsoft.*Jenny.*Online.*Natural/i, score: 98 },
+  { pattern: /Microsoft.*Aria.*Online.*Natural/i, score: 97 },
+  { pattern: /Microsoft (Jenny|Aria|Sara|Michelle)/i, score: 92 },
+  // Apple 여성 음성
+  { pattern: /Samantha/i, score: 87 },
+  // 일반 en-US (fallback)
+  { pattern: /en-US/i, score: 50 },
+  { pattern: /en-/i, score: 30 },
+];
+
+// 성별 미지정 시 기본 우선순위 (기존과 동일)
+const DEFAULT_VOICE_PRIORITY = [
+  { pattern: /Google US English/i, score: 100 },
+  { pattern: /Google UK English Male/i, score: 95 },
+  { pattern: /Google UK English Female/i, score: 90 },
+  { pattern: /Microsoft.*Online.*Natural/i, score: 98 },
+  { pattern: /Microsoft (Guy|Ryan|Christopher|Eric|Andrew)/i, score: 92 },
+  { pattern: /Microsoft (Jenny|Aria|Sara|Michelle)/i, score: 88 },
+  { pattern: /Samantha/i, score: 85 },
+  { pattern: /Daniel/i, score: 87 },
+  { pattern: /Alex$/i, score: 83 },
+  { pattern: /en-US/i, score: 50 },
+  { pattern: /en-/i, score: 30 },
+];
+
+const getVoiceScore = (voice, priorityList) => {
   const nameAndLang = `${voice.name} ${voice.lang}`;
-  for (const { pattern, score } of VOICE_PRIORITY) {
+  for (const { pattern, score } of priorityList) {
     if (pattern.test(nameAndLang)) return score;
   }
   return 0;
+};
+
+const selectBestVoice = (voices, gender) => {
+  if (voices.length === 0) return null;
+
+  const priorityList = gender === 'male' ? MALE_VOICE_PRIORITY
+    : gender === 'female' ? FEMALE_VOICE_PRIORITY
+    : DEFAULT_VOICE_PRIORITY;
+
+  const scored = voices
+    .map(voice => ({ voice, score: getVoiceScore(voice, priorityList) }))
+    .sort((a, b) => b.score - a.score);
+
+  return scored[0].voice;
 };
 
 export const useTTS = () => {
@@ -34,6 +75,7 @@ export const useTTS = () => {
   const [voices, setVoices] = useState([]);
   const [selectedVoice, setSelectedVoice] = useState(null);
   const utteranceRef = useRef(null);
+  const englishVoicesRef = useRef([]);
 
   useEffect(() => {
     // 사용 가능한 음성 목록 로드
@@ -44,13 +86,11 @@ export const useTTS = () => {
         voice.lang.startsWith('en')
       );
       setVoices(englishVoices);
+      englishVoicesRef.current = englishVoices;
 
-      // 자연스러운 음성 우선순위로 정렬 후 최고 점수 선택
+      // 기본 음성 선택 (성별 미지정)
       if (englishVoices.length > 0) {
-        const scored = englishVoices
-          .map(voice => ({ voice, score: getVoiceScore(voice) }))
-          .sort((a, b) => b.score - a.score);
-        setSelectedVoice(scored[0].voice);
+        setSelectedVoice(selectBestVoice(englishVoices, null));
       }
     };
 
@@ -73,10 +113,14 @@ export const useTTS = () => {
     const utterance = new SpeechSynthesisUtterance(text);
     utteranceRef.current = utterance;
 
-    // 음성 설정
-    if (selectedVoice) {
+    // 성별에 따른 음성 선택
+    const voiceList = englishVoicesRef.current;
+    if (options.gender && voiceList.length > 0) {
+      utterance.voice = selectBestVoice(voiceList, options.gender);
+    } else if (selectedVoice) {
       utterance.voice = selectedVoice;
     }
+
     utterance.rate = options.rate || 0.9; // 속도 (0.1 ~ 10)
     utterance.pitch = options.pitch || 1; // 음높이 (0 ~ 2)
     utterance.volume = options.volume || 1; // 볼륨 (0 ~ 1)

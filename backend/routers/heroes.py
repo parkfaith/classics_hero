@@ -13,6 +13,15 @@ def safe_get(row, key, default=None):
     except (KeyError, IndexError):
         return default
 
+HERO_GENDER = {
+    "aesop": "male",
+    "grimm": "male",
+    "ohenry": "male",
+    "franklin": "male",
+    "aurelius": "male",
+    "lincoln": "male",
+}
+
 def row_to_hero(row) -> dict:
     scenarios_raw = safe_get(row, "scenarios")
 
@@ -51,7 +60,8 @@ def row_to_hero(row) -> dict:
         "recommendedTopics": json.loads(row["recommended_topics"]) if row["recommended_topics"] else [],
         "ttsConfig": {
             "rate": row["tts_rate"],
-            "pitch": row["tts_pitch"]
+            "pitch": row["tts_pitch"],
+            "gender": HERO_GENDER.get(row["id"], "male")
         },
         "portraitImage": row["portrait_image"],
         "scenarios": scenarios
