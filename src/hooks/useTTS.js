@@ -116,7 +116,9 @@ export const useTTS = () => {
     // 성별에 따른 음성 선택
     const voiceList = englishVoicesRef.current;
     if (options.gender && voiceList.length > 0) {
-      utterance.voice = selectBestVoice(voiceList, options.gender);
+      const genderVoice = selectBestVoice(voiceList, options.gender);
+      utterance.voice = genderVoice;
+      console.log(`[TTS] gender=${options.gender}, selected="${genderVoice?.name}", voices=${voiceList.map(v => v.name).join(', ')}`);
     } else if (selectedVoice) {
       utterance.voice = selectedVoice;
     }
