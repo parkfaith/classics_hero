@@ -44,6 +44,7 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
   // 자동 완료 감지 (마지막 문단 뷰포트 진입)
   const lastParagraphRef = useRef(null);
   const [autoCompleteShown, setAutoCompleteShown] = useState(false);
+  const hasScrolledRef = useRef(false);
 
   const currentChapter = book.chapters[currentChapterIndex];
 
@@ -99,11 +100,23 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     setShowTranslation(false);
     setChapterTranslation('');
     setAutoCompleteShown(false);
+    hasScrolledRef.current = false;
     // 챕터 변경 시 재생 중인 오디오 중지
     handleStop();
     // 챕터 변경 시 최상단으로 스크롤
     window.scrollTo(0, 0);
   }, [currentChapterIndex, book.id]);
+
+  // 스크롤 감지: 사용자가 실제로 스크롤해야 자동 완료 감지 활성화
+  useEffect(() => {
+    const onScroll = () => {
+      if (window.scrollY > 200) {
+        hasScrolledRef.current = true;
+      }
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [currentChapter.id]);
 
   // 자동 완료 감지: IntersectionObserver로 마지막 문단 뷰포트 진입 감지
   useEffect(() => {
@@ -112,7 +125,7 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !completedChapters[currentChapter.id]) {
+        if (entry.isIntersecting && hasScrolledRef.current && !completedChapters[currentChapter.id]) {
           setAutoCompleteShown(true);
         }
       },
@@ -605,11 +618,6 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
             {currentChapter.title}
             {chapterCompleted && <span className="reading-completed-badge">✓ 학습 완료</span>}
           </h2>
-          {!chapterCompleted && (
-            <button className="mark-completed-btn" onClick={handleMarkCompleted}>
-              📖 읽기 완료
-            </button>
-          )}
         </div>
 
         {/* TTS 컨트롤 바 */}
