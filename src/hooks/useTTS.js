@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 
 // 남성 음성 우선순위 (높을수록 우선)
+// 주의: "Google US English"는 이름에 성별 표기가 없지만 실제로는 여성 음성
 const MALE_VOICE_PRIORITY = [
   // Google 남성 음성
-  { pattern: /Google US English/i, score: 100 },
-  { pattern: /Google UK English Male/i, score: 98 },
+  { pattern: /Google UK English Male/i, score: 100 },
   // Microsoft 남성 음성 (Neural)
   { pattern: /Microsoft.*Guy.*Online.*Natural/i, score: 97 },
   { pattern: /Microsoft.*Ryan.*Online.*Natural/i, score: 96 },
@@ -21,6 +21,7 @@ const MALE_VOICE_PRIORITY = [
 const FEMALE_VOICE_PRIORITY = [
   // Google 여성 음성
   { pattern: /Google UK English Female/i, score: 100 },
+  { pattern: /Google US English/i, score: 99 },
   // Microsoft 여성 음성 (Neural)
   { pattern: /Microsoft.*Jenny.*Online.*Natural/i, score: 98 },
   { pattern: /Microsoft.*Aria.*Online.*Natural/i, score: 97 },
@@ -118,7 +119,6 @@ export const useTTS = () => {
     if (options.gender && voiceList.length > 0) {
       const genderVoice = selectBestVoice(voiceList, options.gender);
       utterance.voice = genderVoice;
-      console.log(`[TTS] gender=${options.gender}, selected="${genderVoice?.name}", voices=${voiceList.map(v => v.name).join(', ')}`);
     } else if (selectedVoice) {
       utterance.voice = selectedVoice;
     }
