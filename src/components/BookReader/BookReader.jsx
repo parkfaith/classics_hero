@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from '../../hooks/useTranslation';
 import { useLearningProgress } from '../../hooks/useLearningProgress';
 import { useVocabularyExtraction } from '../../hooks/useVocabularyExtraction';
+import { useProgress } from '../../hooks/useProgress';
+import { useStatistics } from '../../hooks/useStatistics';
 import './BookReader.css';
 
 // 기본 책 아이콘 컴포넌트
@@ -36,6 +38,12 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
   const translation = useTranslation();
   const { markChapterCompleted, getBookProgress } = useLearningProgress();
   const { extractVocabulary, isExtracting } = useVocabularyExtraction();
+  const { markChapterCompleted: markProgressCompleted, updateLastChapterIndex } = useProgress();
+  const { recordChapterComplete, endSession } = useStatistics();
+
+  // 자동 완료 감지 (마지막 문단 뷰포트 진입)
+  const lastParagraphRef = useRef(null);
+  const [autoCompleteShown, setAutoCompleteShown] = useState(false);
 
   const currentChapter = book.chapters[currentChapterIndex];
 
@@ -85,14 +93,35 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
       allProgress[book.id] = bookProgress;
       localStorage.setItem('learning-progress', JSON.stringify(allProgress));
     }
+    // 새 훅에도 챕터 인덱스 저장
+    updateLastChapterIndex(book.id, currentChapterIndex);
 
     setShowTranslation(false);
     setChapterTranslation('');
+    setAutoCompleteShown(false);
     // 챕터 변경 시 재생 중인 오디오 중지
     handleStop();
     // 챕터 변경 시 최상단으로 스크롤
     window.scrollTo(0, 0);
   }, [currentChapterIndex, book.id]);
+
+  // 자동 완료 감지: IntersectionObserver로 마지막 문단 뷰포트 진입 감지
+  useEffect(() => {
+    const el = lastParagraphRef.current;
+    if (!el || completedChapters[currentChapter.id]) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !completedChapters[currentChapter.id]) {
+          setAutoCompleteShown(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [currentChapter.id, completedChapters]);
 
   // 챕터 변경 시 중요 단어 추출
   useEffect(() => {
@@ -316,6 +345,10 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
 
   const handleMarkCompleted = () => {
     markChapterCompleted(book.id, currentChapter.id, 'reading');
+    // 새 훅에도 기록
+    markProgressCompleted(book.id, currentChapter.id, 'reading', currentChapter.word_count || currentChapter.wordCount || 0);
+    recordChapterComplete(currentChapter.word_count || currentChapter.wordCount || 0);
+    endSession();
     setCompletedChapters(prev => ({
       ...prev,
       [currentChapter.id]: true
@@ -632,7 +665,22 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
           onMouseUp={handleTextSelection}
         >
           {renderHighlightedText()}
+          {/* 자동 완료 감지용 sentinel */}
+          <div ref={lastParagraphRef} style={{ height: 1 }} />
         </div>
+
+        {/* 자동 완료 제안 토스트 */}
+        {autoCompleteShown && !chapterCompleted && (
+          <div className="auto-complete-toast">
+            <span>끝까지 읽으셨네요!</span>
+            <button onClick={() => { handleMarkCompleted(); setAutoCompleteShown(false); }}>
+              읽기 완료
+            </button>
+            <button className="dismiss" onClick={() => setAutoCompleteShown(false)}>
+              ✕
+            </button>
+          </div>
+        )}
 
         {showTranslation && (
           <div className="chapter-translation">

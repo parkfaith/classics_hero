@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useHeroChat } from '../../hooks/useHeroChat';
 import { useTTS } from '../../hooks/useTTS';
+import { useProgress } from '../../hooks/useProgress';
+import { useStatistics } from '../../hooks/useStatistics';
 import MessageBubble from './MessageBubble';
 import ChatInput from './ChatInput';
 import InsightReport from './InsightReport';
@@ -14,6 +16,9 @@ const ChatInterface = ({ hero, scenario = null, onBack }) => {
   const messagesEndRef = useRef(null);
   const tts = useTTS();
   const lastMessageIdRef = useRef(null);
+  const { markHeroConversation } = useProgress();
+  const { recordHeroConversation } = useStatistics();
+  const heroConversationTrackedRef = useRef(false);
 
   // 초기 인사 메시지 생성
   useEffect(() => {
@@ -35,6 +40,17 @@ const ChatInterface = ({ hero, scenario = null, onBack }) => {
       }, 100);
     }
   }, [messages]);
+
+  // 첫 사용자 메시지 전송 시 영웅 대화 기록
+  useEffect(() => {
+    if (heroConversationTrackedRef.current) return;
+    const userMessages = messages.filter(m => m.role === 'user');
+    if (userMessages.length === 1) {
+      heroConversationTrackedRef.current = true;
+      markHeroConversation(hero.id);
+      recordHeroConversation();
+    }
+  }, [messages, hero.id, markHeroConversation, recordHeroConversation]);
 
   // 영웅 메시지 자동 TTS 재생
   useEffect(() => {

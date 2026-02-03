@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import SplashScreen from './components/SplashScreen/SplashScreen';
 import BrowserCheck from './components/BrowserCheck/BrowserCheck';
 import Navigation from './components/Navigation/Navigation';
@@ -10,6 +10,11 @@ import Dictionary from './components/Dictionary/Dictionary';
 import TalkToHero from './components/TalkToHero/TalkToHero';
 import Settings from './components/Settings/Settings';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
+import MyLearning from './components/MyLearning/MyLearning';
+import { useStatistics } from './hooks/useStatistics';
+import { useBadges } from './hooks/useBadges';
+import { useProgress } from './hooks/useProgress';
+import confetti from 'canvas-confetti';
 import './App.css';
 
 // 학습 데이터 마이그레이션 버전 (형식 변경 시 증가)
@@ -37,19 +42,60 @@ function App() {
       console.log('학습 데이터가 새 형식으로 초기화되었습니다.');
     }
   }, []);
+
   const [selectedBook, setSelectedBook] = useState(null);
   const [selectedWord, setSelectedWord] = useState(null);
-  const [currentPage, setCurrentPage] = useState('library'); // 'library' or 'talk-to-hero'
+  const [currentPage, setCurrentPage] = useState('library'); // 'library', 'talk-to-hero', 'my-learning'
+  const [books, setBooks] = useState([]);
   const [mode, setMode] = useState('reading'); // 'reading' or 'speaking'
   const [showSettings, setShowSettings] = useState(false);
+  const [showBadgeModal, setShowBadgeModal] = useState(false);
+
+  // 새 훅 연동: 통계, 배지, 진행도
+  const { getStatsSummary, startSession } = useStatistics();
+  const { checkAchievements, newBadge, dismissNewBadge, getUnshownBadges } = useBadges();
+  const { getTalkedHeroesCount } = useProgress();
+
+  // 앱 시작 시 세션 시작 & 미표시 배지 체크
+  useEffect(() => {
+    startSession();
+    // 미표시된 배지가 있으면 표시
+    const unshown = getUnshownBadges();
+    if (unshown.length > 0) {
+      setShowBadgeModal(true);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 배지 획득 시 confetti 효과
+  useEffect(() => {
+    if (newBadge) {
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#f59e0b', '#d97706', '#fbbf24', '#3b82f6', '#ef4444'],
+      });
+    }
+  }, [newBadge]);
+
+  // 배지 조건 체크 (페이지 전환 시)
+  const checkBadges = useCallback(() => {
+    const stats = getStatsSummary();
+    stats.talkedHeroes = getTalkedHeroesCount();
+    checkAchievements(stats);
+  }, [getStatsSummary, getTalkedHeroesCount, checkAchievements]);
 
   const handleNavigate = (page) => {
+    checkBadges();
     if (page === 'library') {
       setCurrentPage('library');
       setSelectedBook(null);
       setMode('reading');
     } else if (page === 'talk-to-hero') {
       setCurrentPage('talk-to-hero');
+      setSelectedBook(null);
+    } else if (page === 'my-learning') {
+      setCurrentPage('my-learning');
       setSelectedBook(null);
     }
     // 페이지 전환 시 화면 상단으로 스크롤
@@ -64,6 +110,7 @@ function App() {
   };
 
   const handleBackToLibrary = () => {
+    checkBadges();
     setSelectedBook(null);
     setMode('reading');
     // 도서관으로 돌아갈 때 화면 상단으로 스크롤
@@ -109,10 +156,12 @@ function App() {
       />
 
       <main className="app-main">
-        {currentPage === 'talk-to-hero' ? (
+        {currentPage === 'my-learning' ? (
+          <MyLearning books={books} />
+        ) : currentPage === 'talk-to-hero' ? (
           <TalkToHero onBack={handleBackFromHero} />
         ) : !selectedBook ? (
-          <BookList onBookSelect={handleBookSelect} onTalkToHero={handleTalkToHeroSelect} />
+          <BookList onBookSelect={handleBookSelect} onTalkToHero={handleTalkToHeroSelect} onBooksLoaded={setBooks} />
         ) : mode === 'reading' ? (
           <BookReader
             book={selectedBook}
@@ -141,6 +190,22 @@ function App() {
 
       {showSettings && (
         <Settings onClose={() => setShowSettings(false)} />
+      )}
+
+      {/* 배지 획득 알림 모달 */}
+      {newBadge && (
+        <div className="badge-unlock-overlay" onClick={() => { dismissNewBadge(); setShowBadgeModal(false); }}>
+          <div className="badge-unlock-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="badge-unlock-celebration">🎉</div>
+            <div className="badge-unlock-icon">{newBadge.icon}</div>
+            <h2 className="badge-unlock-title">새 배지 획득!</h2>
+            <h3 className="badge-unlock-name">{newBadge.nameKo}</h3>
+            <p className="badge-unlock-desc">{newBadge.descriptionKo}</p>
+            <button className="badge-unlock-close" onClick={() => { dismissNewBadge(); setShowBadgeModal(false); }}>
+              확인
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

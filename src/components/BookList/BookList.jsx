@@ -5,7 +5,7 @@ import { fetchBooks } from '../../api';
 import { useLearningProgress } from '../../hooks/useLearningProgress';
 import './BookList.css';
 
-const BookList = ({ onBookSelect }) => {
+const BookList = ({ onBookSelect, onBooksLoaded }) => {
   const [filter, setFilter] = useState('all');
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +18,7 @@ const BookList = ({ onBookSelect }) => {
         setLoading(true);
         const data = await fetchBooks();
         setBooks(data);
+        if (onBooksLoaded) onBooksLoaded(data);
         setError(null);
       } catch (err) {
         setError('책 목록을 불러오는데 실패했습니다.');

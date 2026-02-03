@@ -6,6 +6,8 @@ import { usePronunciationAnalysis } from '../../hooks/usePronunciationAnalysis';
 import usePronunciationHistory from '../../hooks/usePronunciationHistory';
 import { useLearningProgress } from '../../hooks/useLearningProgress';
 import { useLearningMotivation } from '../../hooks/useLearningMotivation';
+import { useProgress } from '../../hooks/useProgress';
+import { useStatistics } from '../../hooks/useStatistics';
 import PracticeSummary from './PracticeSummary';
 import MotivationPanel from './MotivationPanel';
 import './SpeakingMode.css';
@@ -42,6 +44,8 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
   const currentChapter = book.chapters[currentChapterIndex];
   const pronunciationHistory = usePronunciationHistory(book.id, currentChapter.id);
   const { markChapterCompleted } = useLearningProgress();
+  const { markChapterCompleted: markProgressCompleted } = useProgress();
+  const { recordSpeakingSession, recordChapterComplete, endSession } = useStatistics();
 
   // 동기부여 시스템
   const motivation = useLearningMotivation();
@@ -80,6 +84,11 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
 
   const handleMarkCompleted = () => {
     markChapterCompleted(book.id, currentChapter.id, 'speaking');
+    // 새 훅에도 기록
+    markProgressCompleted(book.id, currentChapter.id, 'speaking', currentChapter.word_count || currentChapter.wordCount || 0);
+    recordSpeakingSession();
+    recordChapterComplete(currentChapter.word_count || currentChapter.wordCount || 0);
+    endSession();
     setCompletedChapters(prev => ({
       ...prev,
       [currentChapter.id]: true

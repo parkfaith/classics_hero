@@ -53,6 +53,16 @@ function Navigation({ currentPage, onNavigate, onOpenSettings }) {
           </button>
 
           <button
+            className={`nav-item ${currentPage === 'my-learning' ? 'active' : ''}`}
+            onClick={() => onNavigate('my-learning')}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            <span>내 학습</span>
+          </button>
+
+          <button
             className="nav-item settings-btn"
             onClick={onOpenSettings}
             title="설정"
