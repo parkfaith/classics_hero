@@ -27,6 +27,7 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
   const [isPlayingRecording, setIsPlayingRecording] = useState(false);
   const [motivationMessage, setMotivationMessage] = useState(null);
   const [improvementInfo, setImprovementInfo] = useState(null);
+  const [autoCompleteShown, setAutoCompleteShown] = useState(false);
 
   // TTS 하이라이트 관련 상태
   const [isTTSPlaying, setIsTTSPlaying] = useState(false);
@@ -244,6 +245,7 @@ const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
     pronunciation.clearAnalysis();
     setShowTranslation(false);
     setCurrentTranslation('');
+    setAutoCompleteShown(false);
   }, [currentChapterIndex, book]);
 
   // 현재 문장에서 핵심 단어 추출
@@ -685,6 +687,11 @@ Format your response as JSON:
               setMotivationMessage(null);
             }
           }
+
+          // 마지막 문장 연습 완료 시 자동 완료 제안
+          if (currentSentenceIndex === sentences.length - 1 && !chapterCompleted) {
+            setAutoCompleteShown(true);
+          }
         }
       }
     } else {
@@ -789,16 +796,8 @@ Format your response as JSON:
               />
             </div>
 
-            {chapterCompleted ? (
+            {chapterCompleted && (
               <span className="chapter-completed-badge">✓ 완료</span>
-            ) : (
-              <button
-                className="mark-completed-btn"
-                onClick={handleMarkCompleted}
-                title="이 챕터의 말하기 학습을 완료로 표시합니다"
-              >
-                🎤 완료
-              </button>
             )}
           </div>
         </div>
@@ -1120,6 +1119,19 @@ Format your response as JSON:
             disabled={currentSentenceIndex >= sentences.length - 1}
           >
             다음 문장 →
+          </button>
+        </div>
+      )}
+
+      {/* 자동 완료 제안 토스트 */}
+      {autoCompleteShown && !chapterCompleted && (
+        <div className="auto-complete-toast">
+          <span>마지막 문장까지 연습했어요!</span>
+          <button onClick={() => { handleMarkCompleted(); setAutoCompleteShown(false); }}>
+            말하기 완료
+          </button>
+          <button className="dismiss" onClick={() => setAutoCompleteShown(false)}>
+            ✕
           </button>
         </div>
       )}

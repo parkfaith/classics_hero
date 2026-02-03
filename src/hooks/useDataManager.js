@@ -284,11 +284,16 @@ export const useDataManager = () => {
       localStorage.removeItem(key);
     });
 
-    // 책별 진행 데이터 정리 (progress-* 패턴)
+    // 책별 진행 데이터 및 발음 기록 정리
     const keysToRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
-      if (key && (key.startsWith('progress-') || key.startsWith('bookmarks-'))) {
+      if (key && (
+        key.startsWith('progress-') ||
+        key.startsWith('bookmarks-') ||
+        key.startsWith('pronunciation-history-') ||
+        key.startsWith('learned-words-')
+      )) {
         keysToRemove.push(key);
       }
     }
