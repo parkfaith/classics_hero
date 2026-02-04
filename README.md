@@ -1,16 +1,46 @@
-# React + Vite
+# Classic Hero
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+공개 도메인 영어 고전 문학을 활용한 영어 학습 웹앱
 
-Currently, two official plugins are available:
+## 주요 기능
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Reading Mode** - 고전 문학 읽기, 단락별 번역, 단어 사전
+- **Speaking Mode** - TTS 듣기, 녹음 및 발음 연습
+- **Talk to Hero** - 6명의 역사적 인물과 AI 영어 대화
+- **PWA 지원** - 모바일 홈화면 앱 설치 가능
 
-## React Compiler
+## 기술 스택
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Frontend | Backend |
+|----------|---------|
+| React 19 + Vite 7 | FastAPI + Turso/SQLite |
 
-## Expanding the ESLint configuration
+## 실행 방법
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+# Backend
+cd backend
+pip install -r requirements.txt
+python seed_data.py          # 최초 1회
+uvicorn main:app --reload --port 8001
+
+# Frontend
+npm install
+npm run dev                  # http://localhost:5173
+```
+
+## 영웅 구성
+
+| 난이도 | 영웅 |
+|--------|------|
+| Easy | Aesop, Brothers Grimm |
+| Medium | O. Henry, Benjamin Franklin |
+| Advanced | Marcus Aurelius, Abraham Lincoln |
+
+## 라이선스
+
+MIT License
+
+---
+
+Made by ParkJunHyoung
