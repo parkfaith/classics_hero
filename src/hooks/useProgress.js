@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { safeSetItem } from './useDataManager';
 
 const STORAGE_KEY = 'user_progress';
 const LEGACY_KEY = 'learning-progress';
@@ -59,10 +60,15 @@ export const useProgress = () => {
     loadData();
   }, []);
 
-  // localStorage에 저장
+  // localStorage에 저장 (에러 처리 포함)
   const saveProgress = useCallback((newProgress) => {
     setProgress(newProgress);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newProgress));
+    const result = safeSetItem(STORAGE_KEY, newProgress);
+    if (!result.success) {
+      console.error('진행도 저장 실패:', result.message);
+      // 저장 실패 이벤트 발생 (App.jsx에서 처리)
+      window.dispatchEvent(new CustomEvent('storage-error', { detail: result }));
+    }
   }, []);
 
   // 기존 데이터 마이그레이션

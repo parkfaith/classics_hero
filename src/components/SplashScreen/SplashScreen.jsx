@@ -32,7 +32,7 @@ const SplashScreen = ({ onComplete }) => {
           />
         </div>
         <div className="splash-title-wrapper">
-          <span className="splash-brand">Jobible</span>
+          <span className="splash-brand">joBible</span>
           <h1 className="splash-title">Classic Heros</h1>
         </div>
         <p className="splash-subtitle">Learn English with Timeless Literature</p>

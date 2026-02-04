@@ -12,7 +12,7 @@ function Footer() {
             <h3 className="footer-title">Classic Heros</h3>
           </div>
           <p className="footer-description">
-            저작권이 만료된 영어 고전 문학을 활용한<br />
+            영어 고전 문학을 활용한<br />
             인터랙티브 영어 학습 플랫폼
           </p>
         </div>
@@ -51,7 +51,7 @@ function Footer() {
 
       <div className="footer-bottom">
         <p className="footer-copyright">
-          © {currentYear} Jobible Classic Heros. All rights reserved.
+          © {currentYear} joBible Classic Heros. All rights reserved.
         </p>
         <p className="footer-credits">
           Powered by Project Gutenberg & OpenAI

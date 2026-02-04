@@ -11,7 +11,7 @@ function Navigation({ currentPage, onNavigate, onOpenSettings }) {
           className="mobile-header-logo"
         />
         <div className="mobile-header-text">
-          <span className="mobile-header-brand">Jobible</span>
+          <span className="mobile-header-brand">joBible</span>
           <h1 className="mobile-header-title">Classic Heros</h1>
         </div>
       </header>
@@ -25,9 +25,9 @@ function Navigation({ currentPage, onNavigate, onOpenSettings }) {
             className="logo-image"
           />
           <div className="logo-text">
-            <span className="logo-brand">Jobible</span>
+            <span className="logo-brand">joBible</span>
             <h1 className="logo-title">Classic Heros</h1>
-            <p className="logo-subtitle">영어 고전 학습 플랫폼</p>
+            <p className="logo-subtitle">조바이블 영어 고전 학습 플랫폼</p>
           </div>
         </div>
 

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { safeSetItem } from './useDataManager';
 
 const STATS_KEY = 'user_statistics';
 const STREAK_KEY = 'streak_data';
@@ -126,16 +127,24 @@ export const useStatistics = () => {
     return streakData;
   };
 
-  // 통계 저장
+  // 통계 저장 (에러 처리 포함)
   const saveStats = useCallback((newStats) => {
     setStats(newStats);
-    localStorage.setItem(STATS_KEY, JSON.stringify(newStats));
+    const result = safeSetItem(STATS_KEY, newStats);
+    if (!result.success) {
+      console.error('통계 데이터 저장 실패:', result.message);
+      window.dispatchEvent(new CustomEvent('storage-error', { detail: result }));
+    }
   }, []);
 
-  // 스트릭 저장
+  // 스트릭 저장 (에러 처리 포함)
   const saveStreak = useCallback((newStreak) => {
     setStreak(newStreak);
-    localStorage.setItem(STREAK_KEY, JSON.stringify(newStreak));
+    const result = safeSetItem(STREAK_KEY, newStreak);
+    if (!result.success) {
+      console.error('스트릭 데이터 저장 실패:', result.message);
+      window.dispatchEvent(new CustomEvent('storage-error', { detail: result }));
+    }
   }, []);
 
   // localStorage에 학습 시간 직접 저장 (beforeunload용)

@@ -14,6 +14,7 @@ import MyLearning from './components/MyLearning/MyLearning';
 import { useStatistics } from './hooks/useStatistics';
 import { useBadges } from './hooks/useBadges';
 import { useProgress } from './hooks/useProgress';
+import { checkStorageWarning } from './hooks/useDataManager';
 import confetti from 'canvas-confetti';
 import './App.css';
 
@@ -51,6 +52,9 @@ function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [showBadgeModal, setShowBadgeModal] = useState(false);
 
+  // 저장소 관련 알림 상태
+  const [storageAlert, setStorageAlert] = useState(null); // { type: 'error' | 'warning', message: string }
+
   // 새 훅 연동: 통계, 배지, 진행도
   const { getStatsSummary, startSession } = useStatistics();
   const { checkAchievements, newBadge, dismissNewBadge, getUnshownBadges } = useBadges();
@@ -64,6 +68,28 @@ function App() {
     if (unshown.length > 0) {
       setShowBadgeModal(true);
     }
+
+    // 저장소 용량 경고 체크
+    const storageStatus = checkStorageWarning();
+    if (storageStatus.warning) {
+      setStorageAlert({
+        type: 'warning',
+        message: storageStatus.message
+      });
+    }
+
+    // 저장소 에러 이벤트 리스너
+    const handleStorageError = (e) => {
+      setStorageAlert({
+        type: 'error',
+        message: e.detail?.message || '데이터 저장 중 오류가 발생했습니다.'
+      });
+    };
+
+    window.addEventListener('storage-error', handleStorageError);
+    return () => {
+      window.removeEventListener('storage-error', handleStorageError);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 배지 획득 시 confetti 효과
@@ -190,6 +216,36 @@ function App() {
 
       {showSettings && (
         <Settings onClose={() => setShowSettings(false)} />
+      )}
+
+      {/* 저장소 용량 경고/에러 알림 */}
+      {storageAlert && (
+        <div className={`storage-alert ${storageAlert.type}`}>
+          <div className="storage-alert-content">
+            <span className="storage-alert-icon">
+              {storageAlert.type === 'error' ? '⚠️' : '💾'}
+            </span>
+            <span className="storage-alert-message">{storageAlert.message}</span>
+            <button
+              className="storage-alert-action"
+              onClick={() => {
+                setStorageAlert(null);
+                if (storageAlert.type === 'warning') {
+                  // 내 학습 > 데이터 관리로 이동
+                  setCurrentPage('my-learning');
+                }
+              }}
+            >
+              {storageAlert.type === 'warning' ? '백업하기' : '확인'}
+            </button>
+            <button
+              className="storage-alert-close"
+              onClick={() => setStorageAlert(null)}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
       )}
 
       {/* 배지 획득 알림 모달 */}

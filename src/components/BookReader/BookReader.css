@@ -1061,6 +1061,11 @@
   border: 2px solid #bbf7d0;
 }
 
+/* 모바일 힌트는 기본적으로 숨김 */
+.reading-hint .hint-mobile {
+  display: none;
+}
+
 /* TTS 단어 하이라이트 */
 .chapter-text.tts-active {
   line-height: 2;
@@ -1157,6 +1162,15 @@
     font-size: 0.75rem;
     padding: 0.75rem 1rem;
   }
+
+  /* 모바일에서는 드래그 관련 힌트 숨기기, 모바일 힌트 표시 */
+  .reading-hint .hint-desktop {
+    display: none;
+  }
+
+  .reading-hint .hint-mobile {
+    display: inline;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1185,10 +1199,32 @@
   transition: all 0.2s ease;
 }
 
+/* 본문 내 클릭 가능한 하이라이트 */
+.vocabulary-highlight.clickable {
+  cursor: pointer;
+}
+
 .vocabulary-highlight:hover {
   background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+/* 하단 단어 항목 플래시 애니메이션 */
+.vocabulary-item.highlight-flash {
+  animation: vocabFlash 1.5s ease;
+}
+
+@keyframes vocabFlash {
+  0%, 100% {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  20%, 60% {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+    transform: scale(1.02);
+  }
 }
 
 /* 중요 단어 설명 섹션 */

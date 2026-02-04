@@ -418,9 +418,24 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
         );
       }
 
-      // 하이라이트된 단어
+      // 하이라이트된 단어 (클릭 시 하단 설명으로 스크롤)
+      // vocabulary 배열에서 실제 인덱스 찾기
+      const vocabIndex = vocabulary.findIndex(v => v.word.toLowerCase() === sortedVocab[range.idx].word.toLowerCase());
       parts.push(
-        <mark key={`vocab-${index}`} className="vocabulary-highlight" data-vocab-index={range.idx}>
+        <mark
+          key={`vocab-${index}`}
+          className="vocabulary-highlight clickable"
+          data-vocab-index={vocabIndex}
+          onClick={(e) => {
+            e.stopPropagation();
+            const targetEl = document.getElementById(`vocab-item-${vocabIndex}`);
+            if (targetEl) {
+              targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              targetEl.classList.add('highlight-flash');
+              setTimeout(() => targetEl.classList.remove('highlight-flash'), 1500);
+            }
+          }}
+        >
           {range.word}
         </mark>
       );
@@ -664,7 +679,9 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
         </div>
 
         <div className="reading-hint">
-          💡 단어를 드래그하면 사전을 볼 수 있습니다. 재생 버튼을 누르면 원어민 발음을 들으며 따라 읽을 수 있습니다.
+          <span className="hint-desktop">💡 단어를 드래그하면 사전을, </span>
+          <span className="hint-mobile">💡 </span>
+          <span className="hint-common">노란색 단어를 탭하면 하단 설명으로 이동합니다.</span>
         </div>
 
         <div
@@ -726,7 +743,7 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
             {!isExtracting && vocabulary.length > 0 && (
               <div className="vocabulary-list vocabulary-fade-in">
                 {vocabulary.map((item, index) => (
-                  <div key={index} className="vocabulary-item">
+                  <div key={index} id={`vocab-item-${index}`} className="vocabulary-item">
                     <div className="vocabulary-word">
                       <mark className="vocabulary-highlight">{item.word}</mark>
                       {!item.is_idiom && (

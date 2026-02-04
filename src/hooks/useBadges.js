@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { safeSetItem } from './useDataManager';
 
 const STORAGE_KEY = 'user_badges';
 const VERSION = '1.1.0';
@@ -152,10 +153,14 @@ export const useBadges = () => {
     };
   };
 
-  // 저장
+  // 저장 (에러 처리 포함)
   const saveBadgeData = useCallback((data) => {
     setBadgeData(data);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    const result = safeSetItem(STORAGE_KEY, data);
+    if (!result.success) {
+      console.error('배지 데이터 저장 실패:', result.message);
+      window.dispatchEvent(new CustomEvent('storage-error', { detail: result }));
+    }
   }, []);
 
   // 배지 조건 체크 및 획득 처리

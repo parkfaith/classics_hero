@@ -1,6 +1,8 @@
 import { useCallback } from 'react';
 
 const APP_VERSION = '1.1.0';
+const STORAGE_WARNING_THRESHOLD = 80; // 80% 이상 사용 시 경고
+const ESTIMATED_LIMIT_BYTES = 5 * 1024 * 1024; // 5MB 기준
 
 // localStorage 키 목록
 const STORAGE_KEYS = {
@@ -376,6 +378,67 @@ const safeGetItem = (key) => {
     return value ? JSON.parse(value) : null;
   } catch {
     return null;
+  }
+};
+
+/**
+ * 안전한 localStorage 저장
+ * @param {string} key - 저장할 키
+ * @param {any} value - 저장할 값 (객체면 자동 JSON 변환)
+ * @returns {{ success: boolean, error?: string }}
+ */
+export const safeSetItem = (key, value) => {
+  try {
+    const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
+    localStorage.setItem(key, stringValue);
+    return { success: true };
+  } catch (error) {
+    // QuotaExceededError 처리
+    if (error.name === 'QuotaExceededError' || error.code === 22) {
+      console.error('localStorage 용량 초과:', error);
+      return {
+        success: false,
+        error: 'storage_full',
+        message: '저장 공간이 부족합니다. 데이터를 백업 후 일부 삭제해주세요.'
+      };
+    }
+    console.error('localStorage 저장 오류:', error);
+    return {
+      success: false,
+      error: 'unknown',
+      message: '데이터 저장 중 오류가 발생했습니다.'
+    };
+  }
+};
+
+/**
+ * 저장소 용량 경고 체크
+ * @returns {{ warning: boolean, usagePercent: number, message?: string }}
+ */
+export const checkStorageWarning = () => {
+  try {
+    let totalSize = 0;
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      const value = localStorage.getItem(key);
+      if (value) {
+        totalSize += new Blob([value]).size;
+      }
+    }
+
+    const usagePercent = Math.round((totalSize / ESTIMATED_LIMIT_BYTES) * 100);
+
+    if (usagePercent >= STORAGE_WARNING_THRESHOLD) {
+      return {
+        warning: true,
+        usagePercent,
+        message: `저장 공간이 ${usagePercent}% 사용 중입니다. 데이터 백업을 권장합니다.`
+      };
+    }
+
+    return { warning: false, usagePercent };
+  } catch {
+    return { warning: false, usagePercent: 0 };
   }
 };
 
