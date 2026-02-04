@@ -1,4 +1,4 @@
-# Classic Hero
+# joBible Classic Heros
 
 공개 도메인 영어 고전 문학을 활용한 영어 학습 웹앱
 
