@@ -1,7 +1,9 @@
 .book-reader {
   max-width: 900px;
+  width: 100%;
   margin: 0 auto;
   padding: 2rem;
+  overflow-x: hidden;
 }
 
 .reader-header {
@@ -313,6 +315,8 @@
   border-radius: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .chapter-header {
@@ -377,6 +381,8 @@
 .chapter-text {
   line-height: 1.8;
   color: #374151;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .paragraph-container {
@@ -469,6 +475,8 @@
   border-radius: 8px;
   margin-top: 1rem;
   border-left: 4px solid #fbbf24;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .paragraph-translation p {
@@ -1114,6 +1122,8 @@
   border-radius: 12px;
   margin-top: 2rem;
   border-left: 4px solid #fbbf24;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .chapter-translation h3 {
@@ -1234,6 +1244,7 @@
   border-radius: 12px;
   margin-top: 2rem;
   border: 2px solid #bae6fd;
+  overflow-x: hidden;
 }
 
 .vocabulary-header {
@@ -1341,6 +1352,8 @@
   font-weight: 600;
   line-height: 1.6;
   margin-bottom: 0.5rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .vocabulary-example {
@@ -1350,6 +1363,8 @@
   padding-top: 0.5rem;
   border-top: 1px solid #e2e8f0;
   margin-top: 0.5rem;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .vocabulary-example em {
