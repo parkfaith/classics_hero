@@ -173,6 +173,17 @@ body.in-chat .mobile-header {
   line-height: 1;
 }
 
+/* 완료 배지 - 녹색 체크마크 */
+.nav-quest-badge.completed {
+  background: #22c55e;
+  animation: quest-complete-pulse 2s ease-in-out infinite;
+}
+
+@keyframes quest-complete-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
 .nav-item {
   position: relative;
 }

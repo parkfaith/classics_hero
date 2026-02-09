@@ -131,12 +131,12 @@
 .quest-card--completed {
   background: #f0fdf4;
   border-color: #bbf7d0;
-  cursor: default;
 }
 
 .quest-card--completed:hover {
-  transform: none;
-  box-shadow: none;
+  border-color: #86efac;
+  box-shadow: 0 2px 8px rgba(34, 197, 94, 0.12);
+  transform: translateY(-1px);
 }
 
 .quest-card-icon {
@@ -342,6 +342,16 @@
   color: #16a34a;
   font-size: 16px;
   font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.quest-complete-btn.secondary {
+  background: linear-gradient(135deg, #64748b, #475569);
+  color: #fff;
+}
+
+.quest-complete-btn.secondary:hover {
+  box-shadow: 0 4px 12px rgba(71, 85, 105, 0.3);
 }
 
 /* ==================== 반응형 ==================== */

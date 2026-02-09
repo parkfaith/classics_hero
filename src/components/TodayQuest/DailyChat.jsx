@@ -137,7 +137,15 @@ const DailyChat = ({ hero, topic, completed, messageCount, onComplete, onUpdateP
 
       {/* 완료/시작 버튼 */}
       {completed || questCompleted ? (
-        <div className="quest-completed-badge">✅ 대화 미션 완료!</div>
+        <>
+          <div className="quest-completed-badge">✅ 대화 미션 완료!</div>
+          <button
+            className="quest-complete-btn secondary"
+            onClick={() => setChatStarted(true)}
+          >
+            대화 다시 보기
+          </button>
+        </>
       ) : (
         <button
           className="quest-complete-btn"

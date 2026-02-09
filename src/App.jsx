@@ -61,7 +61,12 @@ function App() {
   const { getStatsSummary, startSession } = useStatistics();
   const { checkAchievements, newBadge, dismissNewBadge, getUnshownBadges } = useBadges();
   const { getTalkedHeroesCount } = useProgress();
-  const { getCompletionCount, getConsecutivePerfectDays } = useTodayQuest();
+  const { todayQuests, getConsecutivePerfectDays } = useTodayQuest();
+
+  // 완료된 미션 수 계산 (todayQuests 상태 기반으로 리렌더링 트리거)
+  const completedQuestCount = todayQuests
+    ? Object.values(todayQuests).filter(q => q.completed).length
+    : 0;
 
   // 앱 시작 시 세션 시작 & 미표시 배지 체크
   useEffect(() => {
@@ -112,8 +117,9 @@ function App() {
     const stats = getStatsSummary();
     stats.talkedHeroes = getTalkedHeroesCount();
     stats.consecutivePerfectDays = getConsecutivePerfectDays();
+    stats.completedQuestCount = completedQuestCount;
     checkAchievements(stats);
-  }, [getStatsSummary, getTalkedHeroesCount, getConsecutivePerfectDays, checkAchievements]);
+  }, [getStatsSummary, getTalkedHeroesCount, getConsecutivePerfectDays, completedQuestCount, checkAchievements]);
 
   const handleNavigate = (page) => {
     checkBadges();
@@ -186,7 +192,7 @@ function App() {
         currentPage={currentPage}
         onNavigate={handleNavigate}
         onOpenSettings={() => setShowSettings(true)}
-        questBadgeCount={3 - getCompletionCount()}
+        questBadgeCount={3 - completedQuestCount}
       />
 
       <main className="app-main">

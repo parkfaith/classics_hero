@@ -12,7 +12,8 @@ const ChatInterface = ({ hero, scenario = null, onBack, questMode = false, onQue
   const [showReport, setShowReport] = useState(false);
   const [autoTTS, setAutoTTS] = useState(true);
   const [scenarioCompleted, setScenarioCompleted] = useState(false);
-  const { messages, isLoading, error, sendMessage, initializeChat } = useHeroChat(hero, scenario);
+  const [conversationEnded, setConversationEnded] = useState(false);
+  const { messages, isLoading, error, sendMessage, initializeChat, endConversation } = useHeroChat(hero, scenario);
   const messagesEndRef = useRef(null);
   const tts = useTTS();
   const lastMessageIdRef = useRef(null);
@@ -69,6 +70,13 @@ const ChatInterface = ({ hero, scenario = null, onBack, questMode = false, onQue
       tts.speak(lastMessage.content, hero.ttsConfig);
     }
   }, [messages, autoTTS, hero.ttsConfig, tts]);
+
+  // 대화 종료 핸들러
+  const handleEndConversation = async () => {
+    tts.stop();
+    await endConversation();
+    setConversationEnded(true);
+  };
 
   // 시나리오 완료 체크
   useEffect(() => {
@@ -241,7 +249,24 @@ const ChatInterface = ({ hero, scenario = null, onBack, questMode = false, onQue
         </div>
       </div>
 
-      <ChatInput onSendMessage={sendMessage} isLoading={isLoading} isTTSSpeaking={tts.isPlaying} onStopTTS={tts.stop} questMode={questMode} />
+      {conversationEnded ? (
+        <div className="chat-ended-footer">
+          <p className="chat-ended-message">대화가 종료되었습니다</p>
+          <button className="chat-restart-btn" onClick={onBack}>
+            돌아가기
+          </button>
+        </div>
+      ) : (
+        <ChatInput
+          onSendMessage={sendMessage}
+          isLoading={isLoading}
+          isTTSSpeaking={tts.isPlaying}
+          onStopTTS={tts.stop}
+          questMode={questMode}
+          onEndConversation={handleEndConversation}
+          canEndConversation={messages.filter(m => m.role === 'user').length >= 1}
+        />
+      )}
 
       {showReport && (
         <InsightReport

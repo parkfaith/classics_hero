@@ -628,3 +628,38 @@
     opacity: 1;
   }
 }
+
+
+/* 대화 종료 후 푸터 */
+.chat-ended-footer {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  border-top: 1px solid #bbf7d0;
+  padding: 1.5rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.chat-ended-message {
+  color: #16a34a;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+}
+
+.chat-restart-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.chat-restart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSTT } from '../../hooks/useSTT';
 import './ChatInput.css';
 
-const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS, questMode = false }) => {
+const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS, questMode = false, onEndConversation = null, canEndConversation = false }) => {
   const [message, setMessage] = useState('');
   const [showTextInput, setShowTextInput] = useState(false);
   const [pendingAutoSend, setPendingAutoSend] = useState(false);
@@ -25,14 +25,17 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS, questMo
 
   // 자동 전송: STT가 끝나고 transcript가 확정되면 전송
   useEffect(() => {
-    if (pendingAutoSend && !isListening && transcript.trim()) {
-      const finalMessage = transcript.trim();
-      onSendMessage(finalMessage);
-      setMessage('');
-      clearTranscript();
+    if (pendingAutoSend && !isListening) {
+      // message state에 최종 결과가 있을 수 있으므로 message도 확인
+      const finalMessage = (transcript || message).trim();
+      if (finalMessage) {
+        onSendMessage(finalMessage);
+        setMessage('');
+        clearTranscript();
+      }
       setPendingAutoSend(false);
     }
-  }, [pendingAutoSend, isListening, transcript, onSendMessage, clearTranscript]);
+  }, [pendingAutoSend, isListening, transcript, message, onSendMessage, clearTranscript]);
 
   const handleMicClick = () => {
     if (isListening) {
@@ -201,6 +204,19 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS, questMo
           <span className="tts-icon">🔊</span>
           <span className="tts-text">영웅이 말하고 있습니다...</span>
         </div>
+      )}
+
+      {/* 대화 종료 버튼 */}
+      {onEndConversation && canEndConversation && !isListening && !message.trim() && (
+        <button
+          type="button"
+          className="end-conversation-btn"
+          onClick={onEndConversation}
+          disabled={isLoading}
+          title="대화 마치기"
+        >
+          👋 대화 마치기
+        </button>
       )}
     </div>
   );

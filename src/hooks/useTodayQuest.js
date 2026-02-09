@@ -37,6 +37,15 @@ const splitSentences = (content) => {
     .filter(s => s.length > 10);
 };
 
+// 초중급 수준에 적합한 문장 필터링 (5~15단어, 복잡한 구조 제외)
+const filterEasySentences = (sentences) => {
+  return sentences.filter(s => {
+    const wordCount = s.split(/\s+/).length;
+    // 5~15단어, 세미콜론이나 콜론 없는 문장 (복잡한 구조 제외)
+    return wordCount >= 5 && wordCount <= 15 && !s.includes(';') && !s.includes(':');
+  });
+};
+
 // 초기 상태
 const getInitialState = () => ({
   version: VERSION,
@@ -125,7 +134,7 @@ export const useTodayQuest = () => {
     return result?.item || null;
   }, [today]);
 
-  // 오늘의 읽기 구절 선택 (챕터에서 3~5문장)
+  // 오늘의 읽기 구절 선택 (챕터에서 2~3문장, 초중급 수준)
   const selectTodayPassage = useCallback((books, hero) => {
     if (!books || books.length === 0) return null;
 
@@ -143,21 +152,28 @@ export const useTodayQuest = () => {
     if (!chapterResult) return null;
 
     const chapter = chapterResult.item;
-    const sentences = splitSentences(chapter.content);
-    if (sentences.length === 0) return null;
+    const allSentences = splitSentences(chapter.content);
+    // 초중급 수준 문장만 필터링
+    const sentences = filterEasySentences(allSentences);
 
-    // 3~5문장 추출
+    // 쉬운 문장이 부족하면 전체에서 짧은 문장 선택
+    const finalSentences = sentences.length >= 2 ? sentences :
+      allSentences.filter(s => s.split(/\s+/).length <= 18);
+
+    if (finalSentences.length === 0) return null;
+
+    // 2~3문장 추출 (기존 3~5에서 축소)
     const random = createSeededRandom(getDateSeed(today) + 40);
-    const count = 3 + Math.floor(random() * 3); // 3~5
-    const maxStart = Math.max(0, sentences.length - count);
+    const count = 2 + Math.floor(random() * 2); // 2~3
+    const maxStart = Math.max(0, finalSentences.length - count);
     const start = Math.floor(random() * (maxStart + 1));
-    const passage = sentences.slice(start, start + count).join(' ');
+    const passage = finalSentences.slice(start, start + count).join(' ');
 
     return {
       text: passage,
       bookTitle: book.title,
       chapterTitle: chapter.title,
-      sentenceCount: Math.min(count, sentences.length)
+      sentenceCount: Math.min(count, finalSentences.length)
     };
   }, [today]);
 

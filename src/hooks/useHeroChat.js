@@ -23,7 +23,14 @@ IMPORTANT GUIDELINES:
 - If the user greets you casually or makes small talk, respond naturally and warmly
 - Ask follow-up questions to encourage dialogue
 - Use simple, clear English appropriate for language learners
-- Stay in character but be approachable`;
+- Stay in character but be approachable
+
+GRAMMAR FEEDBACK (Important!):
+- If the user makes a grammar or usage error, gently correct it in your response
+- Use format: "By the way, instead of '[wrong]', you could say '[correct]'. [brief explanation]"
+- Only correct 1 error per response to avoid overwhelming the learner
+- Be encouraging and positive when giving corrections
+- If the sentence is correct, occasionally praise their English`;
 
   // 초기 인사 메시지 생성
   const initializeChat = useCallback(async () => {
@@ -184,12 +191,87 @@ IMPORTANT GUIDELINES:
     initializeChat();
   }, [initializeChat]);
 
+  // 대화 종료 요청 - 영웅이 자연스럽게 작별 인사
+  const endConversation = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const recentMessages = messages.slice(-4);
+      const conversationMessages = [
+        {
+          role: 'system',
+          content: `${enhancedSystemPrompt}
+
+The user wants to end the conversation. Give a warm, brief farewell (1-2 sentences) that:
+- Thanks them for the conversation
+- Encourages them to come back
+- Stays in character
+- Does NOT ask any follow-up questions
+- Ends the conversation naturally`
+        },
+        ...recentMessages.map(msg => ({
+          role: msg.role === 'hero' ? 'assistant' : 'user',
+          content: msg.content
+        })),
+        {
+          role: 'user',
+          content: 'I need to go now. Goodbye!'
+        }
+      ];
+
+      const response = await fetch(`${API_BASE}/openai/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: conversationMessages,
+          temperature: 0.7,
+          max_tokens: 60
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('API 요청 실패');
+      }
+
+      const data = await response.json();
+
+      const farewellMessage = {
+        id: `msg_${Date.now()}_farewell`,
+        role: 'hero',
+        content: data.content,
+        timestamp: Date.now(),
+        isFarewell: true
+      };
+
+      setMessages(prev => [...prev, farewellMessage]);
+      return true; // 종료 성공
+    } catch (err) {
+      console.error('대화 종료 실패:', err);
+      // 폴백 작별 인사
+      const fallbackFarewell = {
+        id: `msg_${Date.now()}_farewell`,
+        role: 'hero',
+        content: `It was wonderful talking with you! Take care, and I hope to see you again soon. Farewell!`,
+        timestamp: Date.now(),
+        isFarewell: true
+      };
+      setMessages(prev => [...prev, fallbackFarewell]);
+      return true;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [messages, enhancedSystemPrompt]);
+
   return {
     messages,
     isLoading,
     error,
     sendMessage,
     initializeChat,
-    resetChat
+    resetChat,
+    endConversation
   };
 };
