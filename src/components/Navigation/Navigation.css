@@ -362,6 +362,12 @@ body.in-chat .mobile-header {
     box-shadow: none;
   }
 
+  /* 모바일 하단 탭 바에서 배지 위치 조정 */
+  .nav-quest-badge {
+    top: 2px;
+    right: 6px;
+  }
+
   /* 채팅 화면에서는 모바일 헤더와 하단 탭 바 숨기기 */
   body.in-chat .mobile-header {
     display: none;
