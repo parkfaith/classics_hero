@@ -11,9 +11,11 @@ import TalkToHero from './components/TalkToHero/TalkToHero';
 import Settings from './components/Settings/Settings';
 import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import MyLearning from './components/MyLearning/MyLearning';
+import TodayQuest from './components/TodayQuest/TodayQuest';
 import { useStatistics } from './hooks/useStatistics';
 import { useBadges } from './hooks/useBadges';
 import { useProgress } from './hooks/useProgress';
+import { useTodayQuest } from './hooks/useTodayQuest';
 import { checkStorageWarning } from './hooks/useDataManager';
 import confetti from 'canvas-confetti';
 import './App.css';
@@ -55,10 +57,11 @@ function App() {
   // 저장소 관련 알림 상태
   const [storageAlert, setStorageAlert] = useState(null); // { type: 'error' | 'warning', message: string }
 
-  // 새 훅 연동: 통계, 배지, 진행도
+  // 새 훅 연동: 통계, 배지, 진행도, 퀘스트
   const { getStatsSummary, startSession } = useStatistics();
   const { checkAchievements, newBadge, dismissNewBadge, getUnshownBadges } = useBadges();
   const { getTalkedHeroesCount } = useProgress();
+  const { getCompletionCount, getConsecutivePerfectDays } = useTodayQuest();
 
   // 앱 시작 시 세션 시작 & 미표시 배지 체크
   useEffect(() => {
@@ -108,8 +111,9 @@ function App() {
   const checkBadges = useCallback(() => {
     const stats = getStatsSummary();
     stats.talkedHeroes = getTalkedHeroesCount();
+    stats.consecutivePerfectDays = getConsecutivePerfectDays();
     checkAchievements(stats);
-  }, [getStatsSummary, getTalkedHeroesCount, checkAchievements]);
+  }, [getStatsSummary, getTalkedHeroesCount, getConsecutivePerfectDays, checkAchievements]);
 
   const handleNavigate = (page) => {
     checkBadges();
@@ -119,6 +123,9 @@ function App() {
       setMode('reading');
     } else if (page === 'talk-to-hero') {
       setCurrentPage('talk-to-hero');
+      setSelectedBook(null);
+    } else if (page === 'today-quest') {
+      setCurrentPage('today-quest');
       setSelectedBook(null);
     } else if (page === 'my-learning') {
       setCurrentPage('my-learning');
@@ -179,10 +186,13 @@ function App() {
         currentPage={currentPage}
         onNavigate={handleNavigate}
         onOpenSettings={() => setShowSettings(true)}
+        questBadgeCount={3 - getCompletionCount()}
       />
 
       <main className="app-main">
-        {currentPage === 'my-learning' ? (
+        {currentPage === 'today-quest' ? (
+          <TodayQuest />
+        ) : currentPage === 'my-learning' ? (
           <MyLearning books={books} />
         ) : currentPage === 'talk-to-hero' ? (
           <TalkToHero onBack={handleBackFromHero} />

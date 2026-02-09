@@ -271,6 +271,210 @@
   color: #1f2937;
 }
 
+/* ==================== Learning Calendar ==================== */
+.learning-calendar {
+  overflow: hidden;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.calendar-header h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #374151;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.calendar-nav-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  line-height: 1;
+}
+
+.calendar-nav-btn:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.calendar-nav-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.calendar-month-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1f2937;
+  min-width: 90px;
+  text-align: center;
+}
+
+/* 달력 그리드 */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #9ca3af;
+  padding: 4px 0;
+}
+
+.calendar-weekday.sunday {
+  color: #ef4444;
+}
+
+.calendar-weekday.saturday {
+  color: #3b82f6;
+}
+
+/* 날짜 셀 */
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.calendar-day.empty {
+  background: transparent;
+}
+
+.calendar-day-number {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #374151;
+  line-height: 1;
+}
+
+.calendar-day-star {
+  font-size: 0.5rem;
+  line-height: 1;
+  margin-top: 1px;
+  color: #d97706;
+}
+
+/* 오늘 */
+.calendar-day.today {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+/* 미래 날짜 */
+.calendar-day.future {
+  opacity: 0.3;
+}
+
+.calendar-day.future .calendar-day-number {
+  color: #d1d5db;
+}
+
+/* 학습한 날 - 강도별 */
+.calendar-day.studied.level-1 {
+  background: #dbeafe;
+}
+
+.calendar-day.studied.level-2 {
+  background: #93c5fd;
+}
+
+.calendar-day.studied.level-2 .calendar-day-number {
+  color: #1e3a8a;
+}
+
+.calendar-day.studied.level-3 {
+  background: #3b82f6;
+}
+
+.calendar-day.studied.level-3 .calendar-day-number {
+  color: #fff;
+}
+
+/* Perfect Day */
+.calendar-day.perfect {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+}
+
+.calendar-day.perfect .calendar-day-number {
+  color: #92400e;
+  font-weight: 700;
+}
+
+/* 범례 + 요약 */
+.calendar-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.calendar-legend {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  color: #6b7280;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+}
+
+.legend-dot.studied {
+  background: #3b82f6;
+  border-color: #3b82f6;
+}
+
+.legend-dot.perfect {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #fbbf24;
+}
+
+.calendar-summary {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #374151;
+}
+
 /* ==================== BadgeCollection ==================== */
 .badge-collection-header {
   display: flex;
@@ -860,6 +1064,29 @@
   /* Dashboard 모바일 */
   .dashboard-welcome h2 {
     font-size: 1.2rem;
+  }
+
+  /* Calendar 모바일 */
+  .calendar-grid {
+    gap: 2px;
+  }
+
+  .calendar-day {
+    border-radius: 6px;
+  }
+
+  .calendar-day-number {
+    font-size: 0.7rem;
+  }
+
+  .calendar-day-star {
+    font-size: 0.4rem;
+  }
+
+  .calendar-footer {
+    flex-direction: column;
+    gap: 0.375rem;
+    align-items: flex-start;
   }
 
   .stats-cards {

@@ -1,0 +1,368 @@
+/* ==================== 문장 카드 ==================== */
+.speaking-sentence-card {
+  padding: 18px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.speaking-sentence-text {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #1e293b;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.speaking-sentence-source {
+  font-size: 12px;
+  color: #94a3b8;
+  margin: 0 0 10px 0;
+}
+
+.speaking-translation {
+  font-size: 14px;
+  color: #6b7280;
+  background: #f8fafc;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 0 0 12px 0;
+  border-left: 3px solid #3b82f6;
+  line-height: 1.6;
+}
+
+.speaking-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.speaking-listen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.speaking-listen-btn:hover:not(:disabled) {
+  background: #dbeafe;
+}
+
+.speaking-listen-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.speaking-translate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #16a34a;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.speaking-translate-btn:hover:not(:disabled) {
+  background: #dcfce7;
+}
+
+.speaking-translate-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ==================== 녹음 영역 ==================== */
+.speaking-record-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 16px;
+  background: #f8fafc;
+  border-radius: 14px;
+  border: 1px dashed #cbd5e1;
+}
+
+/* 녹음 시작 버튼 - 크고 직관적 */
+.speaking-record-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 28px 40px;
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 3px solid #3b82f6;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: inherit;
+  width: 100%;
+  max-width: 280px;
+}
+
+.speaking-record-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.speaking-record-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.record-btn-icon {
+  font-size: 48px;
+  line-height: 1;
+}
+
+.record-btn-label {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e40af;
+}
+
+.record-btn-hint {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+/* ==================== 녹음 중 UI ==================== */
+.speaking-recording-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 8px 0;
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recording-dot {
+  width: 12px;
+  height: 12px;
+  background: #ef4444;
+  border-radius: 50%;
+  animation: recording-blink 1s ease-in-out infinite;
+}
+
+@keyframes recording-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.recording-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #dc2626;
+}
+
+.recording-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  max-width: 300px;
+}
+
+.recording-cancel-btn {
+  flex: 1;
+  padding: 12px 16px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.recording-cancel-btn:hover {
+  background: #e2e8f0;
+}
+
+.recording-done-btn {
+  flex: 1.5;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.recording-done-btn:hover {
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+}
+
+/* 실시간 인식 */
+.speaking-live-transcript {
+  width: 100%;
+  text-align: center;
+  padding: 12px;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.live-text {
+  font-size: 15px;
+  color: #475569;
+  margin: 0;
+  font-style: italic;
+  min-height: 22px;
+}
+
+.speaking-unsupported {
+  text-align: center;
+  color: #ef4444;
+  font-size: 14px;
+}
+
+/* ==================== 결과 카드 ==================== */
+.speaking-result-card {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.speaking-accuracy-display {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.accuracy-circle {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 8px;
+}
+
+.accuracy-high {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.accuracy-mid {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.accuracy-low {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.accuracy-number {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 80px;
+}
+
+.accuracy-percent {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.accuracy-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+  margin: 0;
+}
+
+/* 비교 표시 */
+.speaking-transcript-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.transcript-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.transcript-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #94a3b8;
+  flex-shrink: 0;
+  width: 48px;
+  padding-top: 2px;
+}
+
+.transcript-text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #334155;
+  margin: 0;
+  flex: 1;
+}
+
+.transcript-spoken {
+  color: #3b82f6;
+}
+
+/* 액션 */
+.speaking-result-actions {
+  text-align: center;
+}
+
+.speaking-retry-btn {
+  padding: 10px 24px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.speaking-retry-btn:hover {
+  background: #e2e8f0;
+}
+
+/* ==================== 빈 상태 ==================== */
+.speaking-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+}
+
+.speaking-empty p {
+  margin: 4px 0;
+}

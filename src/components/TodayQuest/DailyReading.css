@@ -1,0 +1,197 @@
+/* ==================== 명언 카드 ==================== */
+.reading-quote-card {
+  display: flex;
+  gap: 14px;
+  padding: 18px;
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  border-radius: 14px;
+  border: 1px solid #bfdbfe;
+}
+
+.reading-hero-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reading-quote-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.reading-quote-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #3b82f6;
+  margin: 0 0 6px 0;
+}
+
+.reading-quote-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #1e3a5f;
+  margin: 0 0 10px 0;
+  font-style: italic;
+  border: none;
+  padding: 0;
+}
+
+/* ==================== 버튼 행 ==================== */
+.reading-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.reading-listen-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  background: #fff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #3b82f6;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.reading-listen-btn:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+.reading-listen-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.reading-listen-btn.stop {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.reading-listen-btn.stop:hover {
+  background: #fee2e2;
+}
+
+.reading-translate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.reading-translate-btn:hover:not(:disabled) {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.reading-translate-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ==================== 번역 표시 ==================== */
+.reading-translation {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #6b7280;
+  margin: 0 0 10px 0;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  border-left: 3px solid #3b82f6;
+}
+
+.reading-translation.passage {
+  background: #f8fafc;
+  border-left-color: #6366f1;
+}
+
+/* ==================== 구절 카드 ==================== */
+.reading-passage-card {
+  padding: 18px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.reading-passage-meta {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.reading-passage-book {
+  font-size: 12px;
+  color: #6366f1;
+  background: #eef2ff;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.reading-passage-chapter {
+  font-size: 12px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 3px 10px;
+  border-radius: 6px;
+}
+
+/* 구절 설명 */
+.reading-passage-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  margin: 0 0 14px 0;
+  line-height: 1.5;
+}
+
+/* 구절 텍스트 + 하이라이트 */
+.reading-passage-text {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #334155;
+  margin: 0 0 16px 0;
+  word-break: break-word;
+}
+
+.reading-sentence {
+  transition: background 0.3s, color 0.3s;
+  border-radius: 2px;
+  padding: 1px 0;
+}
+
+.reading-sentence.highlight {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 1px 2px;
+  border-radius: 3px;
+}
+
+/* ==================== 빈 상태 ==================== */
+.reading-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+}
+
+.reading-empty p {
+  margin: 4px 0;
+}

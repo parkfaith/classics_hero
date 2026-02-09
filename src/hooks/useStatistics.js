@@ -14,6 +14,8 @@ const getInitialStats = () => ({
   completedBooks: 0,           // 완료한 책 수
   heroConversations: 0,        // 영웅 대화 횟수
   speakingSessions: 0,         // Speaking 모드 완료 횟수
+  questsCompleted: 0,          // 완료한 Quest 미션 총 수
+  perfectDays: 0,              // Perfect Day 달성 수
   weeklyActivity: {},          // 주간 활동 { '2026-W05': { mon: 1200000, ... } }
   dailyActivity: {}            // 일별 활동 { '2026-02-01': { studyTime: ..., wordsRead: ... } }
 });
@@ -277,6 +279,24 @@ export const useStatistics = () => {
     updateStreak();
   }, [stats, saveStats]);
 
+  // Quest 미션 완료 기록
+  const recordQuestComplete = useCallback(() => {
+    const newStats = {
+      ...stats,
+      questsCompleted: (stats.questsCompleted || 0) + 1
+    };
+    saveStats(newStats);
+  }, [stats, saveStats]);
+
+  // Perfect Day 기록
+  const recordPerfectDay = useCallback(() => {
+    const newStats = {
+      ...stats,
+      perfectDays: (stats.perfectDays || 0) + 1
+    };
+    saveStats(newStats);
+  }, [stats, saveStats]);
+
   // ==================== 스트릭 관리 ====================
 
   // 스트릭 업데이트
@@ -382,6 +402,8 @@ export const useStatistics = () => {
       completedBooks: stats.completedBooks,
       heroConversations: stats.heroConversations,
       speakingSessions: stats.speakingSessions,
+      questsCompleted: stats.questsCompleted || 0,
+      perfectDays: stats.perfectDays || 0,
       currentStreak: streak.currentStreak,
       longestStreak: streak.longestStreak,
       lastStudyDate: streak.lastStudyDate
@@ -441,6 +463,8 @@ export const useStatistics = () => {
     recordBookComplete,
     recordHeroConversation,
     recordSpeakingSession,
+    recordQuestComplete,
+    recordPerfectDay,
 
     // 스트릭 관리
     updateStreak,

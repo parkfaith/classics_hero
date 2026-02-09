@@ -8,7 +8,7 @@ import ChatInput from './ChatInput';
 import InsightReport from './InsightReport';
 import './ChatInterface.css';
 
-const ChatInterface = ({ hero, scenario = null, onBack }) => {
+const ChatInterface = ({ hero, scenario = null, onBack, questMode = false, onQuestMessageCount = null }) => {
   const [showReport, setShowReport] = useState(false);
   const [autoTTS, setAutoTTS] = useState(true);
   const [scenarioCompleted, setScenarioCompleted] = useState(false);
@@ -51,6 +51,13 @@ const ChatInterface = ({ hero, scenario = null, onBack }) => {
       recordHeroConversation();
     }
   }, [messages, hero.id, markHeroConversation, recordHeroConversation]);
+
+  // Quest 모드: 사용자 메시지 수 콜백
+  useEffect(() => {
+    if (!questMode || !onQuestMessageCount) return;
+    const userMessageCount = messages.filter(m => m.role === 'user').length;
+    onQuestMessageCount(userMessageCount);
+  }, [messages, questMode, onQuestMessageCount]);
 
   // 영웅 메시지 자동 TTS 재생
   useEffect(() => {
@@ -107,7 +114,7 @@ const ChatInterface = ({ hero, scenario = null, onBack }) => {
       <header className="chat-header">
         <div className="chat-header-inner">
           <button className="back-button-chat" onClick={onBack}>
-            ← {hero.scenarios?.length > 0 ? '시나리오 선택' : '영웅 선택'}
+            ← {questMode ? '돌아가기' : hero.scenarios?.length > 0 ? '시나리오 선택' : '영웅 선택'}
           </button>
 
           <div className="hero-info">
@@ -234,7 +241,7 @@ const ChatInterface = ({ hero, scenario = null, onBack }) => {
         </div>
       </div>
 
-      <ChatInput onSendMessage={sendMessage} isLoading={isLoading} isTTSSpeaking={tts.isPlaying} onStopTTS={tts.stop} />
+      <ChatInput onSendMessage={sendMessage} isLoading={isLoading} isTTSSpeaking={tts.isPlaying} onStopTTS={tts.stop} questMode={questMode} />
 
       {showReport && (
         <InsightReport

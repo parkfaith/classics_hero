@@ -95,6 +95,37 @@ export const BADGE_DEFINITIONS = {
     descriptionKo: 'Speaking 모드를 10회 완료했습니다',
     condition: (stats) => stats.speakingSessions >= 10,
     progress: (stats) => ({ current: Math.min(stats.speakingSessions, 10), target: 10 })
+  },
+  // Quest 관련 배지
+  quest_first: {
+    id: 'quest_first',
+    name: 'Quest Beginner',
+    nameKo: '미션 시작',
+    icon: '📋',
+    description: 'Complete your first daily quest',
+    descriptionKo: '첫 번째 일일 미션을 완료했습니다',
+    condition: (stats) => (stats.questsCompleted || 0) >= 1,
+    progress: (stats) => ({ current: Math.min(stats.questsCompleted || 0, 1), target: 1 })
+  },
+  perfect_day: {
+    id: 'perfect_day',
+    name: 'Perfect Day',
+    nameKo: '완벽한 하루',
+    icon: '✨',
+    description: 'Complete all 3 quests in one day',
+    descriptionKo: '하루에 3개 미션을 모두 완료했습니다',
+    condition: (stats) => (stats.perfectDays || 0) >= 1,
+    progress: (stats) => ({ current: Math.min(stats.perfectDays || 0, 1), target: 1 })
+  },
+  perfect_week: {
+    id: 'perfect_week',
+    name: 'Perfect Week',
+    nameKo: '완벽한 한 주',
+    icon: '🌟',
+    description: 'Complete all quests for 7 consecutive days',
+    descriptionKo: '7일 연속 모든 미션을 완료했습니다',
+    condition: (stats) => (stats.consecutivePerfectDays || 0) >= 7,
+    progress: (stats) => ({ current: Math.min(stats.consecutivePerfectDays || 0, 7), target: 7 })
   }
 };
 

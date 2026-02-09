@@ -1,6 +1,6 @@
 import './Navigation.css';
 
-function Navigation({ currentPage, onNavigate, onOpenSettings }) {
+function Navigation({ currentPage, onNavigate, onOpenSettings, questBadgeCount = 0 }) {
   return (
     <>
       {/* 모바일 상단 헤더 */}
@@ -40,6 +40,19 @@ function Navigation({ currentPage, onNavigate, onOpenSettings }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
             </svg>
             <span>도서관</span>
+          </button>
+
+          <button
+            className={`nav-item ${currentPage === 'today-quest' ? 'active' : ''}`}
+            onClick={() => onNavigate('today-quest')}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+            </svg>
+            <span>오늘의 미션</span>
+            {questBadgeCount > 0 && (
+              <span className="nav-quest-badge">{questBadgeCount}</span>
+            )}
           </button>
 
           <button

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSTT } from '../../hooks/useSTT';
 import './ChatInput.css';
 
-const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS }) => {
+const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS, questMode = false }) => {
   const [message, setMessage] = useState('');
   const [showTextInput, setShowTextInput] = useState(false);
   const [pendingAutoSend, setPendingAutoSend] = useState(false);
@@ -96,14 +96,16 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS }) => {
       {/* STT 중심 UI */}
       {!showTextInput ? (
         <div className="voice-input-mode">
-          <button
-            type="button"
-            className="keyboard-toggle-btn"
-            onClick={toggleTextInput}
-            title="키보드로 입력"
-          >
-            ⌨️
-          </button>
+          {!questMode && (
+            <button
+              type="button"
+              className="keyboard-toggle-btn"
+              onClick={toggleTextInput}
+              title="키보드로 입력"
+            >
+              ⌨️
+            </button>
+          )}
 
           <button
             type="button"

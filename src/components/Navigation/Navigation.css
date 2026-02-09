@@ -154,6 +154,29 @@ body.in-chat .mobile-header {
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
+/* 미완료 미션 배지 */
+.nav-quest-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 18px;
+  height: 18px;
+  background: #ef4444;
+  color: #fff;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.nav-item {
+  position: relative;
+}
+
 /* 반응형 */
 @media (max-width: 768px) {
   .nav-container {
