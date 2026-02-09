@@ -245,18 +245,39 @@
 }
 
 .quest-back-btn {
-  background: none;
-  border: none;
-  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
-  padding: 8px;
-  border-radius: 8px;
-  color: #64748b;
-  transition: background 0.2s;
+  padding: 8px 14px;
+  border-radius: 10px;
+  color: #475569;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.quest-back-btn .back-arrow {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.quest-back-btn .back-label {
+  font-size: 13px;
 }
 
 .quest-back-btn:hover {
-  background: #f1f5f9;
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+.quest-back-btn:active {
+  background: #cbd5e1;
+  transform: scale(0.97);
 }
 
 .quest-detail-title {

@@ -103,7 +103,8 @@ const DailyReading = ({ hero, quote, passage, completed, onComplete, onBack }) =
       {/* 헤더 */}
       <div className="quest-detail-header">
         <button className="quest-back-btn" onClick={() => { tts.stop(); onBack(); }}>
-          ←
+          <span className="back-arrow">←</span>
+          <span className="back-label">Today's Quest</span>
         </button>
         <h2 className="quest-detail-title">📖 Daily Reading</h2>
       </div>

@@ -35,7 +35,10 @@ const DailyChat = ({ hero, topic, completed, messageCount, onComplete, onUpdateP
     return (
       <div className="quest-detail">
         <div className="quest-detail-header">
-          <button className="quest-back-btn" onClick={onBack}>←</button>
+          <button className="quest-back-btn" onClick={onBack}>
+            <span className="back-arrow">←</span>
+            <span className="back-label">Today's Quest</span>
+          </button>
           <h2 className="quest-detail-title">💬 Daily Chat</h2>
         </div>
         <div className="chat-quest-empty">
@@ -79,7 +82,10 @@ const DailyChat = ({ hero, topic, completed, messageCount, onComplete, onUpdateP
     <div className="quest-detail">
       {/* 헤더 */}
       <div className="quest-detail-header">
-        <button className="quest-back-btn" onClick={onBack}>←</button>
+        <button className="quest-back-btn" onClick={onBack}>
+          <span className="back-arrow">←</span>
+          <span className="back-label">Today's Quest</span>
+        </button>
         <h2 className="quest-detail-title">💬 Daily Chat</h2>
       </div>
 
