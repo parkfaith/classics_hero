@@ -1,6 +1,6 @@
 {
-  "name": "Classic Hero - 영어 고전 문학 학습",
-  "short_name": "Classic Hero",
+  "name": "joBiBle Classic Heros",
+  "short_name": "joBiBle Classic Heros",
   "description": "공개 도메인 영어 고전 문학으로 영어를 배우고 역사적 영웅들과 대화하세요",
   "start_url": "/",
   "display": "standalone",
