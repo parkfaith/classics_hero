@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-02-10 - 태블릿(아이패드) 반응형 레이아웃 수정 및 iPad Safari 감지
+
+### 버그 수정
+- **상단 네비게이션**: 아이패드 Pro 11인치(834px) 등 태블릿에서 메뉴 정렬 깨지는 문제 수정
+  - 1024px 이하 태블릿 브레이크포인트 추가
+  - 로고, 메뉴 아이템 크기/간격 축소
+- **하단 Footer**: 태블릿 해상도에서 텍스트 정렬 및 간격 개선
+- **iPad Safari 감지**: iPadOS 13+ Safari에서 Chrome 설치 안내가 표시되지 않던 문제 수정
+  - iPadOS 13+는 User Agent를 Mac 데스크톱으로 보고하여 기존 감지 실패
+  - `navigator.maxTouchPoints > 1` + Mac 플랫폼 체크로 iPad 감지 추가
+
+### 파일
+- 수정: `Navigation.css` (태블릿 브레이크포인트 추가)
+- 수정: `Footer.css` (태블릿 브레이크포인트 추가)
+- 수정: `BrowserCheck.jsx` (iPadOS 13+ 감지 로직 추가)
+
+---
+
 ## 2026-02-09 - Today's Quest 개선: 난이도 조정, 대화 종료, 문법 피드백
 
 ### 기능 개선

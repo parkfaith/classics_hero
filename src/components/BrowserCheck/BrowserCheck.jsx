@@ -16,8 +16,9 @@ function BrowserCheck() {
     const isAndroidDevice = /android/.test(userAgent);
     setIsAndroid(isAndroidDevice);
 
-    // iOS 기기 확인
-    const isIOSDevice = /ipad|iphone|ipod/.test(userAgent) && !window.MSStream;
+    // iOS 기기 확인 (iPadOS 13+는 Mac으로 보고되므로 maxTouchPoints 체크 필요)
+    const isIOSDevice = (/ipad|iphone|ipod/.test(userAgent) && !window.MSStream) ||
+      (navigator.maxTouchPoints > 1 && /macintosh/.test(userAgent));
 
     // 모바일 기기가 아니면 체크 불필요
     if (!isAndroidDevice && !isIOSDevice) {
