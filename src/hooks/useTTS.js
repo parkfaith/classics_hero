@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 // 남성 음성 우선순위 (높을수록 우선)
 // 주의: "Google US English"는 이름에 성별 표기가 없지만 실제로는 여성 음성
@@ -59,12 +59,15 @@ const getVoiceScore = (voice, priorityList) => {
 const selectBestVoice = (voices, gender) => {
   if (voices.length === 0) return null;
 
-  const priorityList = gender === 'male' ? MALE_VOICE_PRIORITY
-    : gender === 'female' ? FEMALE_VOICE_PRIORITY
-    : DEFAULT_VOICE_PRIORITY;
+  const priorityList =
+    gender === "male"
+      ? MALE_VOICE_PRIORITY
+      : gender === "female"
+        ? FEMALE_VOICE_PRIORITY
+        : DEFAULT_VOICE_PRIORITY;
 
   const scored = voices
-    .map(voice => ({ voice, score: getVoiceScore(voice, priorityList) }))
+    .map((voice) => ({ voice, score: getVoiceScore(voice, priorityList) }))
     .sort((a, b) => b.score - a.score);
 
   return scored[0].voice;
@@ -83,8 +86,8 @@ export const useTTS = () => {
     const loadVoices = () => {
       const availableVoices = window.speechSynthesis.getVoices();
       // 영어 음성만 필터링
-      const englishVoices = availableVoices.filter(voice =>
-        voice.lang.startsWith('en')
+      const englishVoices = availableVoices.filter((voice) =>
+        voice.lang.startsWith("en"),
       );
       setVoices(englishVoices);
       englishVoicesRef.current = englishVoices;
@@ -102,6 +105,12 @@ export const useTTS = () => {
       window.speechSynthesis.onvoiceschanged = loadVoices;
     }
 
+    // 모바일 브라우저 음성 로드 대기 (안드로이드 등에서 필요할 수 있음)
+    if (window.speechSynthesis.getVoices().length === 0) {
+      setTimeout(loadVoices, 100);
+      setTimeout(loadVoices, 500);
+    }
+
     return () => {
       window.speechSynthesis.cancel();
     };
@@ -110,6 +119,11 @@ export const useTTS = () => {
   const speak = (text, options = {}) => {
     // 이전 음성 중지
     window.speechSynthesis.cancel();
+
+    // 모바일(iOS)에서 중지 후 즉시 재생 시 문제가 발생할 수 있어 resume 호출
+    if (window.speechSynthesis.resume) {
+      window.speechSynthesis.resume();
+    }
 
     const utterance = new SpeechSynthesisUtterance(text);
     utteranceRef.current = utterance;
@@ -121,6 +135,10 @@ export const useTTS = () => {
       utterance.voice = genderVoice;
     } else if (selectedVoice) {
       utterance.voice = selectedVoice;
+    }
+    // 선택된 음성이 없어도 기본 lang 설정
+    if (!utterance.voice) {
+      utterance.lang = "en-US";
     }
 
     utterance.rate = options.rate || 0.9; // 속도 (0.1 ~ 10)
@@ -141,10 +159,13 @@ export const useTTS = () => {
     };
 
     utterance.onerror = (event) => {
-      console.error('TTS Error:', event);
+      console.error("TTS Error:", event);
       setIsPlaying(false);
       setIsPaused(false);
-      if (options.onError) options.onError(event);
+      // cancel 이벤트는 에러가 아님 (사용자 중지 등)
+      if (event.error !== "interrupted" && event.error !== "canceled") {
+        if (options.onError) options.onError(event);
+      }
     };
 
     utterance.onpause = () => {

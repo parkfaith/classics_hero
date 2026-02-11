@@ -571,10 +571,39 @@ Format your response as JSON:
       clearInterval(timerRef.current);
     }
 
+    // 모바일(iOS) 등에서 TTS가 중단된 상태일 수 있으므로 resume 호출
+    if (window.speechSynthesis.resume) {
+        window.speechSynthesis.resume();
+    }
+
     const words = sentenceWordsRef.current;
     const wordDurations = calculateWordDurations(words, playbackSpeed);
 
     const utterance = new SpeechSynthesisUtterance(currentSentence);
+    
+    // 명시적으로 음성 선택 (모바일 호환성)
+    const voices = window.speechSynthesis.getVoices();
+    // 1. Google US English (Android)
+    // 2. Samantha (iOS)
+    // 3. Any en-US
+    // 4. Any English
+    const priorityVoices = [
+        /Google US English/i,
+        /Samantha/i,
+        /en-US/i,
+        /en-/i
+    ];
+
+    let selectedVoice = null;
+    for (const pattern of priorityVoices) {
+        selectedVoice = voices.find(v => pattern.test(v.name) || pattern.test(v.lang));
+        if (selectedVoice) break;
+    }
+
+    if (selectedVoice) {
+        utterance.voice = selectedVoice;
+    }
+
     utterance.lang = 'en-US';
     utterance.rate = playbackSpeed;
 
@@ -715,7 +744,7 @@ Format your response as JSON:
     setIsPracticing(false);
   };
 
-  const currentSentence = sentences[currentSentenceIndex] || '';
+
 
   // 연습 기록이 있는 문장인지 확인
   const currentSentenceRecord = pronunciationHistory.getRecordBySentence(currentSentenceIndex);

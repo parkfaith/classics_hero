@@ -53,6 +53,18 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     return text.split(/(\s+)/).filter(word => word.trim().length > 0);
   }, []);
 
+  // TTS 중지 (useCallback으로 정의하여 의존성 문제 해결)
+  const handleStopCallback = useCallback(() => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    setIsPlaying(false);
+    setCurrentWordIndex(-1);
+  }, []);
+
   // 초기 완료 상태 로드
   useEffect(() => {
     const saved = localStorage.getItem('learning-progress');
@@ -102,10 +114,10 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     setAutoCompleteShown(false);
     hasScrolledRef.current = false;
     // 챕터 변경 시 재생 중인 오디오 중지
-    handleStop();
+    handleStopCallback();
     // 챕터 변경 시 최상단으로 스크롤
     window.scrollTo(0, 0);
-  }, [currentChapterIndex, book.id]);
+  }, [currentChapterIndex, book.id, handleStopCallback, updateLastChapterIndex]);
 
   // 스크롤 감지: 사용자가 실제로 스크롤해야 자동 완료 감지 활성화
   useEffect(() => {
@@ -247,12 +259,42 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
+  
+    // 모바일 브라우저(특히 iOS)에서 오디오 컨텍스트가 닫히거나 중단된 상태일 수 있으므로 resume 호출
+    if (window.speechSynthesis.resume) {
+        window.speechSynthesis.resume();
+    }
 
     const text = currentChapter.content;
     const words = wordsRef.current;
     const wordDurations = calculateWordDurations(words, playbackRate);
 
     const utterance = new SpeechSynthesisUtterance(text);
+    
+    // 명시적으로 음성 선택 (모바일 호환성)
+    const voices = window.speechSynthesis.getVoices();
+    // 1. Google US English (Android)
+    // 2. Samantha (iOS)
+    // 3. Any en-US
+    // 4. Any English
+    const priorityVoices = [
+        /Google US English/i,
+        /Samantha/i,
+        /en-US/i,
+        /en-/i
+    ];
+
+    let selectedVoice = null;
+    for (const pattern of priorityVoices) {
+        selectedVoice = voices.find(v => pattern.test(v.name) || pattern.test(v.lang));
+        if (selectedVoice) break;
+    }
+
+    if (selectedVoice) {
+        utterance.voice = selectedVoice;
+    }
+    
+    // lang은 항상 설정 (fallback)
     utterance.lang = 'en-US';
     utterance.rate = playbackRate;
 
@@ -310,17 +352,7 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     window.speechSynthesis.speak(utterance);
   };
 
-  // TTS 중지
-  const handleStop = () => {
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-    }
-    setIsPlaying(false);
-    setCurrentWordIndex(-1);
-  };
+
 
   // 컴포넌트 언마운트 시 타이머 정리
   useEffect(() => {
@@ -646,7 +678,7 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
                 <span>원어민 발음 듣기</span>
               </button>
             ) : (
-              <button className="tts-btn stop" onClick={handleStop}>
+              <button className="tts-btn stop" onClick={handleStopCallback}>
                 <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
                   <path d="M6 6h12v12H6z"/>
                 </svg>
