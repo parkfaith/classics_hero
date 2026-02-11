@@ -258,7 +258,13 @@ const ChatInterface = ({ hero, scenario = null, onBack, questMode = false, onQue
         </div>
       ) : (
         <ChatInput
-          onSendMessage={sendMessage}
+          onSendMessage={(text) => {
+              // 메시지 전송 시 AudioContext 잠금 해제 (모바일 대응)
+              if (window.speechSynthesis && window.speechSynthesis.resume) {
+                  window.speechSynthesis.resume();
+              }
+              sendMessage(text);
+          }}
           isLoading={isLoading}
           isTTSSpeaking={tts.isPlaying}
           onStopTTS={tts.stop}

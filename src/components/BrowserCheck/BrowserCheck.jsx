@@ -6,44 +6,39 @@ import './BrowserCheck.css';
  * Android에서 Chrome이 아닌 경우 설치 안내
  */
 function BrowserCheck() {
-  const [showWarning, setShowWarning] = useState(false);
-  const [isAndroid, setIsAndroid] = useState(false);
-
-  useEffect(() => {
+  // 초기 상태 로직을 useState 초기화 함수로 이동
+  const [isAndroid] = useState(() => /android/i.test(navigator.userAgent));
+  
+  const [showWarning, setShowWarning] = useState(() => {
     const userAgent = navigator.userAgent.toLowerCase();
-
-    // Android 기기 확인
+    
+    // PC/Mac 등 모바일이 아닌 경우 체크 건너뛰기 (여기서는 간단히 터치 포인트와 문맥으로 판단)
+    // 실제로는 더 복잡할 수 있으나, 기존 로직 유지
     const isAndroidDevice = /android/.test(userAgent);
-    setIsAndroid(isAndroidDevice);
-
-    // iOS 기기 확인 (iPadOS 13+는 Mac으로 보고되므로 maxTouchPoints 체크 필요)
     const isIOSDevice = (/ipad|iphone|ipod/.test(userAgent) && !window.MSStream) ||
       (navigator.maxTouchPoints > 1 && /macintosh/.test(userAgent));
 
-    // 모바일 기기가 아니면 체크 불필요
-    if (!isAndroidDevice && !isIOSDevice) {
-      return;
-    }
+    if (!isAndroidDevice && !isIOSDevice) return false;
 
-    // Chrome 브라우저 확인
-    // Android: chrome이 있고 edge, opera가 아님
-    // iOS: CriOS (Chrome iOS)
+    // Chrome 체크
     const isChrome = isAndroidDevice
       ? (/chrome/.test(userAgent) && !/edg/.test(userAgent) && !/opr/.test(userAgent))
       : /crios/.test(userAgent);
 
-    // Chrome이 아니고, 이전에 경고를 닫지 않았다면 표시
     if (!isChrome) {
-      const dismissed = sessionStorage.getItem('browser-warning-dismissed');
-      if (!dismissed) {
-        setShowWarning(true);
-      }
+      const dismissed = localStorage.getItem('browser-warning-dismissed');
+      return !dismissed;
     }
+    return false;
+  });
+
+  useEffect(() => {
+    // 필요한 경우 추가적인 사이드 이펙트 처리
   }, []);
 
   const handleDismiss = () => {
     setShowWarning(false);
-    sessionStorage.setItem('browser-warning-dismissed', 'true');
+    localStorage.setItem('browser-warning-dismissed', 'true');
   };
 
   const handleInstallChrome = () => {

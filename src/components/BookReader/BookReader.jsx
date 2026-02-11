@@ -107,8 +107,6 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
       localStorage.setItem('learning-progress', JSON.stringify(allProgress));
     }
     // 새 훅에도 챕터 인덱스 저장
-    updateLastChapterIndex(book.id, currentChapterIndex);
-
     setShowTranslation(false);
     setChapterTranslation('');
     setAutoCompleteShown(false);
@@ -117,7 +115,12 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
     handleStopCallback();
     // 챕터 변경 시 최상단으로 스크롤
     window.scrollTo(0, 0);
-  }, [currentChapterIndex, book.id, handleStopCallback, updateLastChapterIndex]);
+  }, [currentChapterIndex, handleStopCallback, book.id]);
+
+  // 진행도 업데이트 (별도 이펙트로 분리하여 스크롤/TTS 초기화 방지)
+  useEffect(() => {
+      updateLastChapterIndex(book.id, currentChapterIndex);
+  }, [book.id, currentChapterIndex, updateLastChapterIndex]);
 
   // 스크롤 감지: 사용자가 실제로 스크롤해야 자동 완료 감지 활성화
   useEffect(() => {
