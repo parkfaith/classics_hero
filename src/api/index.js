@@ -1,10 +1,10 @@
 // 배포 환경: Render API URL, 로컬: Vite 프록시 사용
-export const API_BASE = import.meta.env.VITE_API_URL || (
-  // 개발 환경(localhost)인지 확인
-  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? '/api'  // 로컬: Vite 프록시 사용
-    : 'https://classics-hero-api.onrender.com/api'  // 배포: Render API 직접 호출
-);
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+const RENDER_API = 'https://classics-hero-api.onrender.com/api';
+
+export const API_BASE = isLocal
+  ? '/api'
+  : (import.meta.env.VITE_API_URL || RENDER_API);
 
 export const fetchBooks = async (difficulty = null) => {
   const url = difficulty ? `${API_BASE}/books?difficulty=${difficulty}` : `${API_BASE}/books`;
