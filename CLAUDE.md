@@ -346,6 +346,11 @@ TalkToHero.jsx
         └── tts-status        # TTS 재생 중 표시
 ```
 
+## 작업 규칙
+
+- **CHANGELOG.md 필수 업데이트**: 코드 수정 후 반드시 `CHANGELOG.md`에 변경 내용을 기록할 것
+  - 날짜, 변경 카테고리(신규 기능/UI 개선/버그 수정 등), 상세 내용, 수정 파일 목록 포함
+
 ## Notes
 
 - 백엔드 포트: `8001` (vite.config.js에서 프록시 설정)

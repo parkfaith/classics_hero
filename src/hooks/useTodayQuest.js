@@ -11,6 +11,13 @@ const getToday = () => new Date().toISOString().split('T')[0];
 // 날짜 문자열 → 숫자 시드
 const getDateSeed = (dateStr) => parseInt(dateStr.replace(/-/g, ''), 10);
 
+// 날짜 → 일수 인덱스 (매일 다른 값 보장, 순환용)
+const getDayIndex = (dateStr) => {
+  const d = new Date(dateStr + 'T00:00:00');
+  const epoch = new Date('2026-01-01T00:00:00');
+  return Math.floor((d - epoch) / (1000 * 60 * 60 * 24));
+};
+
 // Seeded Random (Linear Congruential Generator)
 const createSeededRandom = (seed) => {
   let state = seed;
@@ -115,11 +122,11 @@ export const useTodayQuest = () => {
 
   // ==================== 컨텐츠 선택 로직 ====================
 
-  // 오늘의 영웅 선택 (6명 로테이션)
+  // 오늘의 영웅 선택 (매일 순환, 연속 중복 없음)
   const selectTodayHero = useCallback((heroes) => {
     if (!heroes || heroes.length === 0) return null;
-    const result = selectByDate(heroes, today, 0);
-    return result?.item || null;
+    const dayIndex = getDayIndex(today);
+    return heroes[((dayIndex % heroes.length) + heroes.length) % heroes.length];
   }, [today]);
 
   // 오늘의 명언 선택
