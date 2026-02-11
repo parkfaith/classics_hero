@@ -3,6 +3,8 @@
 ## 2026-02-11 - Footer 간결화 & Today's Quest 영웅 순환 개선
 
 ### 기능 개선
+- **CORS 도메인 추가**: jobible.net 커스텀 도메인 허용
+  - `https://www.jobible.net`, `https://jobible.net` 추가
 - **Today's Quest 영웅 매일 변경**: 시드 랜덤 → 일수 기반 순환으로 변경
   - 기존: 날짜 시드 랜덤으로 연속 같은 영웅 나올 수 있음 (~16% 확률)
   - 변경: `dayIndex % heroCount`로 매일 반드시 다른 영웅 배정 (6일 주기 순환)
@@ -18,6 +20,7 @@
 - 수정: `Footer.jsx` (불필요한 섹션 제거, 저작권 정보만 유지)
 - 수정: `Footer.css` (컴팩트 레이아웃, 모바일 탭바 여백)
 - 수정: `useTodayQuest.js` (영웅 선택 로직 순환 방식으로 변경)
+- 수정: `backend/main.py` (CORS 허용 도메인에 jobible.net 추가)
 
 ---
 

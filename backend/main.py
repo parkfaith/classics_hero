@@ -12,7 +12,7 @@ load_dotenv()
 app = FastAPI(title="Classic Hero API", version="1.0.0")
 
 # CORS 설정 - 환경변수 또는 기본값 사용
-cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,https://classics-hero.vercel.app")
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://127.0.0.1:5173,https://classics-hero.vercel.app,https://www.jobible.net,https://jobible.net")
 allowed_origins = [origin.strip() for origin in cors_origins.split(",")]
 
 app.add_middleware(
