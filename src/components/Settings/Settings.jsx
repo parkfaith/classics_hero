@@ -1,6 +1,8 @@
 import { GoogleLogin } from '@react-oauth/google';
 import './Settings.css';
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
+
 const Settings = ({ onClose, user, isLoggedIn, onLogin, onLogout, syncNow, isSyncing, lastSyncTime }) => {
 
   const formatSyncTime = (isoString) => {
@@ -63,21 +65,25 @@ const Settings = ({ onClose, user, isLoggedIn, onLogin, onLogout, syncNow, isSyn
                 <p className="login-description">
                   Google 계정으로 로그인하면 여러 기기에서 학습 데이터를 동기화할 수 있습니다.
                 </p>
-                <div className="google-login-wrapper">
-                  <GoogleLogin
-                    onSuccess={(credentialResponse) => {
-                      if (credentialResponse.credential) {
-                        onLogin(credentialResponse.credential);
-                      }
-                    }}
-                    onError={() => {
-                      console.error('Google 로그인 실패');
-                    }}
-                    text="signin_with"
-                    shape="rectangular"
-                    locale="ko"
-                  />
-                </div>
+                {GOOGLE_CLIENT_ID ? (
+                  <div className="google-login-wrapper">
+                    <GoogleLogin
+                      onSuccess={(credentialResponse) => {
+                        if (credentialResponse.credential) {
+                          onLogin(credentialResponse.credential);
+                        }
+                      }}
+                      onError={() => {
+                        console.error('Google 로그인 실패');
+                      }}
+                      text="signin_with"
+                      shape="rectangular"
+                      locale="ko"
+                    />
+                  </div>
+                ) : (
+                  <p className="login-unavailable">로그인 서비스 준비 중입니다.</p>
+                )}
               </div>
             )}
           </section>
