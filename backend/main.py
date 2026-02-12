@@ -3,7 +3,7 @@ import traceback
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from routers import books, heroes, chapters, words, openai_proxy, vocabulary, translations
+from routers import books, heroes, chapters, words, openai_proxy, vocabulary, translations, auth, sync
 from database import init_db
 from dotenv import load_dotenv
 
@@ -31,6 +31,8 @@ app.include_router(words.router, prefix="/api")
 app.include_router(openai_proxy.router, prefix="/api")
 app.include_router(vocabulary.router, prefix="/api")
 app.include_router(translations.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
+app.include_router(sync.router, prefix="/api")
 
 @app.on_event("startup")
 def startup():

@@ -336,6 +336,29 @@ def init_db():
             )
         """)
 
+        # Users 테이블 (Google OAuth 인증)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS users (
+                id TEXT PRIMARY KEY,
+                google_id TEXT NOT NULL UNIQUE,
+                email TEXT NOT NULL,
+                name TEXT NOT NULL,
+                picture TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                last_login_at TIMESTAMP
+            )
+        """)
+
+        # User Sync Data 테이블 (크로스 디바이스 동기화)
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS user_sync_data (
+                user_id TEXT PRIMARY KEY,
+                data TEXT NOT NULL,
+                updated_at TIMESTAMP NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+            )
+        """)
+
         conn.commit()
 
 

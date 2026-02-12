@@ -17,6 +17,8 @@ import { useBadges } from './hooks/useBadges';
 import { useProgress } from './hooks/useProgress';
 import { useTodayQuest } from './hooks/useTodayQuest';
 import { checkStorageWarning } from './hooks/useDataManager';
+import { useAuth } from './hooks/useAuth';
+import { useSyncManager } from './hooks/useSyncManager';
 import confetti from 'canvas-confetti';
 import './App.css';
 
@@ -56,6 +58,23 @@ function App() {
 
   // 저장소 관련 알림 상태
   const [storageAlert, setStorageAlert] = useState(null); // { type: 'error' | 'warning', message: string }
+
+  // 인증 & 동기화
+  const { user, isLoggedIn, login, logout, getToken } = useAuth();
+  const { syncNow, isSyncing, lastSyncTime } = useSyncManager({ isLoggedIn, getToken });
+
+  // 로그인 핸들러
+  const handleLogin = useCallback(async (googleCredential) => {
+    try {
+      await login(googleCredential);
+      // 로그인 후 동기화 → 페이지 리로드로 훅 리프레시
+      setTimeout(() => {
+        syncNow().then(() => window.location.reload());
+      }, 100);
+    } catch (err) {
+      console.error('로그인 실패:', err);
+    }
+  }, [login, syncNow]);
 
   // 새 훅 연동: 통계, 배지, 진행도, 퀘스트
   const { getStatsSummary, startSession } = useStatistics();
@@ -231,7 +250,16 @@ function App() {
       )}
 
       {showSettings && (
-        <Settings onClose={() => setShowSettings(false)} />
+        <Settings
+          onClose={() => setShowSettings(false)}
+          user={user}
+          isLoggedIn={isLoggedIn}
+          onLogin={handleLogin}
+          onLogout={logout}
+          syncNow={syncNow}
+          isSyncing={isSyncing}
+          lastSyncTime={lastSyncTime}
+        />
       )}
 
       {/* 저장소 용량 경고/에러 알림 */}

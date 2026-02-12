@@ -1,5 +1,48 @@
 # Changelog
 
+## 2026-02-12 - Google 로그인 & 크로스 디바이스 동기화
+
+### 신규 기능
+
+- **Google OAuth 로그인**: Google 계정 원클릭 로그인 지원
+  - `@react-oauth/google` 라이브러리 사용
+  - 백엔드 Google ID token 검증 + 자체 JWT 발급 (7일 만료)
+  - 게스트 모드 유지 (로그인 선택사항)
+- **크로스 디바이스 동기화**: 핸드폰/태블릿/PC 간 학습 데이터 자동 동기화
+  - 동기화 범위: 진행률(`user_progress`), 통계(`user_statistics`), 스트릭(`streak_data`), 뱃지(`user_badges`), 퀘스트(`today_quest_data`)
+  - Pull → Merge → Push 전략 (기존 merge 함수 재사용)
+  - 데이터 변경 시 2초 디바운스 자동 Push
+  - 앱 복귀 시(visibilitychange) 자동 동기화
+- **Settings 계정 섹션**: 로그인/프로필/동기화 상태 UI 추가
+
+### Backend
+
+- `users`, `user_sync_data` DB 테이블 추가 (`database.py`)
+- `POST /api/auth/google`, `GET /api/auth/me` 인증 API (`routers/auth.py`)
+- `GET /api/sync`, `PUT /api/sync` 동기화 API (`routers/sync.py`)
+- `google-auth`, `PyJWT` 의존성 추가
+
+### Frontend
+
+- `useAuth.js` 훅: 인증 상태 관리 (로그인/로그아웃/토큰)
+- `useSyncManager.js` 훅: 동기화 로직 (pull/merge/push/디바운스)
+- `useDataManager.js`: merge 함수 모듈 레벨 export + `storage-sync` 이벤트 추가
+- `main.jsx`: `GoogleOAuthProvider` 래핑
+- `App.jsx`: `useAuth`, `useSyncManager` 통합
+- `Settings.jsx`: 계정 섹션 UI (Google 로그인 버튼, 프로필 카드, 동기화 상태)
+- `src/api/index.js`: auth/sync API 함수 추가
+
+### 수정 파일
+
+- `backend/database.py`, `backend/main.py`, `backend/requirements.txt`
+- `backend/routers/auth.py` (신규), `backend/routers/sync.py` (신규)
+- `src/api/index.js`, `src/main.jsx`, `src/App.jsx`
+- `src/hooks/useAuth.js` (신규), `src/hooks/useSyncManager.js` (신규)
+- `src/hooks/useDataManager.js`
+- `src/components/Settings/Settings.jsx`, `src/components/Settings/Settings.css`
+
+---
+
 ## [Unreleased]
 
 ### Fixed

@@ -65,6 +65,49 @@ export const fetchSemanticShift = async (word) => {
   return response.json();
 };
 
+// ==================== Auth API ====================
+
+export const loginWithGoogle = async (credential) => {
+  const response = await fetch(`${API_BASE}/auth/google`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ credential }),
+  });
+  if (!response.ok) throw new Error('Login failed');
+  return response.json();
+};
+
+export const getMe = async (token) => {
+  const response = await fetch(`${API_BASE}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error('Failed to get user');
+  return response.json();
+};
+
+// ==================== Sync API ====================
+
+export const getSyncData = async (token) => {
+  const response = await fetch(`${API_BASE}/sync/`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error('Failed to get sync data');
+  return response.json();
+};
+
+export const putSyncData = async (token, data) => {
+  const response = await fetch(`${API_BASE}/sync/`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Failed to put sync data');
+  return response.json();
+};
+
 // Detect archaic words in text
 export const detectArchaicWords = async (text) => {
   const response = await fetch(`${API_BASE}/detect-archaic?text=${encodeURIComponent(text)}`, {

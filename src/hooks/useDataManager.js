@@ -118,131 +118,28 @@ export const useDataManager = () => {
     }
   };
 
-  // 데이터 병합 (더 높은 값 유지)
+  // 데이터 병합 (더 높은 값 유지) - 모듈 레벨 함수 사용
   const mergeData = (importedData) => {
-    // Progress 병합
     if (importedData.progress) {
       const current = safeGetItem(STORAGE_KEYS.progress) || { books: {}, heroes: {} };
       const merged = mergeProgressData(current, importedData.progress);
       localStorage.setItem(STORAGE_KEYS.progress, JSON.stringify(merged));
     }
-
-    // Badges 병합 (획득한 배지 유지)
     if (importedData.badges) {
       const current = safeGetItem(STORAGE_KEYS.badges) || { badges: {} };
       const merged = mergeBadgesData(current, importedData.badges);
       localStorage.setItem(STORAGE_KEYS.badges, JSON.stringify(merged));
     }
-
-    // Statistics 병합 (더 높은 값)
     if (importedData.statistics) {
       const current = safeGetItem(STORAGE_KEYS.statistics) || {};
       const merged = mergeStatisticsData(current, importedData.statistics);
       localStorage.setItem(STORAGE_KEYS.statistics, JSON.stringify(merged));
     }
-
-    // Streak 병합 (최장 기록 유지)
     if (importedData.streakData) {
       const current = safeGetItem(STORAGE_KEYS.streak) || {};
       const merged = mergeStreakData(current, importedData.streakData);
       localStorage.setItem(STORAGE_KEYS.streak, JSON.stringify(merged));
     }
-  };
-
-  // Progress 데이터 병합
-  const mergeProgressData = (current, imported) => {
-    const merged = { ...current };
-
-    // Books 병합
-    if (imported.books) {
-      merged.books = merged.books || {};
-      Object.entries(imported.books).forEach(([bookId, bookData]) => {
-        if (!merged.books[bookId]) {
-          merged.books[bookId] = bookData;
-        } else {
-          // 챕터별로 완료 상태 병합
-          merged.books[bookId].chapters = merged.books[bookId].chapters || {};
-          Object.entries(bookData.chapters || {}).forEach(([chapterId, chapterData]) => {
-            const existing = merged.books[bookId].chapters[chapterId] || {};
-            merged.books[bookId].chapters[chapterId] = {
-              readingCompleted: existing.readingCompleted || chapterData.readingCompleted,
-              speakingCompleted: existing.speakingCompleted || chapterData.speakingCompleted,
-              readingCompletedAt: existing.readingCompletedAt || chapterData.readingCompletedAt,
-              speakingCompletedAt: existing.speakingCompletedAt || chapterData.speakingCompletedAt,
-              wordCount: Math.max(existing.wordCount || 0, chapterData.wordCount || 0)
-            };
-          });
-        }
-      });
-    }
-
-    // Heroes 병합
-    if (imported.heroes) {
-      merged.heroes = merged.heroes || {};
-      Object.entries(imported.heroes).forEach(([heroId, heroData]) => {
-        if (!merged.heroes[heroId]) {
-          merged.heroes[heroId] = heroData;
-        } else {
-          merged.heroes[heroId] = {
-            conversationCount: Math.max(
-              merged.heroes[heroId].conversationCount || 0,
-              heroData.conversationCount || 0
-            ),
-            firstTalkDate: merged.heroes[heroId].firstTalkDate || heroData.firstTalkDate,
-            lastTalkDate: heroData.lastTalkDate || merged.heroes[heroId].lastTalkDate
-          };
-        }
-      });
-    }
-
-    return merged;
-  };
-
-  // Badges 데이터 병합
-  const mergeBadgesData = (current, imported) => {
-    const merged = { ...current };
-    merged.badges = merged.badges || {};
-
-    if (imported.badges) {
-      Object.entries(imported.badges).forEach(([badgeId, badgeData]) => {
-        // 이미 획득했거나, 가져오는 데이터에서 획득했으면 획득 상태 유지
-        if (!merged.badges[badgeId]?.unlocked && badgeData.unlocked) {
-          merged.badges[badgeId] = badgeData;
-        }
-      });
-    }
-
-    return merged;
-  };
-
-  // Statistics 데이터 병합
-  const mergeStatisticsData = (current, imported) => {
-    return {
-      ...current,
-      totalStudyTime: Math.max(current.totalStudyTime || 0, imported.totalStudyTime || 0),
-      totalWords: Math.max(current.totalWords || 0, imported.totalWords || 0),
-      completedChapters: Math.max(current.completedChapters || 0, imported.completedChapters || 0),
-      completedBooks: Math.max(current.completedBooks || 0, imported.completedBooks || 0),
-      heroConversations: Math.max(current.heroConversations || 0, imported.heroConversations || 0),
-      speakingSessions: Math.max(current.speakingSessions || 0, imported.speakingSessions || 0),
-      // 주간/일별 활동은 덮어쓰기 (병합 어려움)
-      weeklyActivity: imported.weeklyActivity || current.weeklyActivity || {},
-      dailyActivity: imported.dailyActivity || current.dailyActivity || {}
-    };
-  };
-
-  // Streak 데이터 병합
-  const mergeStreakData = (current, imported) => {
-    return {
-      ...current,
-      longestStreak: Math.max(current.longestStreak || 0, imported.longestStreak || 0),
-      currentStreak: imported.currentStreak || current.currentStreak || 0,
-      lastStudyDate: imported.lastStudyDate || current.lastStudyDate,
-      studyDates: [...new Set([
-        ...(current.studyDates || []),
-        ...(imported.studyDates || [])
-      ])].sort()
-    };
   };
 
   // ==================== Validation ====================
@@ -369,6 +266,110 @@ export const useDataManager = () => {
   };
 };
 
+// ==================== Merge 함수 (동기화에서도 사용) ====================
+
+export const mergeProgressData = (current, imported) => {
+  const merged = { ...current };
+  if (imported.books) {
+    merged.books = merged.books || {};
+    Object.entries(imported.books).forEach(([bookId, bookData]) => {
+      if (!merged.books[bookId]) {
+        merged.books[bookId] = bookData;
+      } else {
+        merged.books[bookId].chapters = merged.books[bookId].chapters || {};
+        Object.entries(bookData.chapters || {}).forEach(([chapterId, chapterData]) => {
+          const existing = merged.books[bookId].chapters[chapterId] || {};
+          merged.books[bookId].chapters[chapterId] = {
+            readingCompleted: existing.readingCompleted || chapterData.readingCompleted,
+            speakingCompleted: existing.speakingCompleted || chapterData.speakingCompleted,
+            readingCompletedAt: existing.readingCompletedAt || chapterData.readingCompletedAt,
+            speakingCompletedAt: existing.speakingCompletedAt || chapterData.speakingCompletedAt,
+            wordCount: Math.max(existing.wordCount || 0, chapterData.wordCount || 0)
+          };
+        });
+      }
+    });
+  }
+  if (imported.heroes) {
+    merged.heroes = merged.heroes || {};
+    Object.entries(imported.heroes).forEach(([heroId, heroData]) => {
+      if (!merged.heroes[heroId]) {
+        merged.heroes[heroId] = heroData;
+      } else {
+        merged.heroes[heroId] = {
+          conversationCount: Math.max(merged.heroes[heroId].conversationCount || 0, heroData.conversationCount || 0),
+          firstTalkDate: merged.heroes[heroId].firstTalkDate || heroData.firstTalkDate,
+          lastTalkDate: heroData.lastTalkDate || merged.heroes[heroId].lastTalkDate
+        };
+      }
+    });
+  }
+  return merged;
+};
+
+export const mergeBadgesData = (current, imported) => {
+  const merged = { ...current };
+  merged.badges = merged.badges || {};
+  if (imported.badges) {
+    Object.entries(imported.badges).forEach(([badgeId, badgeData]) => {
+      if (!merged.badges[badgeId]?.unlocked && badgeData.unlocked) {
+        merged.badges[badgeId] = badgeData;
+      }
+    });
+  }
+  return merged;
+};
+
+export const mergeStatisticsData = (current, imported) => {
+  return {
+    ...current,
+    totalStudyTime: Math.max(current.totalStudyTime || 0, imported.totalStudyTime || 0),
+    totalWords: Math.max(current.totalWords || 0, imported.totalWords || 0),
+    completedChapters: Math.max(current.completedChapters || 0, imported.completedChapters || 0),
+    completedBooks: Math.max(current.completedBooks || 0, imported.completedBooks || 0),
+    heroConversations: Math.max(current.heroConversations || 0, imported.heroConversations || 0),
+    speakingSessions: Math.max(current.speakingSessions || 0, imported.speakingSessions || 0),
+    weeklyActivity: imported.weeklyActivity || current.weeklyActivity || {},
+    dailyActivity: imported.dailyActivity || current.dailyActivity || {}
+  };
+};
+
+export const mergeStreakData = (current, imported) => {
+  return {
+    ...current,
+    longestStreak: Math.max(current.longestStreak || 0, imported.longestStreak || 0),
+    currentStreak: imported.currentStreak || current.currentStreak || 0,
+    lastStudyDate: imported.lastStudyDate || current.lastStudyDate,
+    studyDates: [...new Set([
+      ...(current.studyDates || []),
+      ...(imported.studyDates || [])
+    ])].sort()
+  };
+};
+
+export const mergeTodayQuestData = (current, imported) => {
+  const merged = { ...current };
+  if (imported) {
+    Object.entries(imported).forEach(([dateKey, questData]) => {
+      if (!merged[dateKey]) {
+        merged[dateKey] = questData;
+      } else {
+        // completed=true가 우선
+        const mergedQuest = { ...merged[dateKey] };
+        Object.entries(questData).forEach(([questId, quest]) => {
+          if (!mergedQuest[questId]) {
+            mergedQuest[questId] = quest;
+          } else if (quest.completed && !mergedQuest[questId].completed) {
+            mergedQuest[questId] = quest;
+          }
+        });
+        merged[dateKey] = mergedQuest;
+      }
+    });
+  }
+  return merged;
+};
+
 // ==================== 유틸리티 함수 ====================
 
 // 안전한 localStorage 읽기
@@ -391,6 +392,8 @@ export const safeSetItem = (key, value) => {
   try {
     const stringValue = typeof value === 'string' ? value : JSON.stringify(value);
     localStorage.setItem(key, stringValue);
+    // 동기화 매니저에 데이터 변경 알림
+    window.dispatchEvent(new CustomEvent('storage-sync', { detail: { key } }));
     return { success: true };
   } catch (error) {
     // QuotaExceededError 처리
