@@ -33,16 +33,6 @@ function Navigation({ currentPage, onNavigate, onOpenSettings, questBadgeCount =
 
         <div className="nav-menu">
           <button
-            className={`nav-item ${currentPage === 'library' ? 'active' : ''}`}
-            onClick={() => onNavigate('library')}
-          >
-            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-            </svg>
-            <span>도서관</span>
-          </button>
-
-          <button
             className={`nav-item ${currentPage === 'today-quest' ? 'active' : ''}`}
             onClick={() => onNavigate('today-quest')}
           >
@@ -55,6 +45,16 @@ function Navigation({ currentPage, onNavigate, onOpenSettings, questBadgeCount =
             ) : (
               <span className="nav-quest-badge completed">✓</span>
             )}
+          </button>
+
+          <button
+            className={`nav-item ${currentPage === 'library' ? 'active' : ''}`}
+            onClick={() => onNavigate('library')}
+          >
+            <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+            </svg>
+            <span>도서관</span>
           </button>
 
           <button

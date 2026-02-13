@@ -10,6 +10,22 @@ const getApiBase = () => {
 
 export const API_BASE = getApiBase();
 
+export const wakeUpServer = async () => {
+  try {
+    // 타임아웃 5초 설정 (너무 오래 걸리지 않도록)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    
+    await fetch(`${API_BASE}/health`, { 
+        method: 'GET',
+        signal: controller.signal
+    });
+    clearTimeout(timeoutId);
+  } catch (err) {
+    // Ignore errors, just trying to wake up
+  }
+};
+
 export const fetchBooks = async (difficulty = null) => {
   const url = difficulty ? `${API_BASE}/books?difficulty=${difficulty}` : `${API_BASE}/books`;
   const response = await fetch(url);

@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-02-13 - 크로스 디바이스 동기화 버그 수정 + 로컬 서버 설정 수정
+
+### 버그 수정
+
+- **오늘의 미션 크로스 디바이스 동기화 실패 수정**: `mergeTodayQuestData()` 데이터 구조 불일치 해결
+  - 원인: `useTodayQuest`는 `{ version, quests: { "날짜": {...} } }` 구조로 저장하지만, merge 함수는 flat 구조(`{ "날짜": {...} }`)를 기대
+  - `Object.entries(imported)`가 `version`, `quests` 키를 날짜로 잘못 처리하여 병합 실패
+  - 수정: `quests` 내부 객체를 올바르게 추출하여 병합 후 `{ version, quests }` 구조로 반환
+  - 수정 파일: `src/hooks/useDataManager.js`
+- **Vite 프록시 포트 불일치 수정**: `vite.config.js`에서 프록시 대상 포트 `8000` → `8001`로 수정
+  - 로컬 개발 시 `/api` 요청이 백엔드에 도달하지 못하던 문제 해결
+  - 수정 파일: `vite.config.js`
+- **백엔드 import 오류 수정**: `main.py`에서 존재하지 않는 라우터 모듈 import 제거
+  - `from backend.routers import chat, archaic_words, statistics, badges` → 실제 존재하는 라우터로 복원
+  - 수정 파일: `backend/main.py`
+
+---
+
 ## 2026-02-13 - 영웅 대화 기능 버그 수정 (DailyChat + TalkToHero)
 
 ### UI 개선
@@ -30,6 +48,13 @@
 - **InsightReport.jsx**: 메시지 role 필터 불일치 수정
   - `m.role === 'assistant'` → `m.role === 'hero'` (3곳)
   - 대화 리포트에서 영웅 메시지가 0건으로 표시되던 문제 해결
+- **SpeakingMode.jsx**: 린트 에러 수정
+  - 미사용 변수 `e` (catch block) 제거
+  - 미사용 props `onBack` 제거
+- **ChatInterface.jsx**: "계속 대화하기" 버튼 무한 루프 수정
+  - 시나리오 완료 로직(`scenarioCompleted`)과 모달 UI 상태(`showCompletionModal`) 분리
+- **App.jsx**: Render 초기 로딩(Cold Start) 개선
+  - 앱 실행 시 백엔드 `/health` 엔드포인트 호출하여 서버 깨우기 (`wakeUpServer`)
 
 ### 수정 파일
 
@@ -38,6 +63,10 @@
 - `src/components/TodayQuest/DailyChat.jsx`
 - `src/components/TalkToHero/ChatInput.jsx`
 - `src/components/TalkToHero/InsightReport.jsx`
+- `src/components/SpeakingMode/SpeakingMode.jsx`
+- `src/components/TalkToHero/ChatInterface.jsx`
+- `src/App.jsx`
+- `src/api/index.js`
 
 ---
 

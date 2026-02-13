@@ -12,7 +12,7 @@ import PracticeSummary from './PracticeSummary';
 import MotivationPanel from './MotivationPanel';
 import './SpeakingMode.css';
 
-const SpeakingMode = ({ book, onBack, onSwitchToReading, onWordSelect }) => {
+const SpeakingMode = ({ book, onSwitchToReading, onWordSelect }) => {
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
   const [sentences, setSentences] = useState([]);
@@ -406,7 +406,7 @@ Format your response as JSON:
           } else {
             throw new Error('JSON format not found');
           }
-        } catch (e) {
+        } catch {
           // JSON 파싱 실패 시 간단한 번역만 저장
           setWordDetails(prev => ({
             ...prev,

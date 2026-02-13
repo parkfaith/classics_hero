@@ -12,6 +12,7 @@ const ChatInterface = ({ hero, scenario = null, onBack, questMode = false, onQue
   const [showReport, setShowReport] = useState(false);
   const [autoTTS, setAutoTTS] = useState(true);
   const [scenarioCompleted, setScenarioCompleted] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [conversationEnded, setConversationEnded] = useState(false);
   const { messages, isLoading, error, sendMessage, initializeChat, endConversation } = useHeroChat(hero, scenario);
   const messagesEndRef = useRef(null);
@@ -100,7 +101,11 @@ const ChatInterface = ({ hero, scenario = null, onBack, questMode = false, onQue
     };
 
     if (checkCompletion()) {
-      setScenarioCompleted(true);
+      // 상태 업데이트를 다음 틱으로 미뤄 warning 방지
+      setTimeout(() => {
+        setScenarioCompleted(true);
+        setShowCompletionModal(true);
+      }, 0);
       // 배지를 localStorage에 저장
       const badges = JSON.parse(localStorage.getItem('earned-badges') || '[]');
       const badgeId = `${hero.id}_${scenario.id}`;
@@ -282,8 +287,8 @@ const ChatInterface = ({ hero, scenario = null, onBack, questMode = false, onQue
         />
       )}
 
-      {scenarioCompleted && scenario && (
-        <div className="badge-modal-overlay" onClick={() => setScenarioCompleted(false)}>
+      {showCompletionModal && scenario && (
+        <div className="badge-modal-overlay" onClick={() => setShowCompletionModal(false)}>
           <div className="badge-modal" onClick={(e) => e.stopPropagation()}>
             <div className="badge-celebration">🎉</div>
             <div className="badge-icon-large">{scenario.badge.icon}</div>
@@ -300,7 +305,7 @@ const ChatInterface = ({ hero, scenario = null, onBack, questMode = false, onQue
                 ))}
               </ul>
             </div>
-            <button className="badge-close-btn" onClick={() => setScenarioCompleted(false)}>
+            <button className="badge-close-btn" onClick={() => setShowCompletionModal(false)}>
               계속 대화하기
             </button>
           </div>

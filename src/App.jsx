@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { wakeUpServer } from './api';
 import SplashScreen from './components/SplashScreen/SplashScreen';
 import BrowserCheck from './components/BrowserCheck/BrowserCheck';
 import Navigation from './components/Navigation/Navigation';
@@ -46,6 +47,9 @@ function App() {
       localStorage.setItem('learning-data-version', String(LEARNING_DATA_VERSION));
       console.log('학습 데이터가 새 형식으로 초기화되었습니다.');
     }
+
+    // 서버 깨우기 (Render Free Tier Cold Start 방지)
+    wakeUpServer();
   }, []);
 
   const [selectedBook, setSelectedBook] = useState(null);

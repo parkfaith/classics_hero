@@ -348,18 +348,22 @@ export const mergeStreakData = (current, imported) => {
 };
 
 export const mergeTodayQuestData = (current, imported) => {
-  const merged = { ...current };
-  if (imported) {
-    Object.entries(imported).forEach(([dateKey, questData]) => {
+  // { version, quests: { "2026-02-13": { reading, speaking, chat } } } 구조 처리
+  const currentQuests = current?.quests || current || {};
+  const importedQuests = imported?.quests || imported || {};
+
+  const merged = { ...currentQuests };
+  if (importedQuests && typeof importedQuests === 'object') {
+    Object.entries(importedQuests).forEach(([dateKey, questData]) => {
       if (!merged[dateKey]) {
         merged[dateKey] = questData;
-      } else {
+      } else if (typeof questData === 'object' && questData !== null) {
         // completed=true가 우선
         const mergedQuest = { ...merged[dateKey] };
         Object.entries(questData).forEach(([questId, quest]) => {
           if (!mergedQuest[questId]) {
             mergedQuest[questId] = quest;
-          } else if (quest.completed && !mergedQuest[questId].completed) {
+          } else if (quest?.completed && !mergedQuest[questId]?.completed) {
             mergedQuest[questId] = quest;
           }
         });
@@ -367,7 +371,10 @@ export const mergeTodayQuestData = (current, imported) => {
       }
     });
   }
-  return merged;
+  return {
+    version: imported?.version || current?.version || '1.0.0',
+    quests: merged
+  };
 };
 
 // ==================== 유틸리티 함수 ====================
