@@ -377,6 +377,93 @@ export const mergeTodayQuestData = (current, imported) => {
   };
 };
 
+// 챕터별 학습 진행 병합 (learning-progress)
+export const mergeLearningProgress = (current, imported) => {
+  const merged = { ...current };
+  if (imported) {
+    Object.entries(imported).forEach(([bookId, bookData]) => {
+      if (!merged[bookId]) {
+        merged[bookId] = bookData;
+      } else {
+        // 챕터별 completed=true 우선
+        const mergedChapters = { ...merged[bookId].chapters };
+        if (bookData.chapters) {
+          Object.entries(bookData.chapters).forEach(([chapterId, ch]) => {
+            if (!mergedChapters[chapterId]) {
+              mergedChapters[chapterId] = ch;
+            } else {
+              mergedChapters[chapterId] = {
+                ...mergedChapters[chapterId],
+                readingCompleted: mergedChapters[chapterId].readingCompleted || ch.readingCompleted,
+                speakingCompleted: mergedChapters[chapterId].speakingCompleted || ch.speakingCompleted,
+                readingCompletedAt: mergedChapters[chapterId].readingCompletedAt || ch.readingCompletedAt,
+                speakingCompletedAt: mergedChapters[chapterId].speakingCompletedAt || ch.speakingCompletedAt,
+              };
+            }
+          });
+        }
+        // 더 최근의 lastAccessedAt 사용
+        const lastAccessed = [merged[bookId].lastAccessedAt, bookData.lastAccessedAt]
+          .filter(Boolean).sort().pop();
+        merged[bookId] = {
+          ...merged[bookId],
+          ...bookData,
+          chapters: mergedChapters,
+          lastAccessedAt: lastAccessed,
+        };
+      }
+    });
+  }
+  return merged;
+};
+
+// 책별 읽기 진행률 병합 (progress-{bookId})
+export const mergeReadingProgress = (current, imported) => {
+  const merged = { ...current };
+  if (imported) {
+    Object.entries(imported).forEach(([bookId, progress]) => {
+      if (!merged[bookId]) {
+        merged[bookId] = progress;
+      } else {
+        // 더 높은 진행률 유지
+        const currentPct = merged[bookId].completionPercentage || 0;
+        const importedPct = progress.completionPercentage || 0;
+        if (importedPct > currentPct) {
+          merged[bookId] = progress;
+        } else if (importedPct === currentPct && progress.lastReadDate > (merged[bookId].lastReadDate || '')) {
+          merged[bookId] = progress;
+        }
+      }
+    });
+  }
+  return merged;
+};
+
+// 북마크 병합 (bookmarks-{bookId}) — 합집합
+export const mergeBookmarks = (current, imported) => {
+  const merged = { ...current };
+  if (imported) {
+    Object.entries(imported).forEach(([bookId, marks]) => {
+      if (!merged[bookId]) {
+        merged[bookId] = marks;
+      } else if (Array.isArray(marks) && Array.isArray(merged[bookId])) {
+        // 북마크 배열의 합집합 (chapterIndex 기준 중복 제거)
+        const existing = new Set(merged[bookId].map(b => `${b.chapterIndex}-${b.paragraphIndex}`));
+        const combined = [...merged[bookId]];
+        marks.forEach(mark => {
+          const key = `${mark.chapterIndex}-${mark.paragraphIndex}`;
+          if (!existing.has(key)) {
+            combined.push(mark);
+            existing.add(key);
+          }
+        });
+        merged[bookId] = combined;
+      }
+    });
+  }
+  return merged;
+};
+
 // ==================== 유틸리티 함수 ====================
 
 // 안전한 localStorage 읽기

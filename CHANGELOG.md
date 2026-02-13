@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-02-13 - 도서관 데이터 크로스 디바이스 동기화 추가
+
+### 신규 기능
+
+- **도서관 학습 데이터 동기화 추가**: 챕터별 학습 완료, 읽기 진행률, 북마크를 크로스 디바이스 동기화 대상에 포함
+  - `learning-progress`: 챕터별 읽기/말하기 완료 상태 (completed=true 우선 병합)
+  - `progress-{bookId}`: 책별 읽기 진행률 (더 높은 진행률 유지)
+  - `bookmarks-{bookId}`: 책별 북마크 (합집합 병합)
+  - 동적 키(`progress-*`, `bookmarks-*`)를 프리픽스 기반으로 수집/저장
+  - 수정 파일: `src/hooks/useSyncManager.js`, `src/hooks/useDataManager.js`, `backend/routers/sync.py`
+
+---
+
 ## 2026-02-13 - 크로스 디바이스 동기화 버그 수정 + 로컬 서버 설정 수정
 
 ### 버그 수정

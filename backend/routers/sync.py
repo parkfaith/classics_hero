@@ -17,6 +17,9 @@ class SyncData(BaseModel):
     streakData: Optional[dict] = None
     badges: Optional[dict] = None
     todayQuestData: Optional[dict] = None
+    learningProgress: Optional[dict] = None
+    readingProgress: Optional[dict] = None
+    bookmarks: Optional[dict] = None
 
 
 class SyncResponse(BaseModel):

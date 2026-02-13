@@ -6,6 +6,9 @@ import {
   mergeStatisticsData,
   mergeStreakData,
   mergeTodayQuestData,
+  mergeLearningProgress,
+  mergeReadingProgress,
+  mergeBookmarks,
 } from './useDataManager';
 
 const STORAGE_KEYS = {
@@ -14,10 +17,19 @@ const STORAGE_KEYS = {
   statistics: 'user_statistics',
   streak: 'streak_data',
   todayQuest: 'today_quest_data',
+  learningProgress: 'learning-progress',
 };
 
-// 동기화 대상 키 목록
+// 동기화 대상 키 목록 (정적 키)
 const SYNC_KEYS = new Set(Object.values(STORAGE_KEYS));
+
+// 동적 키 프리픽스 (progress-{bookId}, bookmarks-{bookId})
+const SYNC_KEY_PREFIXES = ['progress-', 'bookmarks-'];
+
+const isSyncTarget = (key) => {
+  if (SYNC_KEYS.has(key)) return true;
+  return SYNC_KEY_PREFIXES.some(prefix => key.startsWith(prefix));
+};
 
 const DEBOUNCE_MS = 2000;
 
@@ -28,6 +40,22 @@ const safeGetItem = (key) => {
   } catch {
     return null;
   }
+};
+
+// localStorage에서 프리픽스로 시작하는 모든 키의 데이터를 수집
+const collectPrefixedItems = (prefix) => {
+  const result = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key.startsWith(prefix)) {
+      const id = key.slice(prefix.length);
+      const value = safeGetItem(key);
+      if (value !== null) {
+        result[id] = value;
+      }
+    }
+  }
+  return result;
 };
 
 export const useSyncManager = ({ isLoggedIn, getToken }) => {
@@ -46,6 +74,9 @@ export const useSyncManager = ({ isLoggedIn, getToken }) => {
       streakData: safeGetItem(STORAGE_KEYS.streak),
       badges: safeGetItem(STORAGE_KEYS.badges),
       todayQuestData: safeGetItem(STORAGE_KEYS.todayQuest),
+      learningProgress: safeGetItem(STORAGE_KEYS.learningProgress),
+      readingProgress: collectPrefixedItems('progress-'),
+      bookmarks: collectPrefixedItems('bookmarks-'),
     };
   }, []);
 
@@ -56,6 +87,17 @@ export const useSyncManager = ({ isLoggedIn, getToken }) => {
     if (data.streakData) localStorage.setItem(STORAGE_KEYS.streak, JSON.stringify(data.streakData));
     if (data.badges) localStorage.setItem(STORAGE_KEYS.badges, JSON.stringify(data.badges));
     if (data.todayQuestData) localStorage.setItem(STORAGE_KEYS.todayQuest, JSON.stringify(data.todayQuestData));
+    if (data.learningProgress) localStorage.setItem(STORAGE_KEYS.learningProgress, JSON.stringify(data.learningProgress));
+    if (data.readingProgress) {
+      Object.entries(data.readingProgress).forEach(([bookId, progress]) => {
+        localStorage.setItem(`progress-${bookId}`, JSON.stringify(progress));
+      });
+    }
+    if (data.bookmarks) {
+      Object.entries(data.bookmarks).forEach(([bookId, marks]) => {
+        localStorage.setItem(`bookmarks-${bookId}`, JSON.stringify(marks));
+      });
+    }
   }, []);
 
   // 로컬 + 서버 데이터 병합
@@ -67,6 +109,9 @@ export const useSyncManager = ({ isLoggedIn, getToken }) => {
       streakData: mergeStreakData(local.streakData || {}, server.streakData || {}),
       badges: mergeBadgesData(local.badges || { badges: {} }, server.badges || { badges: {} }),
       todayQuestData: mergeTodayQuestData(local.todayQuestData || {}, server.todayQuestData || {}),
+      learningProgress: mergeLearningProgress(local.learningProgress || {}, server.learningProgress || {}),
+      readingProgress: mergeReadingProgress(local.readingProgress || {}, server.readingProgress || {}),
+      bookmarks: mergeBookmarks(local.bookmarks || {}, server.bookmarks || {}),
     };
   }, []);
 
@@ -135,8 +180,8 @@ export const useSyncManager = ({ isLoggedIn, getToken }) => {
   // storage-sync 이벤트 리스너 (데이터 변경 감지)
   useEffect(() => {
     const handler = (e) => {
-      // 동기화 대상 키에 대해서만 push
-      if (e.detail?.key && SYNC_KEYS.has(e.detail.key)) {
+      // 동기화 대상 키에 대해서만 push (정적 키 + 동적 프리픽스)
+      if (e.detail?.key && isSyncTarget(e.detail.key)) {
         pushDebounced();
       }
     };
