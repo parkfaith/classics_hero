@@ -132,7 +132,7 @@ export const useTodayQuest = () => {
   // 오늘의 명언 선택
   const selectTodayQuote = useCallback((hero) => {
     if (!hero) return null;
-    let quotes = hero.quotes;
+    let quotes = hero.profile?.quotes;
     if (typeof quotes === 'string') {
       try { quotes = JSON.parse(quotes); } catch { return null; }
     }
@@ -216,7 +216,7 @@ export const useTodayQuest = () => {
   // 오늘의 대화 주제 선택
   const selectTodayTopic = useCallback((hero) => {
     if (!hero) return null;
-    let topics = hero.recommended_topics;
+    let topics = hero.recommendedTopics;
     if (typeof topics === 'string') {
       try { topics = JSON.parse(topics); } catch { return null; }
     }

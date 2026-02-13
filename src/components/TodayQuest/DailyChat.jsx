@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import ChatInterface from '../TalkToHero/ChatInterface';
 import './DailyChat.css';
 
@@ -13,6 +13,23 @@ const DailyChat = ({ hero, topic, completed, messageCount, onComplete, onUpdateP
   const [chatStarted, setChatStarted] = useState(false);
   const [currentMessageCount, setCurrentMessageCount] = useState(messageCount);
   const [questCompleted, setQuestCompleted] = useState(completed);
+
+  // topic을 scenario 형태로 변환하여 ChatInterface에 전달 (메모이제이션 필수)
+  const topicAsScenario = useMemo(() => {
+    if (!topic) return null;
+    const title = topic.titleKo || topic.title || '오늘의 대화';
+    return {
+      id: `daily_topic`,
+      titleKo: title,
+      initialMessage: topic.questions?.[0]
+        ? `Hello! I'd love to talk about "${title}". ${topic.questions[0]}`
+        : null,
+      systemPromptAddition: `Today's conversation topic: "${title}". ${topic.questions ? 'Suggested questions: ' + topic.questions.join(', ') : ''}. Guide the conversation naturally around this topic.`,
+      successCriteria: { minMessages: REQUIRED_MESSAGES, keyTopics: [] },
+      objectives: [],
+      badge: { icon: '💬', nameKo: '오늘의 대화' }
+    };
+  }, [topic]);
 
   // Quest 모드 메시지 카운트 콜백
   const handleQuestMessageCount = useCallback((count) => {
@@ -69,6 +86,7 @@ const DailyChat = ({ hero, topic, completed, messageCount, onComplete, onUpdateP
 
         <ChatInterface
           hero={hero}
+          scenario={topicAsScenario}
           onBack={handleBackFromChat}
           questMode={true}
           onQuestMessageCount={handleQuestMessageCount}

@@ -1,11 +1,5 @@
 import { useState, useCallback } from 'react';
-
-// 배포 환경: Render API URL, 로컬: Vite 프록시 사용
-const API_BASE = import.meta.env.VITE_API_URL || (
-  window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? '/api'
-    : 'https://classics-hero-api.onrender.com/api'
-);
+import { API_BASE } from '../api/index.js';
 
 export const useHeroChat = (hero, scenario = null) => {
   const [messages, setMessages] = useState([]);
@@ -18,19 +12,19 @@ export const useHeroChat = (hero, scenario = null) => {
   const enhancedSystemPrompt = `${basePrompt}${scenarioAddition}
 
 IMPORTANT GUIDELINES:
-- Keep responses SHORT and CONCISE (2-3 sentences max, under 50 words)
+- STRICTLY keep responses to 1-2 sentences (MAX 30 words). Never exceed this limit.
+- Write short, simple sentences. Split long thoughts into separate turns.
 - Be conversational and friendly, allowing small talk
 - If the user greets you casually or makes small talk, respond naturally and warmly
-- Ask follow-up questions to encourage dialogue
+- Ask ONE follow-up question to encourage dialogue
 - Use simple, clear English appropriate for language learners
 - Stay in character but be approachable
 
 GRAMMAR FEEDBACK (Important!):
-- If the user makes a grammar or usage error, gently correct it in your response
-- Use format: "By the way, instead of '[wrong]', you could say '[correct]'. [brief explanation]"
+- If the user makes a grammar or usage error, gently correct it BRIEFLY
+- Use format: "(Tip: '[wrong]' → '[correct]')"
 - Only correct 1 error per response to avoid overwhelming the learner
-- Be encouraging and positive when giving corrections
-- If the sentence is correct, occasionally praise their English`;
+- If the sentence is correct, occasionally praise briefly (e.g. "Great English!")`;
 
   // 초기 인사 메시지 생성
   const initializeChat = useCallback(async () => {
@@ -145,7 +139,7 @@ GRAMMAR FEEDBACK (Important!):
         body: JSON.stringify({
           messages: conversationMessages,
           temperature: 0.85,
-          max_tokens: 100
+          max_tokens: 60
         })
       });
 

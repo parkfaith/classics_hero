@@ -7,7 +7,7 @@ const InsightReport = ({ hero, messages, onClose }) => {
   // 대화 통계 계산
   const stats = useMemo(() => {
     const userMessages = messages.filter(m => m.role === 'user');
-    const heroMessages = messages.filter(m => m.role === 'assistant');
+    const heroMessages = messages.filter(m => m.role === 'hero');
 
     const totalUserWords = userMessages.reduce((acc, m) =>
       acc + m.content.split(/\s+/).filter(w => w.length > 0).length, 0);
@@ -59,7 +59,7 @@ const InsightReport = ({ hero, messages, onClose }) => {
 
   // 학습한 어휘 추출 (영웅 메시지에서 자주 사용된 단어)
   const vocabulary = useMemo(() => {
-    const heroMessages = messages.filter(m => m.role === 'assistant');
+    const heroMessages = messages.filter(m => m.role === 'hero');
     const allText = heroMessages.map(m => m.content).join(' ');
 
     // 고급 단어 패턴 (일반적이지 않은 단어들)

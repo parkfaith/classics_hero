@@ -1,5 +1,46 @@
 # Changelog
 
+## 2026-02-13 - 영웅 대화 기능 버그 수정 (DailyChat + TalkToHero)
+
+### UI 개선
+
+- **영웅 응답 길이 제한**: 대화 시 영웅 응답이 너무 길어지는 문제 해결
+  - 시스템 프롬프트: "1-2 sentences, MAX 30 words" 제한 강화
+  - `max_tokens`: 100 → 60으로 축소
+  - 문법 피드백 형식도 간결하게 변경 (`(Tip: 'wrong' → 'correct')`)
+  - Daily Chat, Talk to Hero 모두 적용
+- **DailyChat 무한 렌더링 수정**: `topicAsScenario`를 `useMemo`로 메모이제이션
+  - 기존: 매 렌더마다 새 객체 생성 → `initializeChat` 무한 재호출
+  - 수정: `topic` 변경 시에만 재생성
+
+### 버그 수정
+
+- **useHeroChat.js**: API_BASE 중복 정의 → `src/api/index.js`에서 import하도록 통일
+  - 배포 환경에서 API URL 불일치로 대화 API 호출 실패 가능성 해소
+- **useTodayQuest.js**: 프로퍼티명 불일치 수정
+  - `hero.recommended_topics` → `hero.recommendedTopics` (camelCase로 통일)
+  - `hero.quotes` → `hero.profile?.quotes` (API 응답 구조에 맞게 수정)
+  - 오늘의 대화 주제, 명언이 표시되지 않던 문제 해결
+- **DailyChat.jsx**: topic 정보를 ChatInterface에 scenario 형태로 전달
+  - 기존: topic을 받아도 ChatInterface에 전달하지 않음 → 주제 없이 대화 시작
+  - 수정: topic을 scenario 형태로 변환하여 영웅이 주제에 맞는 인사 메시지로 시작
+- **ChatInput.jsx**: questMode에서 키보드 입력 토글 버튼 허용
+  - 기존: questMode일 때 키보드 전환 불가 → STT 미지원 환경에서 입력 불가
+  - 수정: questMode에서도 키보드 전환 가능
+- **InsightReport.jsx**: 메시지 role 필터 불일치 수정
+  - `m.role === 'assistant'` → `m.role === 'hero'` (3곳)
+  - 대화 리포트에서 영웅 메시지가 0건으로 표시되던 문제 해결
+
+### 수정 파일
+
+- `src/hooks/useHeroChat.js`
+- `src/hooks/useTodayQuest.js`
+- `src/components/TodayQuest/DailyChat.jsx`
+- `src/components/TalkToHero/ChatInput.jsx`
+- `src/components/TalkToHero/InsightReport.jsx`
+
+---
+
 ## 2026-02-12 - Google 로그인 & 크로스 디바이스 동기화
 
 ### 신규 기능

@@ -99,16 +99,14 @@ const ChatInput = ({ onSendMessage, isLoading, isTTSSpeaking, onStopTTS, questMo
       {/* STT 중심 UI */}
       {!showTextInput ? (
         <div className="voice-input-mode">
-          {!questMode && (
-            <button
-              type="button"
-              className="keyboard-toggle-btn"
-              onClick={toggleTextInput}
-              title="키보드로 입력"
-            >
-              ⌨️
-            </button>
-          )}
+          <button
+            type="button"
+            className="keyboard-toggle-btn"
+            onClick={toggleTextInput}
+            title="키보드로 입력"
+          >
+            ⌨️
+          </button>
 
           <button
             type="button"
