@@ -9,6 +9,10 @@
   - `Object.entries(imported)`가 `version`, `quests` 키를 날짜로 잘못 처리하여 병합 실패
   - 수정: `quests` 내부 객체를 올바르게 추출하여 병합 후 `{ version, quests }` 구조로 반환
   - 수정 파일: `src/hooks/useDataManager.js`
+- **앱 로드 시 자동 동기화 추가**: 로그인 상태에서 앱을 열면 즉시 서버 데이터를 pull하여 병합
+  - 기존: `visibilitychange` 이벤트(백그라운드→포그라운드)에만 의존 → 앱을 새로 열면 동기화 안 됨
+  - 수정: `isLoggedIn` 상태 변경 시 자동으로 `syncNow()` 호출
+  - 수정 파일: `src/hooks/useSyncManager.js`
 - **Vite 프록시 포트 불일치 수정**: `vite.config.js`에서 프록시 대상 포트 `8000` → `8001`로 수정
   - 로컬 개발 시 `/api` 요청이 백엔드에 도달하지 못하던 문제 해결
   - 수정 파일: `vite.config.js`

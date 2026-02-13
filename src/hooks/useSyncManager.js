@@ -125,6 +125,13 @@ export const useSyncManager = ({ isLoggedIn, getToken }) => {
     }, DEBOUNCE_MS);
   }, [isLoggedIn, getToken, getLocalData]);
 
+  // 로그인 상태에서 앱 로드 시 자동 동기화
+  useEffect(() => {
+    if (isLoggedIn) {
+      syncNow();
+    }
+  }, [isLoggedIn]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // storage-sync 이벤트 리스너 (데이터 변경 감지)
   useEffect(() => {
     const handler = (e) => {
