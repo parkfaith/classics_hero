@@ -10,7 +10,6 @@ Claude Code를 위한 프로젝트 가이드
 - **학습 모드:** Reading, Speaking, Talk to Hero
 - AI 기반 발음 분석 및 역사적 인물과의 대화 기능
 - 음성 중심 UI (TTS/STT 기본 활성화)
-- **PWA 지원:** 모바일 홈화면 추가 가능
 
 ## Development Commands
 
@@ -76,14 +75,14 @@ classics_heros/
 │   │   ├── books.py         # /api/books
 │   │   ├── heroes.py        # /api/heroes
 │   │   ├── chapters.py      # /api/chapters
-│   │   └── words.py         # /api/words (고어 사전)
+│   │   ├── words.py         # /api/words (고어 사전)
+│   │   ├── vocabulary.py    # /api/vocabulary (챕터별 중요 단어/숙어)
+│   │   ├── auth.py          # /api/auth (Google OAuth)
+│   │   └── sync.py          # /api/sync (크로스 디바이스 동기화)
 │   └── data/
 │       └── classics.db      # SQLite DB 파일
 │
 ├── public/
-│   ├── manifest.json        # PWA 웹 앱 매니페스트
-│   ├── service-worker.js    # PWA Service Worker
-│   ├── ClassicHero.png      # 앱 아이콘 (512x512)
 │   └── heroes/              # 영웅 프로필 이미지 (지브리 스타일)
 │       ├── aesop.png
 │       ├── grimm.png
@@ -107,13 +106,6 @@ classics_heros/
 │   │   │   ├── ChatInput.jsx
 │   │   │   ├── MessageBubble.jsx
 │   │   │   └── InsightReport.jsx
-│   │   ├── BrowserCheck/    # Chrome 브라우저 체크
-│   │   │   ├── BrowserCheck.jsx
-│   │   │   └── BrowserCheck.css
-│   │   ├── InstallPrompt/   # PWA 홈화면 추가 안내
-│   │   │   ├── InstallPrompt.jsx
-│   │   │   └── InstallPrompt.css
-│   │   ├── SplashScreen/    # 스플래시 화면
 │   │   ├── Dictionary/      # 단어 사전
 │   │   └── ...
 │   └── hooks/               # 커스텀 훅
@@ -125,9 +117,6 @@ classics_heros/
 
 ```
 App.jsx (Mode Router)
-├── SplashScreen → 로딩 화면 (made by ParkJunHyoung)
-├── BrowserCheck → Chrome 브라우저 체크 (Android)
-├── InstallPrompt → PWA 홈화면 추가 안내 (자동 표시)
 ├── BookList → 도서관 (API: /api/books)
 ├── BookReader → 읽기 모드 (mode: 'reading')
 ├── SpeakingMode → 말하기 모드 (mode: 'speaking')
@@ -180,19 +169,58 @@ modern_meaning, modern_meaning_ko
 example_historical, example_modern, tip, tip_ko
 ```
 
+### chapter_vocabulary 테이블 (챕터별 중요 단어/숙어 - GPT 추출 결과 캐싱)
+```sql
+id, chapter_id (TEXT), word, definition
+example, phonetic (IPA 발음 기호), is_idiom (0/1)
+created_at
+UNIQUE(chapter_id, word)
+```
+
+### chapter_translations 테이블 (챕터별 번역 캐싱)
+```sql
+chapter_id (PK), translation, created_at
+```
+
+### sentence_translations 테이블 (문장 단위 번역 캐싱)
+```sql
+text_hash (PK), source_text, translated_text
+target_lang, created_at
+```
+
+### users 테이블 (Google OAuth 인증)
+```sql
+id, google_id (UNIQUE), email, name, picture
+created_at, last_login_at
+```
+
+### user_sync_data 테이블 (크로스 디바이스 동기화)
+```sql
+user_id (PK, FK → users), data (JSON)
+updated_at
+```
+
 ## API Endpoints
 
 ```
-GET  /api/books                    # 모든 책 (챕터 포함)
-GET  /api/books?difficulty=easy    # 난이도 필터
-GET  /api/books/{book_id}          # 특정 책 상세
-GET  /api/books/{book_id}/chapters # 책의 챕터 목록
+GET    /api/books                          # 모든 책 (챕터 포함)
+GET    /api/books?difficulty=easy          # 난이도 필터
+GET    /api/books/{book_id}                # 특정 책 상세
+GET    /api/books/{book_id}/chapters       # 책의 챕터 목록
 
-GET  /api/heroes                   # 모든 영웅
-GET  /api/heroes?difficulty=easy   # 난이도 필터
-GET  /api/heroes/{hero_id}         # 특정 영웅 상세
+GET    /api/heroes                         # 모든 영웅
+GET    /api/heroes?difficulty=easy         # 난이도 필터
+GET    /api/heroes/{hero_id}               # 특정 영웅 상세
 
-GET  /api/health                   # 헬스체크
+GET    /api/vocabulary/chapter/{id}        # 챕터 중요 단어/숙어 조회
+POST   /api/vocabulary/chapter/{id}        # 챕터 중요 단어/숙어 저장 (GPT 추출 결과)
+DELETE /api/vocabulary/chapter/{id}        # 챕터 단어 캐시 삭제
+
+POST   /api/auth/google                    # Google OAuth 로그인
+POST   /api/sync/upload                    # 학습 데이터 업로드 (크로스 디바이스)
+POST   /api/sync/download                  # 학습 데이터 다운로드
+
+GET    /api/health                         # 헬스체크
 ```
 
 ## Content (6명 영웅)
@@ -216,22 +244,9 @@ GET  /api/health                   # 헬스체크
 | `useTranslation` | OpenAI/MyMemory 번역 |
 | `usePronunciationAnalysis` | AI 발음 분석 |
 | `useReadingProgress` | 독서 진행률 (localStorage) |
+| `useVocabularyExtraction` | GPT 기반 중요 단어/숙어 자동 추출 (DB 캐싱) |
 
 ## Key Features
-
-### PWA (Progressive Web App)
-- **Chrome 브라우저 필수**: 모바일에서 Chrome이 아닌 브라우저 접속 시 Chrome 설치 안내
-  - **Android**: Chrome이 아닌 브라우저 접속 시 설치 안내 표시
-  - **iOS**: Safari는 STT(음성인식) 미지원으로 Chrome 권장 안내 표시
-  - STT/TTS 완벽 지원은 Chrome에서만 가능
-- **홈화면 추가**: 모바일 기기 홈화면에 앱 아이콘 추가 가능
-- **자동 설치 안내**: 앱 시작 3초 후 설치 프롬프트 자동 표시
-  - Android Chrome: 원클릭 설치 버튼
-  - iOS Safari: 단계별 설치 안내
-- **Service Worker**: 오프라인 지원 및 빠른 로딩
-- **Web App Manifest**: 앱 메타데이터 (이름, 아이콘, 테마 색상)
-- **설치 거부 시**: 7일간 프롬프트 미표시
-- **크레딧**: 스플래시 화면에 "made by ParkJunHyoung" 표시
 
 ### Talk to Hero (영웅과 대화)
 - 6명의 역사적 인물과 영어 대화
@@ -248,6 +263,12 @@ GET  /api/health                   # 헬스체크
 - 단어 선택 → 사전 모달
 - TTS로 원어민 발음 듣기
 - 챕터 진행률 추적, 북마크
+- **중요 단어/숙어 자동 추출**: GPT-4o-mini가 챕터에서 중요 어휘 추출
+  - 난이도별 추출 개수: easy(5개), medium(7개), advanced(10개)
+  - 본문에 노란색 하이라이트 표시
+  - IPA 발음 기호 제공 (단어만, 숙어는 제외)
+  - 하단에 '📚 중요 단어 & 숙어' 섹션으로 정의/예문 표시
+  - DB 캐싱으로 재방문 시 즉시 로드 (GPT 호출 없음)
 
 ### Speaking Mode
 - TTS로 원문 듣기 (속도 조절)
@@ -260,7 +281,12 @@ GET  /api/health                   # 헬스체크
 **Turso (Production) / SQLite (Development):**
 - 환경변수 `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` 설정 시 Turso 사용
 - 미설정 시 로컬 SQLite (`backend/data/classics.db`) 사용
-- 테이블: books, chapters, heroes, archaic_words, semantic_shifts
+- 테이블:
+  - books, chapters, heroes (기본 콘텐츠)
+  - archaic_words, semantic_shifts (고어/의미변화 사전)
+  - chapter_vocabulary (챕터별 중요 단어/숙어 캐싱)
+  - chapter_translations, sentence_translations (번역 캐싱)
+  - users, user_sync_data (Google OAuth + 크로스 디바이스 동기화)
 
 **localStorage:**
 - `openai_api_key` - OpenAI API 키
@@ -273,6 +299,7 @@ GET  /api/health                   # 헬스체크
 - Talk to Hero 대화
 - 발음 분석 및 피드백
 - 번역 (우선)
+- 중요 단어/숙어 자동 추출
 
 **MyMemory Translation API:**
 - 번역 Fallback (무료)
@@ -289,8 +316,10 @@ GET  /api/health                   # 헬스체크
 **Backend:**
 - Python 3.x
 - FastAPI
-- SQLite
+- SQLite / Turso (libsql-client)
 - Pydantic
+- google-auth (Google OAuth 인증)
+- PyJWT (JWT 토큰)
 
 **Frontend:**
 - React 19
@@ -346,11 +375,6 @@ TalkToHero.jsx
         └── tts-status        # TTS 재생 중 표시
 ```
 
-## 작업 규칙
-
-- **CHANGELOG.md 필수 업데이트**: 코드 수정 후 반드시 `CHANGELOG.md`에 변경 내용을 기록할 것
-  - 날짜, 변경 카테고리(신규 기능/UI 개선/버그 수정 등), 상세 내용, 수정 파일 목록 포함
-
 ## Notes
 
 - 백엔드 포트: `8001` (vite.config.js에서 프록시 설정)
@@ -359,15 +383,3 @@ TalkToHero.jsx
 - OpenAI API 키 필요 (Talk to Hero, 발음 분석)
 - 영웅 프로필 이미지는 `public/heroes/` 폴더에 저장
 - TTS/STT는 브라우저 Web Speech API 사용 (Chrome 권장)
-- **PWA**: 모바일 홈화면 추가 가능
-  - **Chrome 필수**: 모바일에서 Chrome 브라우저 필수 (자동 안내)
-    - Android: Chrome 외 브라우저에서 설치 안내
-    - iOS: Safari는 STT 미지원으로 Chrome 권장
-  - Android Chrome: 자동 설치 프롬프트
-  - iOS Chrome: 더보기 메뉴 > "홈 화면에 추가"
-  - Service Worker로 오프라인 지원
-  - 설치 거부 시 7일간 미표시
-- **브라우저 호환성**:
-  - TTS (읽어주기): Chrome, Safari, Firefox, Edge 모두 지원
-  - STT (음성인식): Chrome, Edge만 지원 (Safari, Firefox 미지원)
-- **크레딧**: 스플래시 화면 하단에 "made by ParkJunHyoung" 표시

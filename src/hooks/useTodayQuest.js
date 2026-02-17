@@ -4,6 +4,7 @@ import { safeSetItem } from './useDataManager';
 const STORAGE_KEY = 'today_quest_data';
 const VERSION = '1.0.0';
 const MAX_DAYS = 30; // 최대 30일치 데이터 보관
+const QUEST_UPDATE_EVENT = 'quest-data-updated'; // 크로스 인스턴스 동기화 이벤트
 
 // 날짜 유틸리티
 const getToday = () => new Date().toISOString().split('T')[0];
@@ -91,6 +92,15 @@ export const useTodayQuest = () => {
     setIsLoaded(true);
   }, []);
 
+  // 다른 훅 인스턴스에서 발생한 변경 감지 (App.jsx ↔ TodayQuest.jsx 동기화)
+  useEffect(() => {
+    const handleQuestUpdate = (e) => {
+      setQuestData(e.detail);
+    };
+    window.addEventListener(QUEST_UPDATE_EVENT, handleQuestUpdate);
+    return () => window.removeEventListener(QUEST_UPDATE_EVENT, handleQuestUpdate);
+  }, []);
+
   // 30일 이전 데이터 자동 정리
   useEffect(() => {
     if (!isLoaded) return;
@@ -106,13 +116,15 @@ export const useTodayQuest = () => {
     }
   }, [isLoaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 저장
+  // 저장 (다른 훅 인스턴스에 변경 알림)
   const saveQuestData = useCallback((data) => {
     setQuestData(data);
     const result = safeSetItem(STORAGE_KEY, data);
     if (!result.success) {
       console.error('퀘스트 데이터 저장 실패:', result.message);
     }
+    // 같은 탭 내 다른 useTodayQuest 인스턴스에 변경 알림
+    window.dispatchEvent(new CustomEvent(QUEST_UPDATE_EVENT, { detail: data }));
   }, []);
 
   // 오늘 퀘스트 데이터 가져오기 (없으면 초기화)

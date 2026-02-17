@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { safeSetItem } from './useDataManager';
 
 export const useReadingProgress = (bookId) => {
   const [progress, setProgress] = useState({
@@ -22,7 +23,7 @@ export const useReadingProgress = (bookId) => {
     };
 
     setProgress(newProgress);
-    localStorage.setItem(`progress-${bookId}`, JSON.stringify(newProgress));
+    safeSetItem(`progress-${bookId}`, newProgress);
   };
 
   const resetProgress = () => {

@@ -4,6 +4,7 @@ import { useLearningProgress } from '../../hooks/useLearningProgress';
 import { useVocabularyExtraction } from '../../hooks/useVocabularyExtraction';
 import { useProgress } from '../../hooks/useProgress';
 import { useStatistics } from '../../hooks/useStatistics';
+import { safeSetItem } from '../../hooks/useDataManager';
 import './BookReader.css';
 
 // 기본 책 아이콘 컴포넌트
@@ -104,7 +105,7 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
       bookProgress.lastChapterIndex = currentChapterIndex;
       bookProgress.lastAccessedAt = new Date().toISOString();
       allProgress[book.id] = bookProgress;
-      localStorage.setItem('learning-progress', JSON.stringify(allProgress));
+      safeSetItem('learning-progress', allProgress);
     }
     // 새 훅에도 챕터 인덱스 저장
     setShowTranslation(false);
@@ -174,7 +175,7 @@ const BookReader = ({ book, onBack, onWordSelect, onSwitchToSpeaking }) => {
 
   const saveBookmarks = (newBookmarks) => {
     setBookmarks(newBookmarks);
-    localStorage.setItem(`bookmarks-${book.id}`, JSON.stringify(newBookmarks));
+    safeSetItem(`bookmarks-${book.id}`, newBookmarks);
   };
 
   const toggleBookmark = () => {

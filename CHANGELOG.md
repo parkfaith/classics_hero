@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-02-14 - 미션 완료 시 네비게이션 배지 실시간 업데이트 + 도서관 크로스 디바이스 동기화 수정
+
+### 버그 수정
+
+- **오늘의 미션 완료 시 상단 네비게이션 배지가 즉시 반영되지 않던 문제 수정**
+  - 원인: `App.jsx`와 `TodayQuest.jsx`가 각각 `useTodayQuest()` 훅의 별도 인스턴스를 사용하여 state가 독립적으로 관리됨. `TodayQuest`에서 미션을 완료해도 `App.jsx`의 state는 갱신되지 않아 Navigation 배지 카운트가 업데이트 안 됨
+  - 수정: `useTodayQuest` 훅에 커스텀 이벤트(`quest-data-updated`) 기반 크로스 인스턴스 동기화 추가. 데이터 저장 시 이벤트 발행, 다른 인스턴스가 이벤트를 수신하여 state 동기화
+  - 수정 파일: `src/hooks/useTodayQuest.js`
+
+- **도서관 학습 진행률/북마크가 크로스 디바이스 동기화되지 않던 문제 수정**
+  - 원인: `useLearningProgress.js`, `BookReader.jsx`, `useReadingProgress.js`에서 `localStorage.setItem()`을 직접 호출하여 `storage-sync` 이벤트가 발생하지 않음. 동기화 매니저가 데이터 변경을 감지하지 못해 서버에 push되지 않음
+  - 수정: 3개 파일의 모든 `localStorage.setItem()` 호출을 `safeSetItem()`으로 교체하여 `storage-sync` 이벤트 발생 → 동기화 매니저가 변경 감지 → 2초 디바운스 후 서버 push
+  - 영향 키: `learning-progress`, `progress-{bookId}`, `bookmarks-{bookId}`
+  - 수정 파일: `src/hooks/useLearningProgress.js`, `src/hooks/useReadingProgress.js`, `src/components/BookReader/BookReader.jsx`
+
+---
+
 ## 2026-02-13 - 도서관 데이터 크로스 디바이스 동기화 추가
 
 ### 신규 기능

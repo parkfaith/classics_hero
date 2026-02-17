@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { safeSetItem } from './useDataManager';
 
 // 학습 진행 상황을 관리하는 훅
 export const useLearningProgress = () => {
@@ -12,10 +13,10 @@ export const useLearningProgress = () => {
     }
   }, []);
 
-  // localStorage에 저장
+  // localStorage에 저장 (safeSetItem으로 동기화 이벤트 발생)
   const saveProgress = useCallback((newProgress) => {
     setAllProgress(newProgress);
-    localStorage.setItem('learning-progress', JSON.stringify(newProgress));
+    safeSetItem('learning-progress', newProgress);
   }, []);
 
   // 책의 학습 진행 상황 가져오기
